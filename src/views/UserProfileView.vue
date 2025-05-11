@@ -1,9 +1,9 @@
 <template>
-  <h1>Index</h1>
+    <h1>Perfil de usuario</h1>
 </template>
 
 <script setup>
 </script>
 
-<style scoped> 
+<style scoepd>
 </style>

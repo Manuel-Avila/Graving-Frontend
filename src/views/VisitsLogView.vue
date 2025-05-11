@@ -1,9 +1,9 @@
 <template>
-  <h1>Index</h1>
+    <h1>Historial de visitas</h1>
 </template>
 
 <script setup>
 </script>
 
-<style scoped> 
+<style scoepd>
 </style>
