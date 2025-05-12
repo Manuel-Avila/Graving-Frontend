@@ -1,19 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import LoginView from '@/views/LoginView.vue'
-import RegisterView from '@/views/RegisterView.vue'
-import UserProfileView from '@/views/UserProfileView.vue'
-import EditUserProfileView from '@/views/EditUserProfileView.vue'
-import VisitsLogView from '@/views/VisitsLogView.vue'
-import MapView from '@/views/MapView.vue'
-import DeceasedDetailView from '@/views/DeceasedDetailView.vue'
-import RegisterVisitView from '@/views/RegisterVisitView.vue'
-import AdminDashboardView from '@/views/AdminDashboardView.vue'
-import DeceasedAdministrationView from '@/views/DeceasedAdministrationView.vue'
-import RegisterDeceasedView from '@/views/RegisterDeceasedView.vue'
-import OwnersAdministrationView from '@/views/OwnersAdministrationView.vue'
-import GravesAdministrationView from '@/views/GravesAdministrationView.vue'
-import SystemLogView from '@/views/SystemLogView.vue'
+import LoginView from '@/views/users/LoginView.vue'
+import UserRegisterView from '@/views/users/UserRegisterView.vue'
+import UserProfileView from '@/views/users/UserProfileView.vue'
+import EditUserProfileView from '@/views/users/EditUserProfileView.vue'
+import VisitsLogView from '@/views/visits/VisitsLogView.vue'
+import MapView from '@/views/map/MapView.vue'
+import DeceasedDetailView from '@/views/deceased/DeceasedDetailView.vue'
+import RegisterVisitView from '@/views/visits/RegisterVisitView.vue'
+import AdminDashboardView from '@/views/admin/AdminDashboardView.vue'
+import DeceasedAdministrationView from '@/views/admin/DeceasedAdministrationView.vue'
+import RegisterDeceasedView from '@/views/deceased/RegisterDeceasedView.vue'
+import OwnersAdministrationView from '@/views/admin/OwnersAdministrationView.vue'
+import GravesAdministrationView from '@/views/admin/GravesAdministrationView.vue'
+import SystemLogView from '@/views/admin/SystemLogView.vue'
 
 const routes = [
   {
@@ -29,7 +29,7 @@ const routes = [
   {
     path: '/register',
     name: 'register',
-    component: RegisterView
+    component: UserRegisterView
   },
   {
     path: '/profile',

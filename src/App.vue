@@ -1,6 +1,59 @@
 <template>
-  <router-view/>
+  <div class="layout">
+    <AppHeader v-if="showLayout"/>
+    <main>
+      <router-view/>
+    </main>
+    <AppFooter v-if="showLayout"/>
+  </div>
 </template>
 
+<script setup>
+  import { useRoute } from 'vue-router'
+  import { computed } from 'vue'
+
+  import AppHeader from './components/layout/AppHeader.vue'
+  import AppFooter from './components/layout/AppFooter.vue'
+
+   const route = useRoute()
+   const noLayoutRoutes = ['login', 'register']
+
+   const showLayout = computed(() => !noLayoutRoutes.includes(route.name))
+</script>
+
 <style>
+  :root {
+    --background-color: #f5f5f7;
+    --font-color: #1f1f20;
+  }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--font-color);
+  }
+
+  body, p, span, li, a, input, textarea {
+    font-family: 'Lato', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+  }
+
+  main {
+    flex: 1;
+  }
+
+  .layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .container-background {
+    background-color: white;
+  }
 </style>
