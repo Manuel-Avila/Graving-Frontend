@@ -7,6 +7,11 @@
             <h1>Graving</h1>
         </div>
 
+        <button class="hamburguer-icon" @click="toggleMenu">
+            <span v-if="!isMenuOpen">☰</span>
+            <span v-else>×</span>
+        </button>
+
         <nav class="navegation-bar">
             <router-link v-if="admin" :to="{name: 'dashboard'}" :class="{'current-page': currentPage==='dashboard'}">Panel</router-link>
             <router-link :to="{name: 'home'}" :class="{'current-page': currentPage==='home'}">Inicio</router-link>
@@ -21,17 +26,37 @@
                 </div>
             </div>
         </nav>
+
+        <Transition name="slide-down">
+            <nav v-if="isMenuOpen" class="navegation-bar-mobile">
+                <router-link v-if="admin" :to="{ name: 'dashboard' }" @click="closeMenu">Panel</router-link>
+                <router-link :to="{ name: 'home' }" @click="closeMenu">Inicio</router-link>
+                <router-link :to="{ name: 'map' }" @click="closeMenu">Mapa</router-link>
+                <router-link :to="{ name: 'profile' }" @click="closeMenu">Iniciar Sesión</router-link>
+                <router-link :to="{ name: 'profile' }" @click="closeMenu">Registrarse</router-link>
+                <router-link :to="{ name: 'profile' }" @click="closeMenu">Ver Perfil</router-link>
+            </nav>
+        </Transition>
     </header>
 </template>
 
 <script setup>
     import { useRoute } from 'vue-router'
-    import { computed } from 'vue'
+    import { ref, computed } from 'vue'
 
     const route = useRoute()
     const currentPage = computed(() => route.name)
-
     const admin = true
+
+    const isMenuOpen = ref(false)
+
+    const toggleMenu = () => {
+        isMenuOpen.value = !isMenuOpen.value
+    }
+
+    const closeMenu = () => {
+        isMenuOpen.value = false
+    }
 </script>
 
 <style scoped>
@@ -39,6 +64,7 @@
         display: flex;
         justify-content: space-around;
         box-shadow: 2px 2px 8px var(--shadow-color);
+        position: relative;
     }
 
     .logo-div {
@@ -91,11 +117,14 @@
     }
 
     .dropdown-menu {
-        display: none;
+        visibility: hidden;
         position: absolute;
         top: 100%;
         left: 0;
         background-color: white;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
         border-radius: 5px;
         min-width: 150px;
         z-index: 10;
@@ -110,10 +139,67 @@
     }
     
     .dropdown:hover .dropdown-menu {
-        display: flex;
+        visibility: visible;
+        opacity: 1;
+        transform: translateY(0);
     }
 
-    @media (max-width: 650px) {
+    .hamburguer-icon {
+        display: none;
+        background-color: white;
+        border: none;
+        align-items: center;
+        font-size: 2rem;
+        cursor: pointer;
+    }
 
+    .navegation-bar-mobile {
+        display: flex;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: white;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 0;
+        z-index: 90;
+        box-shadow: 0 4px 8px var(--shadow-color);
+    }
+
+    .navegation-bar-mobile a {
+        text-decoration: none;
+        font-size: 1.3rem;
+        color: var(--font-color);
+    }
+
+    @media (max-width: 650px) { 
+        .header {
+            justify-content: space-between;
+        }
+
+        .navegation-bar {
+            display: none;
+        }
+
+        .hamburguer-icon {
+            display: flex;
+            margin-right: 1.5rem;
+        }
+    }
+
+    .slide-down-enter-active, .slide-down-leave-active {
+        transition: all 0.2s ease;
+    }
+
+    .slide-down-enter-from, .slide-down-leave-to  {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    .slide-down-enter-to, .slide-down-leave-from {
+        opacity: 1;
+        transform: translateY(0);
     }
 </style>
