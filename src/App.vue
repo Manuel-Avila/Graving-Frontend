@@ -25,6 +25,8 @@
   :root {
     --background-color: #f5f5f7;
     --font-color: #1f1f20;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    --purple-color: #6e346a;
   }
 
   html, body {
