@@ -176,6 +176,7 @@
 
     @media (max-width: 650px) { 
         .header {
+        
             justify-content: space-between;
         }
 

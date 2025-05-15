@@ -58,4 +58,56 @@
   .container-background {
     background-color: white;
   }
+
+
+  .purple-button{
+    background-color: var(--purple-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem; 
+    border-radius: 0.4rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: auto; /* Ancho según contenido */
+    width: 240px; /* Ancho máximo (320px) */
+    height: 45px;
+    display: inline-block; /* Para que no ocupe el 100% */
+    box-shadow: 5px 5px 8px var(--shadow-color);
+
+   
+    &:hover {
+      background-color: #974392;
+    }
+
+
+  }
+  .outline-white-button{
+    color: var(--purple-color);
+    border: 1px solid white;
+    border-color: var(--purple-color);
+    padding: 0.75rem 1.5rem; 
+    border-radius: 0.4rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: auto; /* Ancho según contenido */
+    width: 240px; /* Ancho máximo (320px) */
+    height: 45px;
+    display: inline-block; /* Para que no ocupe el 100% */
+    box-shadow: 5px 5px 8px var(--shadow-color);
+
+
+    &:hover {
+      background-color: #974392;
+    }
+
+
+  }
 </style>
+
+
+
+
