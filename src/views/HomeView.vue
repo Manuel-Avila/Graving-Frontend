@@ -13,9 +13,9 @@
     </div>
   </div>
   <div class="home-view-map">
-          <div class="home-view-map-container">
-              <span>c mapa c papu</span>
-          </div>
+    <div class="home-view-map-container">
+        <span>c mapa c papu</span>
+    </div>
   </div>
 </template>
 
@@ -29,15 +29,13 @@
   text-align: center;
   
 }
-.home-view-logo,.home-view-components {
-  width: 50%;
-}
 .home-view-components{
   display: flex;
   flex-direction: column; 
   align-items: center;    
   justify-content: center;
   gap: 2rem;            
+  width: 40%;
   text-align: center;    
   padding: 1rem;
 }
@@ -45,6 +43,7 @@
   display: flex;
   flex-direction: column; 
   align-items: center;   
+  width: 50%;
   justify-content: center; 
   gap: 2rem;            
   text-align: center;   
@@ -78,15 +77,14 @@
 }
 
 h1{
-  font-size: 50px;
-  
+  font-size: 40px;
 }
 
 label{
   font-size: 20px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 800px) {
   .home-view-top {
     flex-direction: column; 
     height: auto; 
@@ -95,14 +93,21 @@ label{
   .home-view-logo,
   .home-view-components {
     width: 90%; 
+    margin: auto;
   }
   .home-view-logo {
     order: 1; 
     padding-bottom: 0;
+    width: 100%;
+    margin: 0;
+    padding: 0;
   }
   .logo{
-    width: 450px;
-    height: 300px;
+    width: 90%;
+    max-width: 450px;
+    height: auto;
+    max-height: 300px;
+    margin: auto;
   }
   h1{
     font-size: 30px;

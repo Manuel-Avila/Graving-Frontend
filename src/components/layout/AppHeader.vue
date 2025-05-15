@@ -16,14 +16,17 @@
             <router-link v-if="admin" :to="{name: 'dashboard'}" :class="{'current-page': currentPage==='dashboard'}">Panel</router-link>
             <router-link :to="{name: 'home'}" :class="{'current-page': currentPage==='home'}">Inicio</router-link>
             <router-link :to="{name: 'map'}" :class="{'current-page': currentPage==='map'}">Mapa</router-link>
-
-            <div class="dropdown">
+            
+            <div class="dropdown" @mouseenter="isDropdownOpen = true" @mouseleave="isDropdownOpen = false">
                 <span class="dropdown-toggle">Cuenta</span>
-                <div class="dropdown-menu">
-                    <router-link :to="{name: 'profile'}" >Iniciar Sesion</router-link>
-                    <router-link :to="{name: 'profile'}" >Registrarse</router-link>
-                    <router-link :to="{name: 'profile'}" >Ver Perfil</router-link>
-                </div>
+                
+                <Transition name="fade-slide">
+                    <div class="dropdown-menu" v-if="isDropdownOpen">
+                    <router-link :to="{name: 'profile'}">Iniciar Sesión</router-link>
+                    <router-link :to="{name: 'profile'}">Registrarse</router-link>
+                    <router-link :to="{name: 'profile'}">Ver Perfil</router-link>
+                    </div>
+                </Transition>
             </div>
         </nav>
 
@@ -49,6 +52,7 @@
     const admin = true
 
     const isMenuOpen = ref(false)
+    const isDropdownOpen = ref(false)
 
     const toggleMenu = () => {
         isMenuOpen.value = !isMenuOpen.value
@@ -117,14 +121,11 @@
     }
 
     .dropdown-menu {
-        visibility: hidden;
+        display: none;
         position: absolute;
         top: 100%;
         left: 0;
         background-color: white;
-        opacity: 0;
-        transform: translateY(-10px);
-        transition: opacity 0.3s ease, transform 0.3s ease;
         border-radius: 5px;
         min-width: 150px;
         z-index: 10;
@@ -139,9 +140,7 @@
     }
     
     .dropdown:hover .dropdown-menu {
-        visibility: visible;
-        opacity: 1;
-        transform: translateY(0);
+        display: flex;
     }
 
     .hamburguer-icon {
@@ -176,7 +175,6 @@
 
     @media (max-width: 650px) { 
         .header {
-        
             justify-content: space-between;
         }
 
@@ -200,6 +198,20 @@
     }
 
     .slide-down-enter-to, .slide-down-leave-from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .fade-slide-enter-active, .fade-slide-leave-active {
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .fade-slide-enter-from, .fade-slide-leave-to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    .fade-slide-enter-to, .fade-slide-leave-from {
         opacity: 1;
         transform: translateY(0);
     }

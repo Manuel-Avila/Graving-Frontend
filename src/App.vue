@@ -59,7 +59,6 @@
     background-color: white;
   }
 
-
   .purple-button{
     background-color: var(--purple-color);
     color: white;
@@ -75,14 +74,13 @@
     height: 45px;
     display: inline-block; /* Para que no ocupe el 100% */
     box-shadow: 5px 5px 8px var(--shadow-color);
-
-   
-    &:hover {
-      background-color: #974392;
-    }
-
-
+    transition: transform 0.3s ease;
   }
+
+  .purple-button:hover {
+    background-color: #974392;
+  }
+
   .outline-white-button{
     color: var(--purple-color);
     border: 1px solid white;
@@ -98,13 +96,16 @@
     height: 45px;
     display: inline-block; /* Para que no ocupe el 100% */
     box-shadow: 5px 5px 8px var(--shadow-color);
+    transition: transform 0.3s ease;
+  }
 
+  .outline-white-button:hover {
+    background-color: #974392;
+    color: white;
+  }
 
-    &:hover {
-      background-color: #974392;
-    }
-
-
+  .purple-button:hover, .outline-white-button:hover {
+    transform: translateY(-3px);
   }
 </style>
 
