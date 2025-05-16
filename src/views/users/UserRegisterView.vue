@@ -3,70 +3,90 @@
     <img src="../../assets/images/logo.png" class="logo" alt="Graving-logo">
     <h1 class="register-title">Crear perfil</h1>
 
-    
-    <div class="input-group">
-      <input 
-        type="text" 
-        v-model="username" 
-        class="register-input"
-        required
-      >
-      <label class="input-label" :class="{ 'input-label-focused': username }">Nombre</label>
-    </div>
+    <form @submit.prevent="handleRegister">
 
-    <div class="input-group">
-      <input 
-        type="password" 
-        v-model="password" 
-        class="register-input"
-        required
-      >
-      <label class="input-label" :class="{ 'input-label-focused': password }">Correo</label>
-    </div>
+      <div class="input-group">
+        <input type="text" v-model="name" class="register-input" required />
+        <label class="input-label">Nombre</label>
+      </div>
 
-        <div class="input-group">
-      <input 
-        type="text" 
-        v-model="username" 
-        class="register-input"
-        required
-      >
-      <label class="input-label" :class="{ 'input-label-focused': username }">Teléfono</label>
-    </div>
+      <div class="input-group">
+        <input type="email" v-model="email" class="register-input" required />
+        <label class="input-label">Correo</label>
+      </div>
 
-        <div class="input-group">
-      <input 
-        type="text" 
-        v-model="username" 
-        class="register-input"
-        required
-      >
-      <label class="input-label" :class="{ 'input-label-focused': username }">Contraseña</label>
-    </div>
+      <div class="input-group">
+        <input type="tel" v-model="phoneNumber" class="register-input" required />
+        <label class="input-label">Teléfono</label>
+      </div>
 
-        <div class="input-group">
-      <input 
-        type="text" 
-        v-model="username" 
-        class="register-input"
-        required
-      >
-      <label class="input-label" :class="{ 'input-label-focused': username }">Confirmar contraseña</label>
-    </div>
+      <div class="input-group">
+        <input type="password" v-model="password" class="register-input" required />
+        <label class="input-label">Contraseña</label>
+      </div>
 
-    <button type="submit" class="purple-button">Iniciar sesión</button>
+      <div class="input-group">
+        <input type="password" v-model="confirmPassword" class="register-input" required />
+        <label class="input-label">Confirmar contraseña</label>
+      </div>
+
+      <button type="submit" class="purple-button">Registrarse</button>
+    </form>
+
+    <button class="google-signin-btn">
+      <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" class="google-logo">
+      <span>Registrarse con Google</span>
+    </button>
+
     <div class="separator"></div>
-    <p class="register-label">¿Ye tienes una cuenta?</p>
-    <button type="button" class="outline-white-button">Regresar</button>
+    <p class="register-label">¿Ya tienes una cuenta?</p>
+    <router-link :to="{ name: 'login' }" class="purple-button medium-size">Iniciar Sesión</router-link>
+    <router-link :to="{ name: 'home' }" class="outline-white-button">Regresar</router-link>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+  import { ref } from 'vue';
+  import { useRouter } from 'vue-router';
+  import { register } from '@/services/authService';
 
-const username = ref('');
-const password = ref('');
+  const router = useRouter();
+
+  const name = ref('');
+  const email = ref('');
+  const phoneNumber = ref('');
+  const password = ref('');
+  const confirmPassword = ref('');
+
+  const handleRegister = async () => {
+
+    if (!name.value || !email.value || !phoneNumber.value || !password.value || !confirmPassword.value) {
+      alert('Todos los campos son obligatorios');
+      return;
+    }
+
+    if (password.value !== confirmPassword.value) {
+      alert('Las contraseñas no coinciden');
+      return;
+    }
+
+    try {
+      await register({
+        name: name.value,
+        email: email.value,
+        password: password.value,
+        phoneNumber: phoneNumber.value,
+        role: 'admin'
+      });
+
+      alert('Usuario registrado correctamente');
+      router.push({ name: 'login' });
+    } catch (err) {
+      alert(err.response?.data?.error || 'Error al registrar');
+    }
+  };
 </script>
+
 
 <style scoped>
 
@@ -77,6 +97,14 @@ const password = ref('');
   max-width: 400px;
   margin: 0 auto;
   padding: 20px;
+}
+
+form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
 }
 
 .logo {
@@ -139,18 +167,19 @@ const password = ref('');
   text-align: center;
   color: #666;
   font-size: 12px;
-  
 }
 
 .outline-white-button {
   margin-top: 23px;
-  width: 180px;
-  
+  width: 200px;
 }
+
 .purple-button {
   margin-top: 30px;
   margin-bottom: 20px;
-  width: 280px;
-  
+  width: 100%;
+  max-width: 280px;
+  min-width: 200px;
 }
+
 </style>

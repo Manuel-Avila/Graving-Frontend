@@ -41,10 +41,7 @@
 }
 
 .home-view-components a{
-  text-decoration: none;
-  height: 1.5rem;
   width: 50%;
-  max-width: 300px;
 }
 
 .home-view-logo{

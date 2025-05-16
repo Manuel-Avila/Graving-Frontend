@@ -25,9 +25,14 @@
     </div>
 
     <button type="submit" class="purple-button">Iniciar sesión</button>
+    <button class="google-signin-btn">
+      <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" class="google-logo">
+      <span>Iniciar Sesión con Google</span>
+    </button>
     <div class="separator"></div>
     <p class="login-label">¿Aún no tienes una cuenta?</p>
-    <button type="button" class="outline-white-button">Rregístrate</button>
+    <router-link :to="{name: 'register'}" class="purple-button medium-size">Registrate</router-link>
+    <router-link :to="{name: 'home'}" class="outline-white-button">Regresar</router-link>
   </div>
 </template>
 
@@ -122,6 +127,5 @@ const password = ref('');
   margin-top: 40px;
   margin-bottom: 20px;
   width: 280px;
-  
 }
 </style>

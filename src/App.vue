@@ -49,6 +49,10 @@
     flex: 1;
   }
 
+  button {
+    transition: transform 0.3s ease;
+  }
+
   .layout {
     display: flex;
     flex-direction: column;
@@ -62,19 +66,18 @@
   .purple-button{
     background-color: var(--purple-color);
     color: white;
+    text-decoration: none;
+    text-align: center;
     border: none;
     padding: 0.75rem 1.5rem; 
     border-radius: 0.4rem;
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: auto; /* Ancho según contenido */
-    width: 240px; /* Ancho máximo (320px) */
-    height: 45px;
-    display: inline-block; /* Para que no ocupe el 100% */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    max-width: 300px;
+    display: inline-block;
     box-shadow: 5px 5px 8px var(--shadow-color);
-    transition: transform 0.3s ease;
   }
 
   .purple-button:hover {
@@ -85,18 +88,17 @@
     color: var(--purple-color);
     border: 1px solid white;
     border-color: var(--purple-color);
-    padding: 0.75rem 1.5rem; 
+    padding: 0.75rem 1.5rem;
+    text-decoration: none;
+    text-align: center;
     border-radius: 0.4rem;
     font-family: 'Poppins', sans-serif;
     font-size: 14px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: auto; /* Ancho según contenido */
-    width: 240px; /* Ancho máximo (320px) */
-    height: 45px;
-    display: inline-block; /* Para que no ocupe el 100% */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    max-width: 300px;
+    display: inline-block;
     box-shadow: 5px 5px 8px var(--shadow-color);
-    transition: transform 0.3s ease;
   }
 
   .outline-white-button:hover {
@@ -104,8 +106,42 @@
     color: white;
   }
 
-  .purple-button:hover, .outline-white-button:hover {
+  button:hover, .purple-button:hover, .outline-white-button:hover {
     transform: translateY(-3px);
+  }
+
+  a.purple-button {
+    padding: 0.75rem 0;
+    
+  }
+
+  a.outline-white-button {
+    padding: 0.75rem 0;
+  }
+
+  .google-signin-btn {
+    display: inline-flex;
+    align-items: center;
+    background-color: white;
+    color: #444;
+    border: 1px solid #ccc;
+    border-radius: 24px;
+    padding: 10px 16px;
+    font-size: 16px;
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.2s ease;
+  }
+
+  .google-signin-btn:hover {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .google-logo {
+    width: 18px;
+    height: 18px;
+    margin-right: 12px;
   }
 </style>
 
