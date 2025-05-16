@@ -44,8 +44,8 @@ import { useRouter } from 'vue-router'
 import { login, loginGoogle } from '@/services/authService'
 import { useAuthStore } from '@/stores/authStore'
 
-const email = ref('test1@gmail.com')
-const password = ref('test1')
+const email = ref('test12@gmail.com')
+const password = ref('test12')
 const router = useRouter()
 const authStore = useAuthStore()
 

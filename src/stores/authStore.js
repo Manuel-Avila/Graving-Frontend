@@ -5,6 +5,10 @@ export const useAuthStore = defineStore('auth', {
     token: null,
     user: null
   }),
+  getters: {
+    isLoggedIn: (state) => !!state.user && !!state.token,
+    isAdmin: (state) => state.user?.role === 'admin'
+  },
   actions: {
     setAuth(token, user) {
       this.token = token

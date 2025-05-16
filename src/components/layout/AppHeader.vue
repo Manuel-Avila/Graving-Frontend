@@ -13,7 +13,7 @@
         </button>
 
         <nav class="navegation-bar">
-            <router-link v-if="admin" :to="{name: 'dashboard'}" :class="{'current-page': currentPage==='dashboard'}">Panel</router-link>
+            <router-link v-if="isAdmin" :to="{name: 'dashboard'}" :class="{'current-page': currentPage==='dashboard'}">Panel</router-link>
             <router-link :to="{name: 'home'}" :class="{'current-page': currentPage==='home'}">Inicio</router-link>
             <router-link :to="{name: 'map'}" :class="{'current-page': currentPage==='map'}">Mapa</router-link>
             
@@ -22,10 +22,14 @@
                 
                 <Transition name="fade-slide">
                     <div class="dropdown-menu" v-if="isDropdownOpen">
-                        <router-link :to="{name: 'profile'}">Ver Perfil</router-link>
-                        <router-link :to="{name: 'login'}">Iniciar Sesión</router-link>
-                        <router-link :to="{name: 'register'}">Registrarse</router-link>
-                        <router-link>Cerrar Sesión</router-link>
+                        <template v-if="isLoggedIn">
+                            <router-link :to="{name: 'profile'}">Ver Perfil</router-link>
+                            <router-link :to="{name: 'login'}" @click.prevent="handleLogOut">Cerrar Sesión</router-link>
+                        </template>
+                        <template v-else>
+                            <router-link :to="{name: 'login'}">Iniciar Sesión</router-link>
+                            <router-link :to="{name: 'register'}">Registrarse</router-link>
+                        </template>
                     </div>
                 </Transition>
             </div>
@@ -33,13 +37,17 @@
 
         <Transition name="slide-down">
             <nav v-if="isMenuOpen" class="navegation-bar-mobile">
-                <router-link v-if="admin" :to="{ name: 'dashboard' }" @click="closeMenu">Panel</router-link>
                 <router-link :to="{ name: 'home' }" @click="closeMenu">Inicio</router-link>
                 <router-link :to="{ name: 'map' }" @click="closeMenu">Mapa</router-link>
-                <router-link :to="{ name: 'profile' }" @click="closeMenu">Ver Perfil</router-link>
-                <router-link :to="{ name: 'login' }" @click="closeMenu">Iniciar Sesión</router-link>
-                <router-link :to="{ name: 'register' }" @click="closeMenu">Registrarse</router-link>
-                <router-link @click="closeMenu">Cerrar Sesión</router-link>
+                <router-link v-if="isAdmin" :to="{ name: 'dashboard' }" @click="closeMenu">Panel</router-link>
+                <template v-if="isLoggedIn">
+                    <router-link :to="{ name: 'profile' }" @click="closeMenu">Ver Perfil</router-link>
+                    <router-link :to="{name: 'login'}" @click.prevent="handleLogOut">Cerrar Sesión</router-link>
+                </template>
+                <template v-else>
+                    <router-link :to="{ name: 'login' }" @click="closeMenu">Iniciar Sesión</router-link>
+                    <router-link :to="{ name: 'register' }" @click="closeMenu">Registrarse</router-link>
+                </template>
                 
             </nav>
         </Transition>
@@ -47,12 +55,18 @@
 </template>
 
 <script setup>
-    import { useRoute } from 'vue-router'
+    import { useRoute, useRouter } from 'vue-router'
     import { ref, computed } from 'vue'
+    import { useAuthStore } from '@/stores/authStore'
 
+    const router = useRouter()
     const route = useRoute()
+    const authStore = useAuthStore()
+    
     const currentPage = computed(() => route.name)
-    const admin = true
+    const isLoggedIn = computed(() => authStore.isLoggedIn)
+    // const isAdmin = computed(() => authStore.isAdmin)
+    const isAdmin = true
 
     const isMenuOpen = ref(false)
     const isDropdownOpen = ref(false)
@@ -63,6 +77,12 @@
 
     const closeMenu = () => {
         isMenuOpen.value = false
+    }
+
+    const handleLogOut = () => {
+        authStore.logout()
+        closeMenu()
+        router.push({ name: 'login'})
     }
 </script>
 
