@@ -6,10 +6,8 @@ export const useAuthStore = defineStore('auth', {
     user: null
   }),
   actions: {
-    setToken(token) {
+    setAuth(token, user) {
       this.token = token
-    },
-    setUser(user) {
       this.user = user
     },
     logout() {

@@ -7,33 +7,33 @@
 
       <div class="input-group">
         <input type="text" v-model="name" class="register-input" required />
-        <label class="input-label">Nombre</label>
+        <label class="input-label" :class="{ 'input-label-focused': name }">Nombre</label>
       </div>
 
       <div class="input-group">
         <input type="email" v-model="email" class="register-input" required />
-        <label class="input-label">Correo</label>
+        <label class="input-label" :class="{ 'input-label-focused': email }">Correo</label>
       </div>
 
       <div class="input-group">
         <input type="tel" v-model="phoneNumber" class="register-input" required />
-        <label class="input-label">Teléfono</label>
+        <label class="input-label" :class="{ 'input-label-focused': phoneNumber }" >Teléfono</label>
       </div>
 
       <div class="input-group">
         <input type="password" v-model="password" class="register-input" required />
-        <label class="input-label">Contraseña</label>
+        <label class="input-label" :class="{ 'input-label-focused': password }" >Contraseña</label>
       </div>
 
       <div class="input-group">
         <input type="password" v-model="confirmPassword" class="register-input" required />
-        <label class="input-label">Confirmar contraseña</label>
+        <label class="input-label" :class="{ 'input-label-focused': confirmPassword }" >Confirmar contraseña</label>
       </div>
 
       <button type="submit" class="purple-button">Registrarse</button>
     </form>
 
-    <button class="google-signin-btn">
+    <button @click="handleGoogleLogin" class="google-signin-btn">
       <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" class="google-logo">
       <span>Registrarse con Google</span>
     </button>
@@ -46,11 +46,13 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
-  import { register } from '@/services/authService';
+  import { ref } from 'vue'
+  import { useRouter } from 'vue-router'
+  import { register, loginGoogle } from '@/services/authService'
+  import { useAuthStore } from '@/stores/authStore'
 
   const router = useRouter();
+  const authStore = useAuthStore()
 
   const name = ref('');
   const email = ref('');
@@ -59,24 +61,12 @@
   const confirmPassword = ref('');
 
   const handleRegister = async () => {
-
-    if (!name.value || !email.value || !phoneNumber.value || !password.value || !confirmPassword.value) {
-      alert('Todos los campos son obligatorios');
-      return;
-    }
-
-    if (password.value !== confirmPassword.value) {
-      alert('Las contraseñas no coinciden');
-      return;
-    }
-
     try {
       await register({
         name: name.value,
         email: email.value,
         password: password.value,
-        phoneNumber: phoneNumber.value,
-        role: 'admin'
+        phoneNumber: phoneNumber.value
       });
 
       alert('Usuario registrado correctamente');
@@ -85,6 +75,17 @@
       alert(err.response?.data?.error || 'Error al registrar');
     }
   };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const data = await loginGoogle()
+      authStore.setAuth(data.token, data.user)
+      router.push({ name: 'profile' })
+    } catch (error) {
+      console.error('Error al registrarse con Google:', error)
+      alert('Error al registrarse con Google.')
+    }
+  }
 </script>
 
 

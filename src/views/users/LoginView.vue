@@ -2,30 +2,32 @@
   <div class="login-container">
     <img src="../../assets/images/logo.png" class="logo" alt="Graving-logo">
     <h1 class="login-title">Iniciar sesión</h1>
-
     
-    <div class="input-group">
-      <input 
-        type="text" 
-        v-model="username" 
-        class="login-input"
-        required
-      >
-      <label class="input-label" :class="{ 'input-label-focused': username }">Correo</label>
-    </div>
+    <form @submit.prevent="handleLogin">
+      <div class="input-group">
+        <input 
+          type="email" 
+          v-model="email" 
+          class="login-input"
+          required
+        >
+        <label class="input-label" :class="{ 'input-label-focused': email }">Correo</label>
+      </div>
 
-    <div class="input-group">
-      <input 
-        type="password" 
-        v-model="password" 
-        class="login-input"
-        required
-      >
-      <label class="input-label" :class="{ 'input-label-focused': password }">Contraseña</label>
-    </div>
+      <div class="input-group">
+        <input 
+          type="password" 
+          v-model="password" 
+          class="login-input"
+          required
+        >
+        <label class="input-label" :class="{ 'input-label-focused': password }">Contraseña</label>
+      </div>
 
-    <button type="submit" class="purple-button">Iniciar sesión</button>
-    <button class="google-signin-btn">
+      <button type="submit" class="purple-button">Iniciar sesión</button>
+    </form>
+
+    <button @click="handleGoogleLogin" class="google-signin-btn">
       <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" class="google-logo">
       <span>Iniciar Sesión con Google</span>
     </button>
@@ -38,9 +40,37 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router'
+import { login, loginGoogle } from '@/services/authService'
+import { useAuthStore } from '@/stores/authStore'
 
-const username = ref('');
-const password = ref('');
+const email = ref('test1@gmail.com')
+const password = ref('test1')
+const router = useRouter()
+const authStore = useAuthStore()
+
+const handleLogin = async () => {
+  try {
+    const data = await login({ email: email.value, password: password.value })
+    authStore.setAuth(data.token, data.user)
+    router.push({ name: 'profile' })
+  } catch (error) {
+    console.error('Error al iniciar sesión:', error)
+    alert('Correo o contraseña incorrectos.')
+  }
+}
+
+const handleGoogleLogin = async () => {
+  try {
+    const data = await loginGoogle()
+    authStore.setAuth(data.token, data.user)
+    router.push({ name: 'profile' })
+  } catch (error) {
+    console.error('Error al iniciar sesión con Google:', error)
+    alert('Error al iniciar sesión con Google.')
+  }
+}
+
 </script>
 
 <style scoped>
@@ -52,6 +82,14 @@ const password = ref('');
   max-width: 400px;
   margin: 0 auto;
   padding: 20px;
+}
+
+form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
 }
 
 .logo {
