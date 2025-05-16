@@ -22,9 +22,10 @@
                 
                 <Transition name="fade-slide">
                     <div class="dropdown-menu" v-if="isDropdownOpen">
-                    <router-link :to="{name: 'profile'}">Iniciar Sesión</router-link>
-                    <router-link :to="{name: 'profile'}">Registrarse</router-link>
-                    <router-link :to="{name: 'profile'}">Ver Perfil</router-link>
+                        <router-link :to="{name: 'profile'}">Ver Perfil</router-link>
+                        <router-link :to="{name: 'login'}">Iniciar Sesión</router-link>
+                        <router-link :to="{name: 'register'}">Registrarse</router-link>
+                        <router-link>Cerrar Sesión</router-link>
                     </div>
                 </Transition>
             </div>
@@ -35,9 +36,11 @@
                 <router-link v-if="admin" :to="{ name: 'dashboard' }" @click="closeMenu">Panel</router-link>
                 <router-link :to="{ name: 'home' }" @click="closeMenu">Inicio</router-link>
                 <router-link :to="{ name: 'map' }" @click="closeMenu">Mapa</router-link>
-                <router-link :to="{ name: 'profile' }" @click="closeMenu">Iniciar Sesión</router-link>
-                <router-link :to="{ name: 'profile' }" @click="closeMenu">Registrarse</router-link>
                 <router-link :to="{ name: 'profile' }" @click="closeMenu">Ver Perfil</router-link>
+                <router-link :to="{ name: 'login' }" @click="closeMenu">Iniciar Sesión</router-link>
+                <router-link :to="{ name: 'register' }" @click="closeMenu">Registrarse</router-link>
+                <router-link @click="closeMenu">Cerrar Sesión</router-link>
+                
             </nav>
         </Transition>
     </header>

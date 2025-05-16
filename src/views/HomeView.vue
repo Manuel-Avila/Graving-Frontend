@@ -6,10 +6,10 @@
         
     </div>
     <div class="home-view-components">
-         <h1>Busca tumbas,recuerda <br>historias</h1>
-         <label>Busca,encuentra y recuerda. Este sitio fue creado rendir<br> homenaje a tus seres queridos</label>
-         <button class="purple-button">Iniciar sesión</button>
-         <button class="outline-white-button">Registrarse</button>
+        <h1>Busca tumbas,recuerda <br>historias</h1>
+        <label>Busca,encuentra y recuerda. Este sitio fue creado rendir<br> homenaje a tus seres queridos</label>
+        <router-link :to="{name: 'login'}" class="purple-button">Iniciar Sesión</router-link>
+        <router-link :to="{name: 'map'}" class="outline-white-button">Mapa</router-link>
     </div>
   </div>
   <div class="home-view-map">
@@ -39,6 +39,14 @@
   text-align: center;    
   padding: 1rem;
 }
+
+.home-view-components a{
+  text-decoration: none;
+  height: 1.5rem;
+  width: 50%;
+  max-width: 300px;
+}
+
 .home-view-logo{
   display: flex;
   flex-direction: column; 

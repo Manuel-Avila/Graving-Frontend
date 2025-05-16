@@ -3,41 +3,41 @@
     <h1 class="admin-title">Panel de Administración</h1>
     <div class="dashboard-grid">
   
-      <div class="dashboard-card" @click="navigateTo()">
+      <router-link :to="{name: 'deceasedAdministration'}" class="dashboard-card">
         <div class="image-container">
           <img src="../../assets/images/deceasedAdministration.webp" alt="Gestión Difuntos" class="faded-image">
           <div class="image-overlay">
             <h2>Gestión de Difuntos</h2>
           </div>
         </div>
-      </div>
+      </router-link>
         
-      <div class="dashboard-card" @click="navigateTo()">
+      <router-link :to="{name: 'graves'}" class="dashboard-card">
         <div class="image-container">
           <img src="../../assets/images/gravesAdministration.jpg" alt="Gestión tumbas" class="faded-image">
           <div class="image-overlay">
             <h2>Gestión de Tumbas</h2>
           </div>
         </div>
-      </div>
+      </router-link>
         
-      <div class="dashboard-card" @click="navigateTo()">
+      <router-link :to="{name: 'owners'}" class="dashboard-card">
         <div class="image-container">
           <img src="../../assets/images/ownersAdministration.jpg" alt="Gestión Propietarios" class="faded-image">
           <div class="image-overlay">
             <h2>Gestión de Propietarios</h2>
           </div>
         </div>
-      </div>
+      </router-link>
       
-      <div class="dashboard-card" @click="navigateTo()">
+      <router-link :to="{name: 'systemLog'}" class="dashboard-card">
         <div class="image-container">
           <img src="../../assets/images/systemLog.jpg" alt="Bitácora del sistema" class="faded-image">
           <div class="image-overlay">
             <h2>Bitácora del Sistema</h2>
           </div>
         </div>
-      </div>
+      </router-link>
     </div>
   </div>
 </template>
