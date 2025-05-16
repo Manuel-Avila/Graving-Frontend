@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuthStore } from '@/stores/authStore'
 
 const api = axios.create({
   baseURL: process.env.VUE_APP_API_URL,
@@ -13,6 +14,18 @@ api.interceptors.request.use(config => {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
-});
+})
+
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response?.status === 401) {
+      const authStore = useAuthStore()
+      authStore.logoutUser()
+    }
+
+    return Promise.reject(error)
+  }
+)
 
 export default api;

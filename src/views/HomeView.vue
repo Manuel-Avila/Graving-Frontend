@@ -12,14 +12,11 @@
         <router-link :to="{name: 'map'}" class="outline-white-button">Mapa</router-link>
     </div>
   </div>
-  <div class="home-view-map">
-    <div class="home-view-map-container">
-        <span>c mapa c papu</span>
-    </div>
-  </div>
+  <GraveMap />
 </template>
 
 <script setup>
+  import GraveMap from '@/components/map/GraveMap.vue'
 </script>
 
 <style scoped>
@@ -55,28 +52,11 @@
   padding: 1rem;       
 }
 
-
 .logo{
   width: 650px;
   height: 500px;
 }
 
-.home-view-map{
-    position: relative;
-    display: flex;
-    justify-content: center; 
-    align-items: center;     
-    width: 100%;
-    height: 70vh;
-    padding: auto;
-   
-}
-.home-view-map-container{
-    width: 80%;
-    height: 80%;
-    background-color: #ffffff;
-   
-}
 .purple-button{
   margin-top: 30px;
 }
@@ -124,11 +104,5 @@ label{
     order: 2; 
     gap: 1rem; 
   }
-  .home-view-map {
-    height: 50vh; 
-  }
 }
-
-
-
 </style>
