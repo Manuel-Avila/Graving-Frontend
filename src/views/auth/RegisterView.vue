@@ -6,28 +6,28 @@
     <form @submit.prevent="handleRegister">
 
       <div class="input-group">
-        <input type="text" v-model="name" class="register-input" required />
-        <label class="input-label" :class="{ 'input-label-focused': name }">Nombre</label>
+        <input type="text" v-model="name" class="data-input" placeholder=" " required />
+        <label class="input-label">Nombre</label>
       </div>
 
       <div class="input-group">
-        <input type="email" v-model="email" class="register-input" required />
-        <label class="input-label" :class="{ 'input-label-focused': email }">Correo</label>
+        <input type="email" v-model="email" class="data-input"  placeholder=" " required />
+        <label class="input-label">Correo</label>
       </div>
 
       <div class="input-group">
-        <input type="tel" v-model="phoneNumber" class="register-input" required />
-        <label class="input-label" :class="{ 'input-label-focused': phoneNumber }" >Teléfono</label>
+        <input type="tel" v-model="phoneNumber" class="data-input" placeholder=" " required />
+        <label class="input-label"  >Teléfono</label>
       </div>
 
       <div class="input-group">
-        <input type="password" v-model="password" class="register-input" required />
-        <label class="input-label" :class="{ 'input-label-focused': password }" >Contraseña</label>
+        <input type="password" v-model="password" class="data-input" placeholder=" " required />
+        <label class="input-label">Contraseña</label>
       </div>
 
       <div class="input-group">
-        <input type="password" v-model="confirmPassword" class="register-input" required />
-        <label class="input-label" :class="{ 'input-label-focused': confirmPassword }" >Confirmar contraseña</label>
+        <input type="password" v-model="confirmPassword" class="data-input" placeholder=" " required />
+        <label class="input-label"  >Confirmar contraseña</label>
       </div>
 
       <button type="submit" class="purple-button">Registrarse</button>
@@ -123,43 +123,6 @@ form {
   font-size: 30px;
   margin-bottom: 25px;
   color: #333;
-}
-
-.input-group {
-  position: relative;
-  width: 89%;
-  margin-bottom: 20px;
-  margin-top: 28px;
-}
-
-.register-input {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-bottom: 1px solid #ddd;
-  font-size: 16px;
-  background: transparent;
-  outline: none;
-}
-
-.register-input:focus {
-  border-bottom-color: #7E57C2; 
-}
-
-.input-label {
-  position: absolute;
-  left: 0;
-  top: 12px;
-  color: #999;
-  pointer-events: none;
-  transition: all 0.3s ease;
-  font-size: 16px;
-}
-
-.input-label-focused, .register-input:focus + .input-label {
-  top: -15px;
-  font-size: 12px;
-  color: #7E57C2; 
 }
 
 

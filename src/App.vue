@@ -157,6 +157,93 @@
     height: 18px;
     margin-right: 12px;
   }
+
+  .input-group {
+  position: relative;
+  width: 89%;
+  margin-bottom: 20px;
+  margin-top: 40px;
+}
+
+.data-input {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  font-size: 16px;
+  background: transparent;
+  outline: none;
+}
+
+.data-input:focus {
+  border-bottom-color: #7E57C2; 
+}
+
+/* Inputs text */
+.data-input:not(:placeholder-shown) + .input-label {
+  top: -15px;
+  font-size: 12px;
+  color: #7E57C2;
+}
+
+
+.input-label {
+  position: absolute;
+  left: 0;
+  top: 12px;
+  color: #999;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  font-size: 16px;
+}
+
+
+.input-label-focused, .data-input:focus + .input-label {
+  top: -15px;
+  font-size: 12px;
+  color: #7E57C2; 
+}
+
+/* Inputs time and date */
+.data-input[type="date"]:not(:placeholder-shown) + .input-label ,
+.data-input[type="time"]:not(:placeholder-shown) + .input-label{
+  position: absolute;
+  left: 0;
+  top: 12px;
+  color: #999;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  font-size: 16px;
+}
+
+
+.data-input[type="date"] + .input-label ,
+.data-input[type="time"] + .input-label{
+  top: -15px; 
+  font-size: 12px;
+}
+
+.data-input[type="date"]:valid + .input-label,
+.data-input[type="date"]:focus + .input-label,
+.data-input[type="time"]:valid + .input-label,
+.data-input[type="time"]:focus + .input-label {
+  color: #7E57C2; 
+   top: -15px;
+  font-size: 12px;
+  color: #7E57C2; 
+}
+
+.data-input[type="date"]::-webkit-datetime-edit,
+.data-input[type="time"]::-webkit-datetime-edit{
+  color: transparent;
+}
+.data-input[type="date"]:valid::-webkit-datetime-edit,
+.data-input[type="date"]:focus::-webkit-datetime-edit,
+.data-input[type="time"]:valid::-webkit-datetime-edit,
+.data-input[type="time"]:focus::-webkit-datetime-edit {
+  color: #000; 
+}
+
 </style>
 
 

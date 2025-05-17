@@ -8,18 +8,20 @@
         <input 
           type="email" 
           v-model="email" 
-          class="login-input"
+          class="data-input"
           required
+          placeholder=" " 
         >
         <label class="input-label" :class="{ 'input-label-focused': email }">Correo</label>
       </div>
-
-      <div class="input-group">
+      
+     <div class="input-group">
         <input 
           type="password" 
           v-model="password" 
-          class="login-input"
+          class="data-input"
           required
+          placeholder=" " 
         >
         <label class="input-label" :class="{ 'input-label-focused': password }">Contraseña</label>
       </div>
@@ -110,42 +112,7 @@ form {
   color: #333;
 }
 
-.input-group {
-  position: relative;
-  width: 89%;
-  margin-bottom: 20px;
-  margin-top: 40px;
-}
 
-.login-input {
-  width: 100%;
-  padding: 12px;
-  border: none;
-  border-bottom: 1px solid #ddd;
-  font-size: 16px;
-  background: transparent;
-  outline: none;
-}
-
-.login-input:focus {
-  border-bottom-color: #7E57C2; 
-}
-
-.input-label {
-  position: absolute;
-  left: 0;
-  top: 12px;
-  color: #999;
-  pointer-events: none;
-  transition: all 0.3s ease;
-  font-size: 16px;
-}
-
-.input-label-focused, .login-input:focus + .input-label {
-  top: -15px;
-  font-size: 12px;
-  color: #7E57C2; 
-}
 
 
 .separator {
