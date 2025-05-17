@@ -46,11 +46,13 @@
 </template>
 
 <script setup>
-  import { ref } from 'vue'
+  import { ref, nextTick } from 'vue'
   import { useRouter } from 'vue-router'
   import { register, loginGoogle } from '@/services/authService'
   import { useAuthStore } from '@/stores/authStore'
+  import { useToast } from '@/composables/useToast'
 
+  const { showToast } = useToast()
   const router = useRouter();
   const authStore = useAuthStore()
 
@@ -69,10 +71,11 @@
         phoneNumber: phoneNumber.value
       });
 
-      alert('Usuario registrado correctamente');
+      showToast('Registro exitoso!', 'success');
+      await nextTick()
       router.push({ name: 'login' });
     } catch (err) {
-      alert(err.response?.data?.error || 'Error al registrar');
+      showToast('Error al registrarse. Por favor, inténtalo de nuevo.', 'error');
     }
   };
 
@@ -80,10 +83,13 @@
     try {
       const data = await loginGoogle()
       authStore.setAuth(data.token, data.user)
+      showToast('Registro exitoso!', 'success');
+      await nextTick()
       router.push({ name: 'profile' })
     } catch (error) {
       console.error('Error al registrarse con Google:', error)
-      alert('Error al registrarse con Google.')
+      showToast('Error al registrarse con Google!', 'error');
+      await nextTick()
     }
   }
 </script>

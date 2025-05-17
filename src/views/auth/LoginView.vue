@@ -27,7 +27,7 @@
       <button type="submit" class="purple-button">Iniciar sesión</button>
     </form>
 
-    <button @click="handleGoogleLogin" class="google-signin-btn">
+    <button @click="handleLoginGoogle" class="google-signin-btn">
       <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" class="google-logo">
       <span>Iniciar Sesión con Google</span>
     </button>
@@ -39,11 +39,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, nextTick } from 'vue';
 import { useRouter } from 'vue-router'
 import { login, loginGoogle } from '@/services/authService'
 import { useAuthStore } from '@/stores/authStore'
+import { useToast } from '@/composables/useToast'
 
+const { showToast } = useToast()
 const email = ref('test12@gmail.com')
 const password = ref('test12')
 const router = useRouter()
@@ -53,21 +55,25 @@ const handleLogin = async () => {
   try {
     const data = await login({ email: email.value, password: password.value })
     authStore.setAuth(data.token, data.user)
+    showToast('Inicio de sesión exitoso!', 'success')
+    await nextTick()
     router.push({ name: 'profile' })
   } catch (error) {
     console.error('Error al iniciar sesión:', error)
-    alert('Correo o contraseña incorrectos.')
+    showToast('Error al iniciar sesión. Verifica tus credenciales.', 'error')
   }
 }
 
-const handleGoogleLogin = async () => {
+const handleLoginGoogle = async () => {
   try {
     const data = await loginGoogle()
     authStore.setAuth(data.token, data.user)
+    showToast('Inicio de sesión exitoso!', 'success')
+    await nextTick()
     router.push({ name: 'profile' })
   } catch (error) {
     console.error('Error al iniciar sesión con Google:', error)
-    alert('Error al iniciar sesión con Google.')
+    showToast('Error al iniciar sesión con Google.', 'error')
   }
 }
 

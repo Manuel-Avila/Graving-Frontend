@@ -6,19 +6,28 @@
     </main>
     <AppFooter v-if="showLayout"/>
   </div>
+  <ToastContainer ref="toastRef" />
 </template>
 
 <script setup>
   import { useRoute } from 'vue-router'
-  import { computed } from 'vue'
+  import { computed, ref, onMounted } from 'vue'
+  import { setToastRef } from '@/composables/useToast'
 
   import AppHeader from './components/layout/AppHeader.vue'
   import AppFooter from './components/layout/AppFooter.vue'
+  import ToastContainer from '@/components/ui/ToastContainer.vue'
 
-   const route = useRoute()
-   const noLayoutRoutes = ['login', 'register']
+  const route = useRoute()
+  const noLayoutRoutes = ['login', 'register']
 
-   const showLayout = computed(() => !noLayoutRoutes.includes(route.name))
+  const showLayout = computed(() => !noLayoutRoutes.includes(route.name))
+
+  const toastRef = ref(null)
+
+  onMounted(() => {
+    setToastRef(toastRef.value)
+  })
 </script>
 
 <style>
