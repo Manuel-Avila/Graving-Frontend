@@ -7,16 +7,19 @@
     <AppFooter v-if="showLayout"/>
   </div>
   <ToastContainer ref="toastRef" />
+  <ConfirmModal ref="confirmModalRef" />
 </template>
 
 <script setup>
   import { useRoute } from 'vue-router'
   import { computed, ref, onMounted } from 'vue'
   import { setToastRef } from '@/composables/useToast'
+  import { setConfirmModalRef } from './composables/useConfirmModal'
 
   import AppHeader from './components/layout/AppHeader.vue'
   import AppFooter from './components/layout/AppFooter.vue'
   import ToastContainer from '@/components/ui/ToastContainer.vue'
+  import ConfirmModal from './components/ui/ConfirmModal.vue'
 
   const route = useRoute()
   const noLayoutRoutes = ['login', 'register']
@@ -24,9 +27,11 @@
   const showLayout = computed(() => !noLayoutRoutes.includes(route.name))
 
   const toastRef = ref(null)
+  const confirmModalRef = ref(null)
 
   onMounted(() => {
     setToastRef(toastRef.value)
+    setConfirmModalRef(confirmModalRef.value)
   })
 </script>
 

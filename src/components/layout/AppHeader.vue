@@ -24,7 +24,7 @@
                     <div class="dropdown-menu" v-if="isDropdownOpen">
                         <template v-if="isLoggedIn">
                             <router-link :to="{name: 'profile'}">Ver Perfil</router-link>
-                            <router-link :to="{name: 'login'}" @click.prevent="handleLogOut">Cerrar Sesión</router-link>
+                            <button @click.prevent="handleLogOut">Cerrar Sesión</button>
                         </template>
                         <template v-else>
                             <router-link :to="{name: 'login'}">Iniciar Sesión</router-link>
@@ -42,7 +42,7 @@
                 <router-link v-if="isAdmin" :to="{ name: 'dashboard' }" @click="closeMenu">Panel</router-link>
                 <template v-if="isLoggedIn">
                     <router-link :to="{ name: 'profile' }" @click="closeMenu">Ver Perfil</router-link>
-                    <router-link :to="{name: 'login'}" @click.prevent="handleLogOut">Cerrar Sesión</router-link>
+                    <button @click.prevent="handleLogOut">Cerrar Sesión</button>
                 </template>
                 <template v-else>
                     <router-link :to="{ name: 'login' }" @click="closeMenu">Iniciar Sesión</router-link>
@@ -59,7 +59,9 @@
     import { ref, computed, nextTick } from 'vue'
     import { useAuthStore } from '@/stores/authStore'
     import { useToast } from '@/composables/useToast'
+    import { useConfirmModal } from '@/composables/useConfirmModal'
 
+    const { showConfirmModal } = useConfirmModal()
     const { showToast } = useToast()
     const router = useRouter()
     const route = useRoute()
@@ -68,7 +70,7 @@
     const currentPage = computed(() => route.name)
     const isLoggedIn = computed(() => authStore.isLoggedIn)
     // const isAdmin = computed(() => authStore.isAdmin)
-    const isAdmin = true
+    const isAdmin = true;
 
     const isMenuOpen = ref(false)
     const isDropdownOpen = ref(false)
@@ -82,6 +84,11 @@
     }
 
     const handleLogOut = async () => {
+        const confirmed = await showConfirmModal('¿Estás seguro de que deseas cerrar sesión?')
+        if (!confirmed) {
+            return;
+        }
+
         authStore.logout()
         closeMenu()
         showToast('Sesión cerrada correctamente', 'info')
@@ -114,7 +121,7 @@
         column-gap: 3.5rem;
     }
 
-    .navegation-bar a {
+    .navegation-bar a, .navegation-bar button, .navegation-bar-mobile button {
         display: flex;
         align-items: center;
         height: 100%;
@@ -123,7 +130,12 @@
         font-size: 1.1rem;
     }
 
-    .navegation-bar a:hover {
+    .navegation-bar button, .navegation-bar-mobile button {
+        background-color: white;
+        border: none;
+    }
+
+    .navegation-bar a:hover, .navegation-bar button:hover {
         border-bottom: 4px solid var(--purple-color);
         color: var(--purple-color);
     }

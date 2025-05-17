@@ -19,13 +19,21 @@
   const toasts = ref([])
 
   function addToast(message, type = 'success', duration = 3000) {
-    const id = crypto.randomUUID()
+    const id = generateUUID()
     toasts.value.push({ id, message, type })
 
     setTimeout(() => {
       toasts.value = toasts.value.filter(t => t.id !== id)
     }, duration)
   }
+
+  function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0
+    const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    return v.toString(16)
+  })
+}
 
   defineExpose({ addToast })
 </script>
