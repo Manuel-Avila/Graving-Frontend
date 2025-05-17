@@ -56,9 +56,11 @@
 
 <script setup>
     import { useRoute, useRouter } from 'vue-router'
-    import { ref, computed } from 'vue'
+    import { ref, computed, nextTick } from 'vue'
     import { useAuthStore } from '@/stores/authStore'
+    import { useToast } from '@/composables/useToast'
 
+    const { showToast } = useToast()
     const router = useRouter()
     const route = useRoute()
     const authStore = useAuthStore()
@@ -79,9 +81,11 @@
         isMenuOpen.value = false
     }
 
-    const handleLogOut = () => {
+    const handleLogOut = async () => {
         authStore.logout()
         closeMenu()
+        showToast('Sesión cerrada correctamente', 'info')
+        await nextTick()
         router.push({ name: 'login'})
     }
 </script>
