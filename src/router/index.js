@@ -10,7 +10,7 @@ import DeceasedDetailView from '@/views/deceased/DeceasedDetailView.vue'
 import RegisterVisitView from '@/views/visits/RegisterVisitView.vue'
 import AdminDashboardView from '@/views/admin/AdminDashboardView.vue'
 import DeceasedAdministrationView from '@/views/admin/DeceasedAdministrationView.vue'
-import RegisterDeceasedView from '@/views/deceased/RegisterDeceasedView.vue'
+import RegisterAndEditDeceasedView from '@/views/deceased/RegisterAndEditDeceasedView.vue'
 import OwnersAdministrationView from '@/views/admin/OwnersAdministrationView.vue'
 import GravesAdministrationView from '@/views/admin/GravesAdministrationView.vue'
 import SystemLogView from '@/views/admin/SystemLogView.vue'
@@ -72,9 +72,14 @@ const routes = [
     component: DeceasedAdministrationView
   },
   {
-    path: '/registerDeceased',
+    path: '/deceased/register',
     name: 'registerDeceased',
-    component: RegisterDeceasedView
+    component: RegisterAndEditDeceasedView
+  },
+  {
+    path: '/deceased/edit/:id',
+    name: 'editDeceased',
+    component: RegisterAndEditDeceasedView
   },
   {
     path: '/owners',

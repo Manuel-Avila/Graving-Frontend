@@ -6,7 +6,7 @@
           <p>muelto ndea</p>
         </button>
       </div>
-      <router-link :to="{name: 'registerDeceased'}" class="purple-button edit-button">Editar</router-link>
+      <router-link :to="{name: 'editDeceased', params: {id: deceasedId}}" class="purple-button edit-button">Editar</router-link>
     </div>  
     <div class="right-section">
       <div class="form-container">

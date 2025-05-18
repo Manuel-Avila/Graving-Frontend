@@ -7,7 +7,7 @@
           <p>Subir imagen del difunto</p>
         </button>
       </div>
-      <button @click="handleRegister" class="purple-button confirm-btn">Registrar Difunto</button>
+      <button @click="handleSubmit" class="purple-button confirm-btn">{{ isEditing ? 'Actualizar Difunto' : 'Registrar Difunto'}}</button>
     </div>  
     <div class="right-section">
       <div class="form-container">
@@ -39,13 +39,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { registerDeceased } from '@/services/deceasedService'
+import { ref, computed, onMounted, nextTick } from 'vue'
+import { registerDeceased, getDeceasedById, updateDeceased } from '@/services/deceasedService'
 import { useToast } from '@/composables/useToast'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
+const route = useRoute()
 const router = useRouter()
 const { showToast } = useToast()
+
+const isEditing = computed(() => !!route.params.id)
+const deceasedId = route.params.id
 
 const name = ref('')
 const birthDate = ref('')
@@ -53,20 +57,45 @@ const deathDate = ref('')
 const epitaph = ref('')
 const graveId = ref(1)
 
-const handleRegister = async () => {
+onMounted(async () => {
+  if (isEditing.value) {
+    try {
+      const deceased = await getDeceasedById(deceasedId)
+      name.value = deceased.name
+      birthDate.value = deceased.birthDate?.slice(0, 10)
+      deathDate.value = deceased.deathDate?.slice(0, 10)
+      epitaph.value = deceased.epitaph
+      graveId.value = deceased.graveId
+    } catch (error) {
+      showToast('Difunto no encontrado', 'error')
+      await nextTick();
+      router.push({ name: 'deceasedAdministration' })
+    }
+  }
+})
+
+const handleSubmit = async () => {
   try {
-    await registerDeceased({
+    const data = {
       name: name.value,
       birthDate: birthDate.value,
       deathDate: deathDate.value,
       epitaph: epitaph.value,
       graveId: graveId.value
-    })
-    showToast('Difunto registrado correctamente', 'success')
+    }
+
+    if (isEditing.value) {
+      await updateDeceased(deceasedId, data)
+      showToast('Difunto actualizado correctamente', 'success')
+    } else {
+      await registerDeceased(data)
+      showToast('Difunto registrado correctamente', 'success')
+    }
+
+    await nextTick()
     router.push({ name: 'deceasedAdministration' })
-  } catch (error) {
-    showToast('Error al registrar el difunto.', 'error')
-    showToast(error, 'error')
+  } catch (err) {
+    showToast('Error al guardar difunto.', 'error')
   }
 }
 
