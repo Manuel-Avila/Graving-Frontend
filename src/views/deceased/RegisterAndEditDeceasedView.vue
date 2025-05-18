@@ -2,9 +2,22 @@
   <div class="register-container">
      <div class="left-section">
       <div class="image-upload">
-        <button class="upload-btn">
-          <span>+</span>
-          <p>Subir imagen del difunto</p>
+        <input
+          type="file"
+          accept="image/*"
+          ref="fileInput"
+          @change="handleImageChange"
+          style="display: none"
+        />
+
+        <button class="upload-btn" @click.prevent="triggerImageInput">
+          <template v-if="imagePreview">
+            <img :src="imagePreview" class="preview-img" />
+          </template>
+          <template v-else>
+            <span>+</span>
+            <p>Subir imagen del difunto</p>
+          </template>
         </button>
       </div>
       <button @click="handleSubmit" class="purple-button confirm-btn">{{ isEditing ? 'Actualizar Difunto' : 'Registrar Difunto'}}</button>
@@ -99,6 +112,25 @@ const handleSubmit = async () => {
   }
 }
 
+const fileInput = ref(null)
+const selectedImage = ref(null)
+const imagePreview = ref(null)
+
+const triggerImageInput = () => {
+  fileInput.value?.click()
+}
+
+const handleImageChange = (event) => {
+  const file = event.target.files[0]
+  if (file && file.type.startsWith('image/')) {
+    selectedImage.value = file
+    imagePreview.value = URL.createObjectURL(file)
+  } else {
+    selectedImage.value = null
+    imagePreview.value = null
+  }
+}
+
 </script>
 
 <style scoped>
@@ -119,13 +151,21 @@ const handleSubmit = async () => {
 .right-section {
   width: 60%;
   padding: 50px;
+  display: flex;
+  justify-content: center;
 }
 
 .image-upload {
-  
   display: flex;
   justify-content: center;
   margin-bottom: 30px;
+}
+
+.preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
 }
 
 .upload-btn {

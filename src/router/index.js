@@ -57,7 +57,7 @@ const routes = [
     component: DeceasedDetailView
   },
   {
-    path: '/visit',
+    path: '/visit/:id',
     name: 'visit',
     component: RegisterVisitView
   },

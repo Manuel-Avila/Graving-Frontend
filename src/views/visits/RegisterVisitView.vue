@@ -16,17 +16,17 @@
           <div class="info-content">
             <div class="info-field">
               <label>Nombre</label>
-              <p class="info-value">Balatrero Balatrez Díaz</p>
+              <p class="info-value">{{ name }}</p>
             </div>
 
             <div class="info-field">
               <label>Fecha de Defunción</label>
-              <p class="info-value">25 de agosto del 2024</p>
+              <p class="info-value">{{ deathDate }}</p>
             </div>
 
             <div class="info-field">
               <label>Número de Tumba</label>
-              <p class="info-value">5</p>
+              <p class="info-value">{{ graveNumber }}</p>
             </div>
           </div>
         </div>
@@ -76,7 +76,7 @@
           </div>
 
           <div class="action-buttons">
-            <button class="purple-button">Registrar Visita</button>
+            <button @click="handleRegisterVisit" class="purple-button">Registrar Visita</button>
             <button class="outline-white-button">Cancelar</button>
           </div>
         </div>
@@ -88,12 +88,66 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+  import { ref, onMounted, nextTick } from 'vue';
+  import { useRouter, useRoute } from 'vue-router'
+  import { getDeceasedById } from '@/services/deceasedService'
+  import { useToast } from '@/composables/useToast'
+  import { createVisit } from '@/services/visitService'
 
-const deceasedPhoto = ref(null);
-const visitorName = ref('');
-const visitDate = ref('');
-const visitTime = ref('');
+  const { showToast } = useToast()
+  const router = useRouter()
+  const route = useRoute()
+
+  const deceasedPhoto = ref(null);
+  const visitorName = ref('');
+  const visitDate = ref('');
+  const visitTime = ref('');
+
+  const deceasedId = route.params.id
+
+  const name = ref('')
+  const epitaph = ref('')
+  const birthDate = ref('')
+  const deathDate = ref('')
+  const graveNumber = ref('')
+
+  onMounted(async () => {
+    try {
+      const deceased = await getDeceasedById(deceasedId)
+      name.value = deceased.name
+      epitaph.value = deceased.epitaph
+      birthDate.value = deceased.birthDate?.slice(0, 10)
+      deathDate.value = deceased.deathDate?.slice(0, 10)
+      graveNumber.value = deceased.graveNumber
+    } catch (err) {
+      showToast('Difunto no encontrado', 'error')
+      await nextTick()
+      router.push({ name: 'deceasedAdministration' })
+    }
+  })
+
+  const handleRegisterVisit = async () => {
+    if (!visitorName.value || !visitDate.value || !visitTime.value) {
+      showToast('Todos los campos son obligatorios', 'error')
+      return
+    }
+
+    try {
+      const dateTime = `${visitDate.value} ${visitTime.value}`
+
+        await createVisit({
+          deceasedId: deceasedId,
+          date: dateTime
+        })
+
+        showToast('Visita registrada correctamente', 'success')
+        await nextTick()
+        router.push({ name: 'visits' })
+      } catch (error) {
+        console.error('Error al registrar visita:', error)
+        showToast('Error al registrar la visita', 'error')
+    }
+  }
 </script>
 
 <style scoped>
