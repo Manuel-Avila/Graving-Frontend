@@ -43,6 +43,11 @@
     --purple-color: #6e346a;
   }
 
+  *::selection {
+    background-color: var(--purple-color);
+    color: white;
+  }
+
   html, body {
     height: 100%;
     margin: 0;
@@ -176,14 +181,14 @@
 }
 
 .data-input:focus {
-  border-bottom-color: #7E57C2; 
+  border-bottom-color: var(--purple-color); 
 }
 
 /* Inputs text */
 .data-input:not(:placeholder-shown) + .input-label {
   top: -15px;
   font-size: 12px;
-  color: #7E57C2;
+  color: var(--purple-color);
 }
 
 
@@ -201,7 +206,7 @@
 .input-label-focused, .data-input:focus + .input-label {
   top: -15px;
   font-size: 12px;
-  color: #7E57C2; 
+  color: var(--purple-color); 
 }
 
 /* Inputs time and date */
@@ -227,10 +232,10 @@
 .data-input[type="date"]:focus + .input-label,
 .data-input[type="time"]:valid + .input-label,
 .data-input[type="time"]:focus + .input-label {
-  color: #7E57C2; 
+  color: var(--purple-color); 
    top: -15px;
   font-size: 12px;
-  color: #7E57C2; 
+  color: var(--purple-color); 
 }
 
 .data-input[type="date"]::-webkit-datetime-edit,
