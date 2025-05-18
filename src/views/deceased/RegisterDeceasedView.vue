@@ -7,12 +7,12 @@
           <p>Subir imagen del difunto</p>
         </button>
       </div>
-      <button class="purple-button confirm-btn">Registrar Difunto</button>
+      <button @click="handleRegister" class="purple-button confirm-btn">Registrar Difunto</button>
     </div>  
     <div class="right-section">
       <div class="form-container">
         <div class="input-group">
-            <input type="text"    v-model="name" class="data-input"  required  placeholder=" " />
+            <input type="text"  v-model="name" class="data-input"  required  placeholder=" " />
             <label class="input-label">Nombre completo</label>
         </div>
         <div class="input-group">
@@ -39,13 +39,36 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from 'vue'
+import { registerDeceased } from '@/services/deceasedService'
+import { useToast } from '@/composables/useToast'
+import { useRouter } from 'vue-router'
 
-const name = ref('');
-const birthDate = ref('');
-const deathDate = ref('');
-const epitaph = ref('');
+const router = useRouter()
+const { showToast } = useToast()
 
+const name = ref('')
+const birthDate = ref('')
+const deathDate = ref('')
+const epitaph = ref('')
+const graveId = ref(1)
+
+const handleRegister = async () => {
+  try {
+    await registerDeceased({
+      name: name.value,
+      birthDate: birthDate.value,
+      deathDate: deathDate.value,
+      epitaph: epitaph.value,
+      graveId: graveId.value
+    })
+    showToast('Difunto registrado correctamente', 'success')
+    router.push({ name: 'deceasedAdministration' })
+  } catch (error) {
+    showToast('Error al registrar el difunto.', 'error')
+    showToast(error, 'error')
+  }
+}
 
 </script>
 
@@ -133,7 +156,6 @@ const epitaph = ref('');
   .confirm-btn {
     margin-bottom: 30px;
   }
-
   
 }
 

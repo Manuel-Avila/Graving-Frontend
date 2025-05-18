@@ -6,8 +6,7 @@
           <p>muelto ndea</p>
         </button>
       </div>
-      <button class="purple-button">Editar</button>
-      <button class="outline-white-button">Eliminar</button>
+      <router-link :to="{name: 'registerDeceased'}" class="purple-button edit-button">Editar</router-link>
     </div>  
     <div class="right-section">
       <div class="form-container">
@@ -51,7 +50,7 @@
         </div>
         <div class="tomb-info">
           <h3>Número de tumba</h3>
-          <p class="tomb-number">A-245</p>
+          <p class="tomb-number">{{ graveNumber }}</p>
         </div>
       </div>
     </div>
@@ -59,12 +58,36 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+  import { ref, onMounted, nextTick } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
+  import { getDeceasedById } from '@/services/deceasedService'
+  import { useToast } from '@/composables/useToast'
 
-const name = ref('Balatro balatrez');
-const epitaph = ref('Lo balatro sale caro');
-const birthDate = ref('1950-01-01');
-const deathDate = ref('2023-12-31');
+  const { showToast } = useToast()
+  const router = useRouter()
+  const route = useRoute()
+  const deceasedId = route.params.id
+
+  const name = ref('')
+  const epitaph = ref('')
+  const birthDate = ref('')
+  const deathDate = ref('')
+  const graveNumber = ref('')
+
+  onMounted(async () => {
+    try {
+      const deceased = await getDeceasedById(deceasedId)
+      name.value = deceased.name
+      epitaph.value = deceased.epitaph
+      birthDate.value = deceased.birthDate?.slice(0, 10)
+      deathDate.value = deceased.deathDate?.slice(0, 10)
+      graveNumber.value = deceased.graveNumber
+    } catch (err) {
+      showToast('Difunto no encontrado', 'error')
+      await nextTick();
+      router.push({ name: 'deceasedAdministration' })
+    }
+  })
 </script>
 
 <style scoped>
@@ -88,7 +111,6 @@ const deathDate = ref('2023-12-31');
 }
 
 .image-upload {
-  
   display: flex;
   justify-content: center;
   margin-bottom: 30px;
@@ -154,6 +176,10 @@ const deathDate = ref('2023-12-31');
 
 .data-input[type="date"]::-webkit-datetime-edit {
   color: #000;
+}
+
+.edit-button {
+  width: 165px;
 }
 
 

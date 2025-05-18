@@ -69,8 +69,7 @@
     
     const currentPage = computed(() => route.name)
     const isLoggedIn = computed(() => authStore.isLoggedIn)
-    // const isAdmin = computed(() => authStore.isAdmin)
-    const isAdmin = true;
+    const isAdmin = computed(() => authStore.isAdmin)
 
     const isMenuOpen = ref(false)
     const isDropdownOpen = ref(false)

@@ -52,7 +52,7 @@ const routes = [
     component: MapView
   },
   {
-    path: '/deceased',
+    path: '/deceased/:id',
     name: 'deceased',
     component: DeceasedDetailView
   },

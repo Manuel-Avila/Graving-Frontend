@@ -13,6 +13,7 @@ export const useAuthStore = defineStore('auth', {
     setAuth(token, user) {
       this.token = token
       this.user = user
+      localStorage.setItem('token', token)
     },
     logout() {
       this.token = null
