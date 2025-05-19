@@ -48,8 +48,8 @@ import { useAuthStore } from '@/stores/authStore'
 import { useToast } from '@/composables/useToast'
 
 const { showToast } = useToast()
-const email = ref('test12@gmail.com')
-const password = ref('test12')
+const email = ref('test@gmail.com')
+const password = ref('test')
 const router = useRouter()
 const authStore = useAuthStore()
 

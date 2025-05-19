@@ -7,10 +7,8 @@
         </div>
         <div class="info-card">
           <div class="photo-upload">
-            <img v-if="deceasedPhoto" :src="deceasedPhoto" alt="Foto del difunto" class="deceased-photo">
-            <div v-else class="photo-placeholder">
-              <p>Muertito ndeaaaaaaa</p>
-            </div>
+            <img v-if="imageUrl" :src="imageUrl" alt="Foto del difunto" class="deceased-photo">
+            <img v-else src="../../assets/images/deceasedPlaceholder.png" alt="Foto del difunto" class="deceased-photo">
           </div>
 
           <div class="info-content">
@@ -98,7 +96,6 @@
   const router = useRouter()
   const route = useRoute()
 
-  const deceasedPhoto = ref(null);
   const visitorName = ref('');
   const visitDate = ref('');
   const visitTime = ref('');
@@ -110,6 +107,7 @@
   const birthDate = ref('')
   const deathDate = ref('')
   const graveNumber = ref('')
+  const imageUrl = ref(null)
 
   onMounted(async () => {
     try {
@@ -119,6 +117,7 @@
       birthDate.value = deceased.birthDate?.slice(0, 10)
       deathDate.value = deceased.deathDate?.slice(0, 10)
       graveNumber.value = deceased.graveNumber
+      imageUrl.value = deceased.imageUrl
     } catch (err) {
       showToast('Difunto no encontrado', 'error')
       await nextTick()
@@ -212,7 +211,6 @@ h1 {
 .photo-upload {
   width: 180px;
   height: 180px;
-  border: 2px dashed #ccc;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -223,15 +221,8 @@ h1 {
   background-color: #fafafa;
 }
 
-.photo-placeholder span {
-  font-size: 32px;
-  color: #7E57C2;
-}
-
-.photo-placeholder p {
-  margin-top: 10px;
-  color: #666;
-  font-size: 14px;
+.deceased-photo {
+  width: 100%;
 }
 
 .info-content {

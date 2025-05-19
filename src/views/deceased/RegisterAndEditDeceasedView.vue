@@ -1,6 +1,6 @@
 <template>
   <div class="register-container">
-     <div class="left-section">
+    <div class="left-section">
       <div class="image-upload">
         <input
           type="file"
@@ -9,10 +9,9 @@
           @change="handleImageChange"
           style="display: none"
         />
-
         <button class="upload-btn" @click.prevent="triggerImageInput">
-          <template v-if="imagePreview">
-            <img :src="imagePreview" class="preview-img" />
+          <template v-if="imageUrl">
+            <img :src="imageUrl" class="preview-img" />
           </template>
           <template v-else>
             <span>+</span>
@@ -20,25 +19,27 @@
           </template>
         </button>
       </div>
-      <button @click="handleSubmit" class="purple-button confirm-btn">{{ isEditing ? 'Actualizar Difunto' : 'Registrar Difunto'}}</button>
+      <button @click="handleSubmit" class="purple-button confirm-btn">
+        {{ isEditing ? 'Actualizar Difunto' : 'Registrar Difunto' }}
+      </button>
     </div>  
+
     <div class="right-section">
       <div class="form-container">
         <div class="input-group">
-            <input type="text"  v-model="name" class="data-input"  required  placeholder=" " />
-            <label class="input-label">Nombre completo</label>
+          <input type="text" v-model="name" class="data-input" required placeholder=" " />
+          <label class="input-label">Nombre completo</label>
         </div>
         <div class="input-group">
-            <input type="text"    v-model="epitaph" class="data-input"  required  placeholder=" " />
-            <label class="input-label">Epitafio</label>
+          <input type="text" v-model="epitaph" class="data-input" required placeholder=" " />
+          <label class="input-label">Epitafio</label>
         </div>
-       
         <div class="input-group">  
-          <input type="date" v-model="birthDate" class="data-input" required @change="handleDateChange"/>
+          <input type="date" v-model="birthDate" class="data-input" required />
           <label class="input-label">Fecha de nacimiento</label>
         </div>
         <div class="input-group">  
-          <input type="date" v-model="deathDate" class="data-input" required @change="handleDateChange"/>
+          <input type="date" v-model="deathDate" class="data-input" required />
           <label class="input-label">Fecha de defunción</label>
         </div>
 
@@ -52,85 +53,96 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue'
-import { registerDeceased, getDeceasedById, updateDeceased } from '@/services/deceasedService'
-import { useToast } from '@/composables/useToast'
-import { useRouter, useRoute } from 'vue-router'
+  import { ref, computed, onMounted, nextTick } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
+  import { registerDeceased, updateDeceased, getDeceasedById } from '@/services/deceasedService'
+  import { useToast } from '@/composables/useToast'
 
-const route = useRoute()
-const router = useRouter()
-const { showToast } = useToast()
+  const route = useRoute()
+  const router = useRouter()
+  const { showToast } = useToast()
 
-const isEditing = computed(() => !!route.params.id)
-const deceasedId = route.params.id
+  const isEditing = computed(() => !!route.params.id)
+  const deceasedId = route.params.id
 
-const name = ref('')
-const birthDate = ref('')
-const deathDate = ref('')
-const epitaph = ref('')
-const graveId = ref(1)
+  const name = ref('')
+  const birthDate = ref('')
+  const deathDate = ref('')
+  const epitaph = ref('')
+  const graveId = ref(1)
+  const imageUrl = ref(null)
+  const imageDeleteToken = ref(null)
 
-onMounted(async () => {
-  if (isEditing.value) {
-    try {
-      const deceased = await getDeceasedById(deceasedId)
-      name.value = deceased.name
-      birthDate.value = deceased.birthDate?.slice(0, 10)
-      deathDate.value = deceased.deathDate?.slice(0, 10)
-      epitaph.value = deceased.epitaph
-      graveId.value = deceased.graveId
-    } catch (error) {
-      showToast('Difunto no encontrado', 'error')
-      await nextTick();
-      router.push({ name: 'deceasedAdministration' })
-    }
-  }
-})
+  const fileInput = ref(null)
+  const selectedImage = ref(null)
 
-const handleSubmit = async () => {
-  try {
-    const data = {
-      name: name.value,
-      birthDate: birthDate.value,
-      deathDate: deathDate.value,
-      epitaph: epitaph.value,
-      graveId: graveId.value
-    }
-
+  onMounted(async () => {
     if (isEditing.value) {
-      await updateDeceased(deceasedId, data)
-      showToast('Difunto actualizado correctamente', 'success')
-    } else {
-      await registerDeceased(data)
-      showToast('Difunto registrado correctamente', 'success')
+      try {
+        const deceased = await getDeceasedById(deceasedId)
+        name.value = deceased.name
+        birthDate.value = deceased.birthDate?.slice(0, 10)
+        deathDate.value = deceased.deathDate?.slice(0, 10)
+        epitaph.value = deceased.epitaph
+        graveId.value = deceased.graveId
+        imageUrl.value = deceased.imageUrl
+        imageDeleteToken.value = deceased.imageDeleteToken
+      } catch {
+        showToast('Difunto no encontrado', 'error')
+        await nextTick()
+        router.push({ name: 'deceasedAdministration' })
+      }
+    }
+  })
+
+  const handleSubmit = async () => {
+    if (!name.value || !birthDate.value || !deathDate.value || !epitaph.value) {
+      showToast('Todos los campos son obligatorios', 'error')
+      return
     }
 
-    await nextTick()
-    router.push({ name: 'deceasedAdministration' })
-  } catch (err) {
-    showToast('Error al guardar difunto.', 'error')
+    let imageResult = null
+
+    try {
+      const data = {
+        name: name.value,
+        birthDate: birthDate.value,
+        deathDate: deathDate.value,
+        epitaph: epitaph.value,
+        graveId: graveId.value,
+        imageUrl: imageResult?.url || imageUrl.value,
+        imageDeleteToken: imageResult?.deleteToken || imageDeleteToken.value
+      }
+
+      if (isEditing.value) {
+        await updateDeceased(deceasedId, data, selectedImage.value, imageDeleteToken.value)
+        showToast('Difunto actualizado correctamente', 'success')
+      } else {
+        await registerDeceased(data, selectedImage.value)
+        showToast('Difunto registrado correctamente', 'success')
+      }
+
+      await nextTick()
+      router.push({ name: 'deceasedAdministration' })
+    } catch (err) {
+      showToast('Error al guardar difunto.', 'error')
+    }
   }
-}
 
-const fileInput = ref(null)
-const selectedImage = ref(null)
-const imagePreview = ref(null)
-
-const triggerImageInput = () => {
-  fileInput.value?.click()
-}
-
-const handleImageChange = (event) => {
-  const file = event.target.files[0]
-  if (file && file.type.startsWith('image/')) {
-    selectedImage.value = file
-    imagePreview.value = URL.createObjectURL(file)
-  } else {
-    selectedImage.value = null
-    imagePreview.value = null
+  const triggerImageInput = () => {
+    fileInput.value?.click()
   }
-}
 
+  const handleImageChange = (event) => {
+    const file = event.target.files[0]
+    if (file && file.type.startsWith('image/')) {
+      selectedImage.value = file
+      imageUrl.value = URL.createObjectURL(file)
+    } else {
+      selectedImage.value = null
+      imageUrl.value = null
+    }
+  }
 </script>
 
 <style scoped>
