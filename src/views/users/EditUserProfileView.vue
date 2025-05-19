@@ -36,7 +36,7 @@
               <div class="input-group">
                 <input 
                   type="text" 
-                  v-model="name" 
+                  v-model="user.name" 
                   class="data-input" 
                   placeholder=" " 
                 />
@@ -46,7 +46,7 @@
               <div class="input-group">
                 <input 
                   type="email" 
-                  v-model="email" 
+                  v-model="user.email" 
                   class="data-input" 
                   placeholder=" " 
                 />
@@ -56,7 +56,7 @@
               <div class="input-group">
                 <input 
                   type="text" 
-                  v-model="phone" 
+                  v-model="user.phoneNumber" 
                   class="data-input" 
                   placeholder=" " 
                 />
@@ -69,9 +69,30 @@
                   class="data-input" 
                   placeholder=" " 
                 />
-                <label class="input-label">Contraseña</label>
+                <label class="input-label">Contraseña Actual</label>
               </div>
-              <button class="purple-button">Confirmar</button>
+
+              <div class="input-group">
+                <input 
+                  type="password" 
+                  v-model="newPassword" 
+                  class="data-input" 
+                  placeholder=" " 
+                />
+                <label class="input-label">Nueva Contraseña (opcional)</label>
+              </div>
+
+              <div class="input-group">
+                <input 
+                  type="password" 
+                  v-model="confirmPassword" 
+                  class="data-input" 
+                  placeholder=" " 
+                />
+                <label class="input-label">Confirmar Nueva Contraseña</label>
+              </div>
+
+              <button @click="handleSubmit" class="purple-button">Confirmar</button>
             
           </div>
           
@@ -90,12 +111,60 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue'
+import { getMyProfile, updateMyProfile  } from '@/services/userService'
+import { useToast } from '@/composables/useToast'
 
-const name = ref('Balatriño');
-const email = ref('Balatrobalatrez@gmail.com');
-const phone = ref('6121701714');
-const password = ref('lol1');
+const { showToast } = useToast()
+
+const user = ref({
+  name: '',
+  email: '',
+  phoneNumber: ''
+})
+
+const password = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
+
+onMounted(async () => {
+  try {
+    user.value = await getMyProfile()
+  } catch (err) {
+    console.error('Error al obtener el perfil:', err)
+    showToast('Error al cargar tu perfil', 'error')
+  }
+})
+
+const handleSubmit = async () => {
+  if (!password.value) {
+    showToast('Debes ingresar tu contraseña actual', 'error')
+    return
+  }
+
+  if (newPassword.value && newPassword.value !== confirmPassword.value) {
+    showToast('La nueva contraseña y su confirmación no coinciden', 'error')
+    return
+  }
+
+  const data = {
+    ...user.value,
+    password: password.value,
+    newPassword: newPassword.value || undefined
+  }
+
+  try {
+    await updateMyProfile(data)
+    showToast('Perfil actualizado correctamente', 'success')
+    password.value = ''
+    newPassword.value = ''
+    confirmPassword.value = ''
+  } catch (err) {
+    console.error('Error al actualizar perfil:', err)
+    const msg = err.response?.data?.error || 'Error al actualizar perfil'
+    showToast(msg, 'error')
+  }
+}
 </script>
 
 <style scoped>
@@ -109,9 +178,8 @@ const password = ref('lol1');
 }
 
 .profile-center-box {
-    margin-top: 30px;
+  margin-top: 30px;
   width: 80%;
-  height: 70vh;
   background: white;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);

@@ -36,7 +36,7 @@
               <div class="input-group">
                 <input 
                   type="text" 
-                  v-model="name" 
+                  v-model="user.name" 
                   class="data-input" 
                   readonly 
                   placeholder=" " 
@@ -47,7 +47,7 @@
               <div class="input-group">
                 <input 
                   type="text" 
-                  v-model="email" 
+                  v-model="user.email" 
                   class="data-input" 
                   readonly 
                   placeholder=" " 
@@ -58,7 +58,7 @@
               <div class="input-group">
                 <input 
                   type="text" 
-                  v-model="phone" 
+                  v-model="user.phoneNumber" 
                   class="data-input" 
                   readonly 
                   placeholder=" " 
@@ -74,7 +74,7 @@
               src="../../assets/images/logo.png" 
               alt="Logo usuario" 
               class="user-logo"
-            />
+            /> 
           </div>
         </div>
       </div>
@@ -83,11 +83,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue'
+import { getMyProfile } from '@/services/userService'
+import { useToast } from '@/composables/useToast'
 
-const name = ref('Balatriño');
-const email = ref('Balatrobalatrez@gmail.com');
-const phone = ref('6121701714');
+const { showToast } = useToast()
+const user = ref({
+  name: '',
+  email: '',
+  phoneNumber: ''
+})
+
+onMounted(async () => {
+  try {
+    user.value = await getMyProfile()
+  } catch (err) {
+    console.error('Error al obtener el perfil:', err)
+    showToast('Error al cargar tu perfil', 'error')
+  }
+})
 </script>
 
 <style scoped>
