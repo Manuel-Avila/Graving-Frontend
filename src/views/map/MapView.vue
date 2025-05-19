@@ -60,15 +60,7 @@
       </div>
     </div>        
     </div>
-    <div class="map-label">
-        <h1>Mapa del Cementerio</h1>
-    </div>
     <GraveMap />
-    
-    
- 
-    
-
 </template>
 
 <script setup>
@@ -99,7 +91,7 @@ const handleSearch = () => {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 30vh;
+  margin-bottom: 10px;
   padding: 20px;
   box-sizing: border-box;
 }
@@ -113,7 +105,7 @@ const handleSearch = () => {
 }
 
 .search-header {
- 
+  text-align: center;
 }
 
 .search-header h2 {
@@ -180,23 +172,6 @@ const handleSearch = () => {
   flex-direction: column;
 }
 
-.map-label {
-    display: flex;
-    width: 100%;
-    height: 5vh;
-    padding: 20px;
-    padding-bottom: 0px;
-    align-items: center;
-}
-
-.map-label h1 {
-  text-align: center;
-  width: 95%;
-  align-self: center;
-  color: #333;
-  font-size: 1.5rem;
-
-}
 .purple-button{
     width: 200px;
 }
@@ -206,15 +181,12 @@ const handleSearch = () => {
   .input-row {
     flex-direction: column;
   }
-  .map-container-top{
-    height: 80vh;
-  }
   
   .search-button {
     width: 100%;
   }
   .input-group{
- max-width: 90%;
+    max-width: 90%;
   }
  
 }

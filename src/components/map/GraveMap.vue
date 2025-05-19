@@ -1,6 +1,7 @@
 <template>
   <div class="home-view-map">
     <div class="home-view-map-container">
+      <h1 class="center">Cementerio Perlas La Paz</h1>
       <div class="cemetery-map-scroll">
         <div class="cemetery-blocks">
    
@@ -133,6 +134,10 @@ const registerDeceased = (block, row, grave) => {
 };
 </script>
 <style scoped>
+
+.center {
+  text-align: center;
+}
 
 .home-view-map {
   position: relative;
@@ -325,11 +330,10 @@ const registerDeceased = (block, row, grave) => {
     width: 100px;
   }
   .purple-button,
-.green-button,
-.outline-white-button{
-    font-size: 10px;
-   
-}
+  .green-button,
+  .outline-white-button{
+      font-size: 10px;
+  }
 }
 
 @media (max-width: 600px) {
