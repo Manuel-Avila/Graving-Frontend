@@ -138,6 +138,27 @@
     padding: 0.75rem 0;
   }
 
+  .green-button{
+    background-color: #1d914e;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    border: none;
+    padding: 0.75rem 1.5rem; 
+    border-radius: 0.4rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    max-width: 300px;
+    display: inline-block;
+    box-shadow: 5px 5px 8px var(--shadow-color);
+  }
+
+  .green-button:hover {
+    background-color: #3cbd80;
+  }
+
   .google-signin-btn {
     display: inline-flex;
     align-items: center;
