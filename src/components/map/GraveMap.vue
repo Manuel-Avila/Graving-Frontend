@@ -4,66 +4,73 @@
       <h1 class="center">Cementerio Perlas La Paz</h1>
       <div class="cemetery-map-scroll">
         <div class="cemetery-blocks">
-   
           <div class="block" v-for="block in 4" :key="'block-'+block">
             <div class="block-title">Manzana {{ block }}</div>
-      
+
             <div class="row" v-for="row in 5" :key="'row-'+row">
-       
-              <div class="grave-container" v-for="grave in 5" :key="'grave-'+grave">
-                <button 
-                  class="grave"
-                  :class="{
-                    'occupied': isGraveOccupied(block, row, grave),
-                    'selected': isGraveSelected(block, row, grave)
-                  }"
-                  @click="toggleGraveModal(block, row, grave)"
-                >
-                  {{ getGraveLetter(block, row) }}{{ grave }}
-                </button>
-             
-                <div 
-                  class="grave-modal"
-                  :class="{
-                    'top-modal': block <= 2,
-                    'bottom-modal': block > 2
-                  }"
-                  v-if="showModal && currentGrave === getGraveId(block, row, grave)"
-                  @click.stop
-                >
-                  <div class="modal-content">
-                    <h3>Tumba {{ getGraveLetter(block, row) }}{{ grave }}</h3>
-                    <p v-if="isGraveOccupied(block, row, grave)">
-                      Esta tumba está ocupada
-                    </p>
-                    <p v-else>
-                      Esta tumba está disponible
-                    </p>
-                    
-                    <div class="modal-actions">
-                      <template v-if="isGraveOccupied(block, row, grave)">
-                        <button class="purple-button" @click="viewDeceased(block, row, grave)">
-                          Ver Difunto
+              <div class="row-label">
+                <span v-if="block === 1 || block === 3">
+                  {{ getGraveLetter(block, row) }}
+                </span>
+              </div>
+
+              <div class="row-graves">
+                <div class="grave-container" v-for="grave in 5" :key="'grave-'+grave">
+                  <button 
+                    class="grave"
+                    :class="{
+                      'occupied': isGraveOccupied(block, row, grave),
+                      'selected': isGraveSelected(block, row, grave)
+                    }"
+                    @click="toggleGraveModal(block, row, grave)"
+                  >
+                    {{ getGraveNumber(block, row, grave) }}
+
+                  </button>
+
+                  <div 
+                    class="grave-modal"
+                    :class="{
+                      'top-modal': block <= 2,
+                      'bottom-modal': block > 2
+                    }"
+                    v-if="showModal && currentGrave === getGraveId(block, row, grave)"
+                    @click.stop
+                  >
+                    <div class="modal-content">
+                      <h3>Tumba {{ getGraveLetter(block, row) }}{{ grave }}</h3>
+                      <p v-if="isGraveOccupied(block, row, grave)">
+                        Esta tumba está ocupada
+                      </p>
+                      <p v-else>
+                        Esta tumba está disponible
+                      </p>
+
+                      <div class="modal-actions">
+                        <template v-if="isGraveOccupied(block, row, grave)">
+                          <button class="purple-button" @click="viewDeceased(block, row, grave)">
+                            Ver Difunto
+                          </button>
+                          <button class="green-button" @click="generateVisit(block, row, grave)">
+                            Generar Visita
+                          </button>
+                        </template>
+                        <button v-else class="purple-button" @click="registerDeceased(block, row, grave)">
+                          Registrar Difunto
                         </button>
-                        <button class="green-button" @click="generateVisit(block, row, grave)">
-                          Generar Visita
+                        <button class="outline-white-button" @click="closeModal">
+                          Cerrar
                         </button>
-                      </template>
-                      <button v-else class="purple-button" @click="registerDeceased(block, row, grave)">
-                        Registrar Difunto
-                      </button>
-                      <button class="outline-white-button" @click="closeModal">
-                        Cerrar
-                      </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+                </div> <!-- /grave-container -->
+              </div> <!-- /row-graves -->
+            </div> <!-- /row -->
+          </div> <!-- /block -->
+        </div> <!-- /cemetery-blocks -->
+      </div> <!-- /cemetery-map-scroll -->
+    </div> <!-- /container -->
   </div>
 </template>
 
@@ -88,6 +95,11 @@ const getGraveLetter = (block, row) => {
   return String.fromCharCode(65 + letterIndex);
 };
 
+const getGraveNumber = (block, row, grave) => {
+  const gravesPerBlock = 25; 
+  const gravesPerRow = 5;
+  return ((block - 1) * gravesPerBlock) + ((row - 1) * gravesPerRow) + grave;
+};
 
 const getGraveId = (block, row, grave) => {
   return `${getGraveLetter(block, row)}${grave}`;
@@ -145,24 +157,25 @@ const registerDeceased = (block, row, grave) => {
   justify-content: center; 
   align-items: center;     
   width: 100%;
-  height: 70vh;
+ 
   padding: 20px;
   box-sizing: border-box;
 }
-
 .home-view-map-container {
   width: 100%;
   max-width: 1600px;
-  height: 100%;
+  height: 75vh;
+  margin-bottom: 40px;
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .cemetery-map-scroll {
-  width: 100%;
-  height: 100%;
+  flex: 1; 
   overflow: auto;
   padding: 15px;
   box-sizing: border-box;
@@ -171,11 +184,12 @@ const registerDeceased = (block, row, grave) => {
 .cemetery-blocks {
   display: grid;
   grid-template-columns: repeat(2, minmax(300px, 1fr));
-  grid-template-rows: repeat(2, minmax(200px, 1fr));
+  grid-template-rows: repeat(2, auto);
   gap: 20px;
-  min-width: fit-content;
-  min-height: fit-content;
+  min-width: 800px;
+  min-height: 600px;
 }
+
 
 .block {
   display: flex;
@@ -195,10 +209,27 @@ const registerDeceased = (block, row, grave) => {
   font-size: 1.1rem;
 }
 
+
 .row {
   display: flex;
-  justify-content: space-around;
+  align-items: center;
   margin-bottom: 10px;
+}
+
+.row-label {
+  width: 2%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #432c48;
+  font-size: 14px;
+}
+
+.row-graves {
+  width: 96%;
+  display: flex;
+  justify-content: space-around;
 }
 
 .grave-container {
@@ -345,6 +376,7 @@ const registerDeceased = (block, row, grave) => {
 }
   .block {
     min-width: 200px;
+    height: 240px;
   }
   
   .grave {

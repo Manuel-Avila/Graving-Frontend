@@ -18,12 +18,13 @@
             Editar Perfil
           </router-link>
           <router-link 
-            to="/historial-visitas" 
+            to="/visits" 
             class="tab-button"
-            :class="{ 'active': $route.path === '/historial-visitas' }"
+            :class="{ 'active': $route.path === '/visits' }"
           >
-            Historial de Visitas
+            Historial de visitas
           </router-link>
+         
         </div>
       </div>
 
@@ -65,6 +66,8 @@
                 />
                 <label class="input-label">Teléfono</label>
               </div>
+
+              <button class="purple-button">Historial de visitas</button>
             
           </div>
           
@@ -221,6 +224,11 @@ onMounted(async () => {
   max-width: 80%;
   max-height: 80%;
   object-fit: contain;
+}
+
+.purple-button{
+  margin-top: 240px;
+  align-self: center;
 }
 
 @media (max-width: 768px) {

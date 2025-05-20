@@ -18,9 +18,9 @@
             Editar Perfil
           </router-link>
           <router-link 
-            to="/historial-visitas" 
+            to="/visits" 
             class="tab-button"
-            :class="{ 'active': $route.path === '/historial-visitas' }"
+            :class="{ 'active': $route.path === '/visits' }"
           >
             Historial de Visitas
           </router-link>
