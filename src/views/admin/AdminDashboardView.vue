@@ -3,11 +3,11 @@
     <h1 class="admin-title">Panel de Administración</h1>
     <div class="dashboard-grid">
   
-      <router-link :to="{name: 'deceasedAdministration'}" class="dashboard-card">
+      <router-link :to="{name: 'searchDeceased'}" class="dashboard-card">
         <div class="image-container">
           <img src="../../assets/images/deceasedAdministration.webp" alt="Gestión Difuntos" class="faded-image">
           <div class="image-overlay">
-            <h2>Gestión de Difuntos</h2>
+            <h2>Buscador de Difuntos</h2>
           </div>
         </div>
       </router-link>
@@ -23,9 +23,9 @@
         
       <router-link :to="{name: 'owners'}" class="dashboard-card">
         <div class="image-container">
-          <img src="../../assets/images/ownersAdministration.jpg" alt="Gestión Propietarios" class="faded-image">
+          <img src="../../assets/images/ownersAdministration.jpg" alt="Gestión Representantes" class="faded-image">
           <div class="image-overlay">
-            <h2>Gestión de Propietarios</h2>
+            <h2>Gestión de Representantes</h2>
           </div>
         </div>
       </router-link>

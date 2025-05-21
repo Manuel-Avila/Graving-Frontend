@@ -1,6 +1,6 @@
 <template>
   <div class="deceased-container">
-    <h2>Administración de Difuntos</h2>
+    <h2>Buscador de Difuntos</h2>
     
 
     <div class="search-section">
@@ -12,17 +12,16 @@
             v-model="searchQuery" 
             class="data-input" 
             placeholder=" " 
-            @keyup.enter="searchDeceased"
+            @keyup="searchDeceased"
           />
           <label class="input-label">Nombre del difunto</label>
         </div>
-        <button class="purple-button" @click="searchDeceased">Buscar</button>
       </div>
     </div>
 
     <div class="results-container" v-if="showResults">
       <button 
-        class="nav-arrow left-arrow" 
+        class="purple-button arrow-button" 
         @click="prevCard" 
         v-show="canScrollLeft"
         aria-label="Resultados anteriores"
@@ -38,7 +37,7 @@
           <DeceasedCard 
             v-for="(deceased, index) in deceasedResults" 
             :key="index"
-            :deceased="formatDeceasedData(deceased, index)"
+            :deceased="formatDeceasedData(deceased)"
             class="fixed-size-card"
             :class="{ 
               'single-card': deceasedResults.length === 1,
@@ -49,7 +48,7 @@
       </div>
       
       <button 
-        class="nav-arrow right-arrow" 
+        class="purple-button arrow-button" 
         @click="nextCard" 
         v-show="canScrollRight"
         aria-label="Siguientes resultados"
@@ -61,67 +60,65 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import DeceasedCard from '@/components/deceased/DeceasedCard.vue';
+  import { ref, computed, onMounted } from 'vue'
+  import { getAllDeceased } from '@/services/deceasedService'
+  import DeceasedCard from '@/components/deceased/DeceasedCard.vue'
+  import { useToast } from '@/composables/useToast'
 
+  const { showToast } = useToast()
+  const searchQuery = ref('')
+  const currentIndex = ref(0)
+  const allDeceased = ref([])
+  const deceasedResults = ref([])
+  const cardsToShow = 3
 
-const INITIAL_RESULTS_COUNT = 5; 
+  const formatDeceasedData = (deceased) => ({
+    id: deceased.id,
+    name: deceased.name,
+    imageUrl: deceased.imageUrl,
+    graveNumber: deceased.graveNumber,
+    deathDate: new Date(deceased.deathDate).toLocaleDateString('es-MX', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    })
+  })
 
-const searchQuery = ref('');
-const currentIndex = ref(0);
-const deceasedResults = ref([]);
-const cardsToShow = 3; 
+  const searchDeceased = () => {
+    const query = searchQuery.value.trim().toLowerCase()
+    deceasedResults.value = query
+      ? allDeceased.value.filter(d => d.name.toLowerCase().includes(query))
+      : [...allDeceased.value]
 
-
-const mockResults = [
-  { id: 1, name: 'Juan Pérez', date: '15/03/1990 - 10/05/2023' },
-  { id: 2, name: 'María García', date: '22/07/1985 - 05/01/2023' },
-  { id: 3, name: 'María García', date: '22/07/1985 - 05/01/2023' },
-  { id: 4, name: 'María García', date: '22/07/1985 - 05/01/2023' },
-  
-];
-
-
-const formatDeceasedData = (deceased, index) => ({
-  name: deceased.name,
-  deathDate: deceased.date.split(' - ')[1],
-  graveNumber: index + 1
-});
-
-
-const searchDeceased = () => {
-  deceasedResults.value = searchQuery.value 
-    ? mockResults.filter(d => 
-        d.name.toLowerCase().includes(searchQuery.value.toLowerCase()))
-    : mockResults.slice(0, INITIAL_RESULTS_COUNT); 
-  
-  currentIndex.value = 0;
-};
-
-
-const showResults = computed(() => deceasedResults.value.length > 0);
-const canScrollLeft = computed(() => currentIndex.value > 0);
-const canScrollRight = computed(() => {
-
-  return currentIndex.value < Math.ceil(deceasedResults.value.length / cardsToShow) - 1;
-});
-
-
-const nextCard = () => {
-  if (canScrollRight.value) {
-    currentIndex.value++;
+    currentIndex.value = 0
   }
-};
 
-const prevCard = () => {
-  if (canScrollLeft.value) {
-    currentIndex.value--;
+  const showResults = computed(() => deceasedResults.value.length > 0)
+  const canScrollLeft = computed(() => currentIndex.value > 0)
+  const canScrollRight = computed(() => {
+    return currentIndex.value < Math.ceil(deceasedResults.value.length / cardsToShow) - 1
+  })
+
+  const nextCard = () => {
+    if (canScrollRight.value) currentIndex.value++
   }
-};
 
+  const prevCard = () => {
+    if (canScrollLeft.value) currentIndex.value--
+  }
 
-searchDeceased();
+  onMounted(async () => {
+    try {
+      const response = await getAllDeceased()
+      allDeceased.value = response
+      deceasedResults.value = [...response]
+    } catch (err) {
+      console.error('Error al obtener difuntos:', err)
+      showToast('Error al obtener difuntos', 'error')
+    }
+  })
 </script>
+
 
 <style scoped>
 .deceased-container {
@@ -152,24 +149,6 @@ h2 {
   flex-grow: 1;
   position: relative;
 }
-
-
-.purple-button {
-  background-color: var(--purple-color);
-  color: white;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s;
-  white-space: nowrap;
-}
-
-.purple-button:hover {
-  background-color: var(--purple-color-dark);
-}
-
 
 .results-container {
   position: relative;
@@ -207,27 +186,11 @@ h2 {
   margin: 0 auto;
 }
 
-
-.nav-arrow {
-  background: var(--purple-color);
-  color: white;
-  border: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  font-size: 20px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-  flex-shrink: 0;
+.arrow-button {
+  font-size: 1.4rem; 
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
 }
-
-.nav-arrow:hover {
-  background: var(--purple-color-dark);
-}
-
 
 @media (max-width: 1024px) {
   .cards-wrapper {
@@ -268,10 +231,6 @@ h2 {
   .fixed-size-card {
     width: 100%;
     min-width: 100%;
-  }
-  
-  .nav-arrow {
-    display: none;
   }
 }
 </style>

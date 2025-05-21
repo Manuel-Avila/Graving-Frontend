@@ -1,36 +1,44 @@
 <template>
   <div class="deceased-card">
-    <!-- Foto del difunto con padding -->
     <div class="deceased-photo">
       <div class="photo-container">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#6b2c7d" width="48" height="48">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-        </svg>
+        <img v-if="deceased.imageUrl" :src="deceased.imageUrl" alt="Foto del difunto" class="deceased-photo">
+        <img v-else src="../../assets/images/deceasedPlaceholder.png" alt="Foto del difunto" class="deceased-photo">
       </div>
     </div>
 
-    <!-- Información del difunto -->
     <div class="deceased-info">
-      <h3 class="deceased-name">Balatrero Balatrez Diaz</h3>
+      <h3 class="deceased-name">{{ deceased.name }}</h3>
       
       <div class="info-row">
         <span class="info-label">Fecha de Defunción</span>
-        <span class="info-value">25 de agosto del 2024</span>
+        <span class="info-value">{{ deceased.deathDate }}</span>
       </div>
       
       <div class="info-row">
         <span class="info-label">Número de Tumba</span>
-        <span class="info-value">5</span>
+        <span class="info-value">{{ deceased.graveNumber }}</span>
       </div>
     </div>
 
-    <!-- Acciones en columna -->
     <div class="card-actions">
-      <button class="outline-white-button">Ver</button>
-      <button class="purple-button">Editar</button>
+      <router-link :to="{ name: 'editDeceased', params: { id: deceased.id } }" class="purple-button">Editar</router-link>
+      <router-link :to="{ name: 'visit', params: { id: deceased.id } }" class="purple-button">Visitar</router-link>
+      <router-link :to="{ name: 'deceased', params: { id: deceased.id } }"  class="outline-white-button">Ver</router-link>
     </div>
   </div>
 </template>
+
+<script setup> 
+  import { defineProps } from 'vue'
+
+  defineProps({
+    deceased: {
+      type: Object,
+      required: true
+    }
+  })
+</script>
 
 <style scoped>
 .deceased-card {
@@ -41,23 +49,21 @@
   width: 260px;
   margin: 0 auto;
   font-family: Arial, sans-serif;
-  text-align: center; /* Centrado general */
+  text-align: center;
   padding-bottom: 16px;
 }
 
 .deceased-photo {
   width: 100%;
   padding: 20px 0 10px 0;
-  background-color: #f5f5f5;
   display: flex;
   justify-content: center;
-  border-bottom: 1px solid #eee;
 }
 
 .photo-container {
   width: 120px;
   height: 120px;
-  background-color: #eee;
+  background-color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -114,22 +120,11 @@
   transition: background-color 0.2s;
 }
 
-.view-button {
-  background-color: #f0f0f0;
-  color: #333;
-}
-
-.view-button:hover {
-  background-color: #e0e0e0;
-}
-
-.edit-button {
-  background-color: #6b2c7d;
-  color: white;
-}
-
-.edit-button:hover {
-  background-color: #5a2469;
+.profile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 /* Responsive */

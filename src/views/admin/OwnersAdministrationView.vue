@@ -1,9 +1,6 @@
 <template>
   <div class="grave-owners-container">
     <div class="grave-owners-box">
-
-      
-
       <div class="search-group">
         <div class="input-group">
                 <input 
@@ -14,16 +11,12 @@
                 />
                 <label class="input-label">Nombre</label>
         </div>
-        <button class="purple-button">Buscar</button>
-              
       </div>
-
 
       <div class="table-title">
-        <h2>Listado de Propietarios</h2>
+        <h2>Listado de Representantes</h2>
       </div>
 
-    
       <div class="owners-table-wrapper">
         <table class="owners-table">
           <thead>
@@ -31,19 +24,20 @@
               <th>Nombre</th>
               <th>Teléfono</th>
               <th>Correo</th>
+              <th>Curp</th>
               <th>Difunto</th>
               <th>Funciones</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(owner, index) in filteredOwners" :key="index">
-              <td>{{ owner.nombre }}</td>
-              <td>{{ owner.telefono }}</td>
-              <td>{{ owner.correo }}</td>
-              <td>{{ owner.difunto }}</td>
+              <td>{{ owner.name }}</td>
+              <td>{{ owner.phone }}</td>
+              <td>{{ owner.email }}</td>
+              <td>{{ owner.curp }}</td>
+              <td>{{ owner.deceasedName }}</td>
               <td class="actions">
-                 <span class="action-link edit-link" @click="editOwner(owner)">Editar</span>
-                 <span class="action-link delete-link" @click="deleteOwner(owner)">Eliminar</span>
+                <router-link :to="{ name: 'editDeceased', params: { id: owner.deceasedId } }" class="purple-button">Editar</router-link>
               </td>
             </tr>
           </tbody>
@@ -54,37 +48,31 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+  import { ref, computed, onMounted } from 'vue'
+  import { getAllOwners } from '@/services/ownerService'
 
-const searchQuery = ref('');
+  const searchQuery = ref('')
+  const owners = ref([])
 
+  const filteredOwners = computed(() => {
+    return owners.value.filter(owner =>
+      owner.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      owner.phone.includes(searchQuery.value) ||
+      owner.email.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      owner.curp.toLowerCase().includes(searchQuery.value.toLowerCase())
+    )
+  })
 
-const owners = Array(15).fill().map((_, i) => ({
-  nombre: `Propietario ${i + 1}`,
-  telefono: `+52 55 ${Math.floor(1000 + Math.random() * 9000)} ${Math.floor(1000 + Math.random() * 9000)}`,
-  correo: `propietario${i + 1}@example.com`,
-  difunto: i % 3 === 0 ? 'Sí' : 'No'
-}));
-
-
-const filteredOwners = computed(() => {
-  return owners.filter(owner => 
-    owner.nombre.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    owner.telefono.includes(searchQuery.value) ||
-    owner.correo.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
-});
-
-const editOwner = (owner) => {
-  console.log('Editar:', owner);
-  
-};
-
-const deleteOwner = (owner) => {
-  console.log('Eliminar:', owner);
- 
-};
+  onMounted(async () => {
+    try {
+      const response = await getAllOwners();
+      owners.value = response;
+    } catch (err) {
+      console.error('Error al obtener propietarios:', err);
+    }
+  })
 </script>
+
 <style scoped>
 .grave-owners-container {
   display: flex;
@@ -113,22 +101,6 @@ const deleteOwner = (owner) => {
   align-items: center;
 }
 
-.purple-button {
-  background-color: var(--purple-color);
-  color: white;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s;
-  white-space: nowrap;
-}
-
-.purple-button:hover {
-  background-color: var(--purple-color-dark);
-}
-
 .table-title {
   margin-bottom: 20px;
   padding-bottom: 10px;
@@ -139,6 +111,10 @@ const deleteOwner = (owner) => {
   color: #333;
   font-size: 1.5rem;
   margin: 0;
+}
+
+.purple-button {
+  width: 4rem;
 }
 
 .owners-table-wrapper {
@@ -216,10 +192,6 @@ const deleteOwner = (owner) => {
   .search-group {
     flex-direction: column;
     gap: 10px;
-  }
-  
-  .purple-button {
-    width: 60%;
   }
   
   .owners-table-wrapper {

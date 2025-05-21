@@ -9,7 +9,7 @@ import MapView from '@/views/map/MapView.vue'
 import DeceasedDetailView from '@/views/deceased/DeceasedDetailView.vue'
 import RegisterVisitView from '@/views/visits/RegisterVisitView.vue'
 import AdminDashboardView from '@/views/admin/AdminDashboardView.vue'
-import DeceasedAdministrationView from '@/views/admin/DeceasedAdministrationView.vue'
+import DeceasedSearchView from '@/views/deceased/DeceasedSearchView.vue'
 import RegisterAndEditDeceasedView from '@/views/deceased/RegisterAndEditDeceasedView.vue'
 import OwnersAdministrationView from '@/views/admin/OwnersAdministrationView.vue'
 import GravesAdministrationView from '@/views/admin/GravesAdministrationView.vue'
@@ -67,9 +67,9 @@ const routes = [
     component: AdminDashboardView
   },
   {
-    path: '/deceasedAdministration',
-    name: 'deceasedAdministration',
-    component: DeceasedAdministrationView
+    path: '/deceased/search',
+    name: 'searchDeceased',
+    component: DeceasedSearchView
   },
   {
     path: '/deceased/register',

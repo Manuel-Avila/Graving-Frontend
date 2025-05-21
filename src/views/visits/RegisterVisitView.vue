@@ -36,21 +36,10 @@
     <div class="right-section">
       <div class="right-section-components">
         <div class="container-tittle-your-data">
-          <h1 class="tittle-your-data">Tus Datos</h1>
+          <h1 class="tittle-your-data">Fecha</h1>
         </div>
           
         <div class="form-card">
-          <div class="input-group">
-            <input 
-              type="text" 
-              v-model="visitorName" 
-              class="data-input" 
-              placeholder=" "
-              required
-            />
-            <label class="input-label">Nombre</label>
-          </div>
-
           <div class="date-time-group">
             <div class="input-group">
               <input 
@@ -96,7 +85,6 @@
   const router = useRouter()
   const route = useRoute()
 
-  const visitorName = ref('');
   const visitDate = ref('');
   const visitTime = ref('');
 
@@ -126,7 +114,7 @@
   })
 
   const handleRegisterVisit = async () => {
-    if (!visitorName.value || !visitDate.value || !visitTime.value) {
+    if (!visitDate.value || !visitTime.value) {
       showToast('Todos los campos son obligatorios', 'error')
       return
     }

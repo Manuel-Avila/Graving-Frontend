@@ -16,6 +16,7 @@
             <router-link v-if="isAdmin" :to="{name: 'dashboard'}" :class="{'current-page': currentPage==='dashboard'}">Panel</router-link>
             <router-link :to="{name: 'home'}" :class="{'current-page': currentPage==='home'}">Inicio</router-link>
             <router-link :to="{name: 'map'}" :class="{'current-page': currentPage==='map'}">Mapa</router-link>
+            <router-link :to="{name: 'searchDeceased'}" :class="{'current-page': currentPage==='searchDeceased'}">Difuntos</router-link>
             
             <div class="dropdown" @mouseenter="isDropdownOpen = true" @mouseleave="isDropdownOpen = false">
                 <span class="dropdown-toggle">Cuenta</span>
@@ -39,6 +40,7 @@
             <nav v-if="isMenuOpen" class="navegation-bar-mobile">
                 <router-link :to="{ name: 'home' }" @click="closeMenu">Inicio</router-link>
                 <router-link :to="{ name: 'map' }" @click="closeMenu">Mapa</router-link>
+                <router-link :to="{ name: 'searchDeceased' }" @click="closeMenu">Difuntos</router-link>
                 <router-link v-if="isAdmin" :to="{ name: 'dashboard' }" @click="closeMenu">Panel</router-link>
                 <template v-if="isLoggedIn">
                     <router-link :to="{ name: 'profile' }" @click="closeMenu">Ver Perfil</router-link>
@@ -211,7 +213,7 @@
         color: var(--font-color);
     }
 
-    @media (max-width: 650px) { 
+    @media (max-width: 770px) { 
         .header {
             justify-content: space-between;
         }

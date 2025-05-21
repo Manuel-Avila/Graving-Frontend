@@ -1,10 +1,9 @@
 <template>
   <div class="view-deceased-container">
     <div class="left-section">
-      <div class="image-upload">
-        <button class="upload-btn">
-          <p>muelto ndea</p>
-        </button>
+      <div class="photo-upload">
+        <img v-if="imageUrl" :src="imageUrl" alt="Foto del difunto" class="deceased-photo">
+        <img v-else src="../../assets/images/deceasedPlaceholder.png" alt="Foto del difunto" class="deceased-photo">
       </div>
       <router-link :to="{name: 'editDeceased', params: {id: deceasedId}}" class="purple-button edit-button">Editar</router-link>
     </div>  
@@ -73,6 +72,7 @@
   const birthDate = ref('')
   const deathDate = ref('')
   const graveNumber = ref('')
+  const imageUrl = ref('')
 
   onMounted(async () => {
     try {
@@ -82,6 +82,7 @@
       birthDate.value = deceased.birthDate?.slice(0, 10)
       deathDate.value = deceased.deathDate?.slice(0, 10)
       graveNumber.value = deceased.graveNumber
+      imageUrl.value = deceased.imageUrl
     } catch (err) {
       showToast('Difunto no encontrado', 'error')
       await nextTick();
@@ -116,10 +117,9 @@
   margin-bottom: 30px;
 }
 
-.upload-btn {
+.photo-upload {
   width: 380px;
   height: 380px;
-  border: 2px dashed #ccc;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -128,7 +128,12 @@
   cursor: pointer;
   background-color: white;
   transition: all 0.3s ease;
-  margin-top: 70px;
+  margin: 60px ;
+}
+
+.deceased-photo {
+  width: 100%;
+  height: 100%;
 }
 
 .form-container {
@@ -195,12 +200,6 @@
     box-sizing: border-box;
   }
   
-  .upload-btn {
-    width: 300px;
-    height: 300px;
-    margin-top: 20px;
-  }
-  
   .form-container {
    
     margin-left: 12px;
@@ -217,10 +216,6 @@
 }
 
 @media (max-width: 768px) {
-  .upload-btn {
-    width: 250px;
-    height: 250px;
-  }
   
   section {
   width: 100%;
@@ -242,10 +237,6 @@
 }
 
 @media (max-width: 480px) {
-  .upload-btn {
-    width: 200px;
-    height: 200px;
-  }
   
   .right-section {
     padding: 20px;
@@ -253,6 +244,10 @@
   
   .form-container {
     padding: 20px;
+  }
+
+  .photo-upload {
+    width: 250px;
   }
 }
 </style>
