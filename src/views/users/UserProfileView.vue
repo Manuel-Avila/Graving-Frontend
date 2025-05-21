@@ -67,7 +67,7 @@
                 <label class="input-label">Teléfono</label>
               </div>
 
-              <button class="purple-button">Historial de visitas</button>
+              <router-link :to="{name: 'visits'}" class="purple-button">Historial de visitas</router-link>
             
           </div>
           
@@ -111,7 +111,6 @@ onMounted(async () => {
 .user-profile-container {
   display: flex;
   justify-content: center;
- 
   min-height: 70vh;
   padding: 20px;
   background-color: #f5f5f5;
@@ -120,7 +119,6 @@ onMounted(async () => {
 .profile-center-box {
     margin-top: 30px;
   width: 80%;
-  height: 70vh;
   background: white;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -229,6 +227,7 @@ onMounted(async () => {
 .purple-button{
   margin-top: 240px;
   align-self: center;
+  width: 200px;
 }
 
 @media (max-width: 768px) {

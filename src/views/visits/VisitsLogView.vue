@@ -32,16 +32,16 @@
         <table class="visits-table">
           <thead>
             <tr>
-              <th>Nombre(s)</th>
+              <th>Nombre del difunto</th>
               <th>Hora</th>
               <th>Fecha</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(visit, index) in visits" :key="index">
-              <td>{{ visit.nombre }}</td>
-              <td>{{ visit.hora }}</td>
-              <td>{{ visit.fecha }}</td>
+              <td>{{ visit.deceasedName }}</td>
+              <td>{{ formatTime(visit.date) }}</td>
+              <td>{{ formatDate(visit.date) }}</td>
             </tr>
           </tbody>
         </table>
@@ -52,12 +52,31 @@
 
 
 <script setup>
-const visits = Array(20).fill().map((_, i) => ({
-  nombre: `Persona ${i + 1}`,
-  hora: '10:00 AM',
-  fecha: '2025-05-20'
-}));
+// deceased.deathDate?.slice(0, 10)
+import { ref, onMounted } from 'vue'
+import { getMyVisits } from '@/services/userService'
+import { useToast } from '@/composables/useToast'
 
+const { showToast } = useToast()
+const visits = ref([])
+
+onMounted(async () => {
+  try {
+    visits.value = await getMyVisits()
+  } catch (err) {
+    showToast('Error al cargar las visitas', 'error')
+  }
+})
+
+const formatDate = (rawDate) => {
+  const date = new Date(rawDate)
+  return date.toLocaleDateString('es-MX', { year: 'numeric', month: '2-digit', day: '2-digit' })
+}
+
+const formatTime = (rawDate) => {
+  const date = new Date(rawDate)
+  return date.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })
+}
 </script>
 
 <style scoped>.user-visits-container {
