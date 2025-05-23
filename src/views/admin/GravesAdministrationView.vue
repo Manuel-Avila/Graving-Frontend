@@ -1,48 +1,43 @@
 <template>
   <div class="graves-container">
     <div class="graves-box">
-      <!-- Barra de búsqueda -->
       <div class="search-group">
-       <div class="input-group">
-                <input 
-                  type="text" 
-                  v-model="searchQuery" 
-                  class="data-input" 
-                  placeholder=" " 
-                />
-                <label class="input-label">Nombre</label>
+        <div class="input-group">
+          <input 
+            type="text" 
+            v-model="searchQuery" 
+            class="data-input" 
+            placeholder=" " 
+          />
+          <label class="input-label">Tumba</label>
         </div>
-        <button class="purple-button">Buscar</button>
       </div>
 
-      <!-- Título de la tabla -->
       <div class="table-title">
-        <h2>Registro de Tumbas</h2>
+        <h2>Administracion de Tumbas</h2>
       </div>
 
-      <!-- Tabla de tumbas -->
       <div class="graves-table-wrapper">
         <table class="graves-table">
           <thead>
             <tr>
-              <th>Nombre Difunto</th>
-              <th>Propietario</th>
               <th>N° Tumba</th>
-              <th>Reparación</th>
+              <th>Manzana</th>
+              <th>Cuadro</th>
+              <th>Fila</th>
+              <th>Tipo</th>
               <th>Funciones</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(grave, index) in filteredGraves" :key="index">
-              <td>{{ grave.difunto }}</td>
-              <td>{{ grave.propietario }}</td>
-              <td>{{ grave.numeroTumba }}</td>
-              <td :class="{'pending': grave.reparacion === 'Pendiente', 'completed': grave.reparacion !== 'Pendiente' && grave.reparacion !== 'N/A'}">
-                {{ grave.reparacion }}
-              </td>
+              <td>{{ grave.graveNumber }}</td>
+              <td>{{ grave.blockName }}</td>
+              <td>{{ grave.section }}</td>
+              <td>{{ grave.graveRow }}</td>
+              <td>{{ typeLabels[grave.type] }}</td>
               <td class="actions">
-                <span class="action-link edit-link" @click="editGrave(grave)">Editar</span>
-                <span class="action-link delete-link" @click="deleteGrave(grave)">Eliminar</span>
+                <button class="purple-button" @click="editGrave(grave)">Editar</button>
               </td>
             </tr>
           </tbody>
@@ -50,43 +45,96 @@
       </div>
     </div>
   </div>
+
+  <div v-if="editingGrave" class="modal-backdrop">
+    <div class="modal">
+      <h2>Editar Tumba #{{ editingGrave.graveNumber }}</h2>
+
+      <div class="input-group">
+        <input :value="editingGrave.blockName" class="data-input" disabled placeholder=" " />
+        <label class="input-label input-label-focused">Manzana</label>
+      </div>
+
+      <div class="input-group">
+        <input :value="editingGrave.section" class="data-input" disabled placeholder=" " />
+        <label class="input-label input-label-focused">Cuadro</label>
+      </div>
+
+      <div class="input-group">
+        <input :value="editingGrave.graveRow" class="data-input" disabled placeholder=" " />
+        <label class="input-label input-label-focused">Fila</label>
+      </div>
+
+      <div class="input-group">
+        <select v-model="editingGrave.type" class="data-input">
+          <option value="niche">Nicho</option>
+          <option value="grave">Tumba</option>
+          <option value="ossuary">Osario</option>
+        </select>
+        <label class="input-label input-label-focused">Tipo</label>
+      </div>
+
+      <div class="modal-actions">
+        <button class="outline-white-button" @click="editingGrave = null">Cancelar</button>
+        <button class="purple-button" @click="handleUpdate">Guardar</button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue'
+import { getAllGraves, updateGrave } from '@/services/graveService'
+import { useToast } from '@/composables/useToast'
 
-const searchQuery = ref('');
+const { showToast } = useToast()
+const searchQuery = ref('')
+const graves = ref([])
+const editingGrave = ref(null)
 
-// Datos de ejemplo
-const graves = Array(15).fill().map((_, i) => ({
-  difunto: `Difunto ${i + 1}`,
-  propietario: `Propietario ${i + 1}`,
-  numeroTumba: `T-${Math.floor(100 + Math.random() * 900)}`,
-  reparacion: i % 4 === 0 ? `2023-${(i%12)+1}-${(i%28)+1}` : i % 3 === 0 ? 'Pendiente' : 'N/A'
-}));
+onMounted(async () => {
+  try {
+    graves.value = await getAllGraves()
+    console.log(graves.value)
+  } catch (err) {
+    showToast('Error al obtener tumbas', 'error')
+  }
+})
 
 const filteredGraves = computed(() => {
-  return graves.filter(grave => 
-    grave.difunto.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    grave.propietario.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    grave.numeroTumba.includes(searchQuery.value) ||
-    grave.reparacion.toLowerCase().includes(searchQuery.value.toLowerCase())
-  );
-});
+  return graves.value.filter(grave =>
+    grave.blockName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+    grave.section.toString().includes(searchQuery.value) ||
+    grave.graveRow.toString().includes(searchQuery.value) ||
+    grave.graveNumber.toString().includes(searchQuery.value) ||
+    grave.status.toLowerCase().includes(searchQuery.value.toLowerCase())
+  )
+})
+
+const handleUpdate = async () => {
+  try {
+    const { id, type } = editingGrave.value
+    await updateGrave(id, { type })
+    showToast('Tumba actualizada correctamente', 'success')
+    editingGrave.value = null
+    graves.value = await getAllGraves()
+  } catch (err) {
+    showToast('Error al actualizar tumba', 'error')
+  }
+}
 
 const editGrave = (grave) => {
-  console.log('Editar:', grave);
-  // Lógica para editar tumba
-};
+  editingGrave.value = { ...grave }
+}
 
-const deleteGrave = (grave) => {
-  console.log('Eliminar:', grave);
-  // Lógica para eliminar tumba
-};
+const typeLabels = {
+  niche: 'Nicho',
+  grave: 'Tumba',
+  ossuary: 'Osario'
+}
 </script>
 
 <style scoped>
-/* Contenedor principal */
 .graves-container {
   display: flex;
   justify-content: center;
@@ -107,7 +155,6 @@ const deleteGrave = (grave) => {
   padding: 20px;
 }
 
-/* Barra de búsqueda */
 .search-group {
   display: flex;
   gap: 15px;
@@ -120,7 +167,6 @@ const deleteGrave = (grave) => {
   flex-grow: 1;
 }
 
-
 .input-label {
   position: absolute;
   left: 15px;
@@ -130,24 +176,6 @@ const deleteGrave = (grave) => {
   pointer-events: none;
 }
 
-
-.purple-button {
-  background-color: var(--purple-color);
-  color: white;
-  border: none;
-  padding: 12px 25px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s;
-  white-space: nowrap;
-}
-
-.purple-button:hover {
-  background-color: var(--purple-color-dark);
-}
-
-/* Título de la tabla */
 .table-title {
   margin-bottom: 20px;
   padding-bottom: 10px;
@@ -160,7 +188,6 @@ const deleteGrave = (grave) => {
   margin: 0;
 }
 
-/* Tabla de tumbas */
 .graves-table-wrapper {
   max-height: 600px;
   overflow-y: auto;
@@ -190,7 +217,6 @@ const deleteGrave = (grave) => {
   padding: 10px 12px;
 }
 
-/* Estilos para estado de reparación */
 .pending {
   color: #ff9800;
   font-weight: 500;
@@ -209,7 +235,6 @@ const deleteGrave = (grave) => {
   background-color: #f1f1f1;
 }
 
-/* Acciones */
 .actions {
   display: flex;
   gap: 12px;
@@ -229,10 +254,6 @@ const deleteGrave = (grave) => {
   color: #4a7cff;
 }
 
-.delete-link {
-  color: #ff4a4a;
-}
-
 .action-link:hover {
   text-decoration: underline;
   background-color: rgba(0, 0, 0, 0.05);
@@ -242,26 +263,72 @@ const deleteGrave = (grave) => {
   transform: translateY(1px);
 }
 
-/* Responsive */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 90%;
+}
+
+.modal h2 {
+  text-align: center;
+}
+
+.modal-field {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-field label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  gap: 10px;
+}
+
+.modal-actions button {
+  width: 40%;
+}
+
 @media (max-width: 768px) {
   .search-group {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .purple-button {
     width: 100%;
   }
-  
+
   .graves-table-wrapper {
     max-height: none;
     overflow-x: auto;
   }
-  
+
   .graves-table {
     min-width: 700px;
   }
-  
+
   .actions {
     flex-direction: column;
     gap: 8px;
@@ -273,18 +340,26 @@ const deleteGrave = (grave) => {
   .graves-container {
     padding: 10px;
   }
-  
+
   .graves-box {
     width: 100%;
     padding: 15px;
   }
-  
+
   .table-title h2 {
     font-size: 1.3rem;
   }
-  
+
   .action-link {
     padding: 4px 8px;
+  }
+
+  .modal {
+    width: 280px;
+  }
+
+  .modal-actions button {
+    font-size: 0.5rem;
   }
 }
 </style>
