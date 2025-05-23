@@ -38,6 +38,7 @@
               <td>{{ typeLabels[grave.type] }}</td>
               <td class="actions">
                 <button class="purple-button" @click="editGrave(grave)">Editar</button>
+                <router-link :to="{name: 'registerRepair', params: {graveId: grave.id}}" id="repair-button" class="purple-button">Reparacion</router-link>
               </td>
             </tr>
           </tbody>
@@ -254,6 +255,15 @@ const typeLabels = {
   color: #4a7cff;
 }
 
+#repair-button {
+  background-color: rgb(179, 129, 37);
+  width: 90px;
+}
+
+#repair-button:hover {
+  background-color: rgb(214, 155, 45);
+}
+
 .action-link:hover {
   text-decoration: underline;
   background-color: rgba(0, 0, 0, 0.05);
@@ -316,7 +326,7 @@ const typeLabels = {
     gap: 10px;
   }
 
-  .purple-button {
+  .purple-button, #repair-button {
     width: 100%;
   }
 

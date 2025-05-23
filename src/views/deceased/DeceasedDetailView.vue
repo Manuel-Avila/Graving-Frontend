@@ -86,7 +86,7 @@
     } catch (err) {
       showToast('Difunto no encontrado', 'error')
       await nextTick();
-      router.push({ name: 'deceasedAdministration' })
+      router.push({ name: 'searchDeceased' })
     }
   })
 </script>

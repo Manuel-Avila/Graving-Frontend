@@ -7,146 +7,143 @@
           <div class="block" v-for="block in 4" :key="'block-'+block">
             <div class="block-title">Manzana {{ block }}</div>
 
-            <div class="row" v-for="row in 5" :key="'row-'+row">
-              <div class="row-label">
-                <span v-if="block === 1 || block === 3">
-                  {{ getGraveLetter(block, row) }}
-                </span>
-              </div>
+            <div class="row" v-for="row in getRowsForBlock(block)" :key="`row-${block}-${row}`">
+              <div class="row-label"><span>{{ row }}</span></div>
 
               <div class="row-graves">
-                <div class="grave-container" v-for="grave in 5" :key="'grave-'+grave">
-                  <button 
+                <div class="grave-container" v-for="col in 5" :key="`grave-${block}-${row}-${col}`">
+                  <button
                     class="grave"
                     :class="{
-                      'occupied': isGraveOccupied(block, row, grave),
-                      'selected': isGraveSelected(block, row, grave)
+                      occupied: graveMap[block]?.[row]?.[col]?.status === 'occupied',
+                      selected: selectedGrave === graveMap[block]?.[row]?.[col]?.id
                     }"
-                    @click="toggleGraveModal(block, row, grave)"
+                    @click="toggleGraveModal(graveMap[block]?.[row]?.[col])"
                   >
-                    {{ getGraveNumber(block, row, grave) }}
-
+                    {{ graveMap[block]?.[row]?.[col]?.graveNumber || '-' }}
                   </button>
 
-                  <div 
+                  <div
                     class="grave-modal"
-                    :class="{
-                      'top-modal': block <= 2,
-                      'bottom-modal': block > 2
-                    }"
-                    v-if="showModal && currentGrave === getGraveId(block, row, grave)"
+                    :class="{ 'top-modal': block <= 2, 'bottom-modal': block > 2 }"
+                    v-if="showModal && currentGrave?.id === graveMap[block]?.[row]?.[col]?.id"
                     @click.stop
                   >
                     <div class="modal-content">
-                      <h3>Tumba {{ getGraveLetter(block, row) }}{{ grave }}</h3>
-                      <p v-if="isGraveOccupied(block, row, grave)">
-                        Esta tumba está ocupada
-                      </p>
-                      <p v-else>
-                        Esta tumba está disponible
-                      </p>
+                      <h3>Tumba #{{ currentGrave?.graveNumber }}</h3>
+                      <p><strong>Manzana:</strong> {{ currentGrave?.blockId }}</p>
+                      <p><strong>Cuadro:</strong> {{ currentGrave?.section }}</p>
+                      <p><strong>Fila:</strong> {{ currentGrave?.graveRow }}</p>
+                      <p><strong>Tipo:</strong> {{ translateType(currentGrave?.type) }}</p>
 
                       <div class="modal-actions">
-                        <template v-if="isGraveOccupied(block, row, grave)">
-                          <button class="purple-button" @click="viewDeceased(block, row, grave)">
-                            Ver Difunto
-                          </button>
-                          <button class="green-button" @click="generateVisit(block, row, grave)">
-                            Generar Visita
-                          </button>
+                        <template v-if="currentGrave?.status === 'occupied'">
+                          <router-link 
+                            :to="{name: 'deceased', params: {id: getDeceasedByGraveId(currentGrave?.id)?.id}}" 
+                            class="purple-button"
+                            >Ver Difunto
+                          </router-link>
+                          <template v-if="isLoggedIn">
+                            <router-link :to="{name: 'visit', params: {id: getDeceasedByGraveId(currentGrave?.id)?.id}}"
+                              class="green-button"
+                              >Agendar Visita
+                            </router-link>
+                          </template>
+                          <template v-if="isAdmin">
+                            <router-link :to="{name: 'registerRepair', params: {graveId: currentGrave?.id}}" id="repair-button" class="purple-button">Reparacion</router-link>
+                          </template>
                         </template>
-                        <button v-else class="purple-button" @click="registerDeceased(block, row, grave)">
-                          Registrar Difunto
-                        </button>
-                        <button class="outline-white-button" @click="closeModal">
-                          Cerrar
-                        </button>
+                        <template v-else>
+                          <template v-if="isAdmin">
+                            <router-link :to="{name: 'registerDeceased', params: {graveId: currentGrave?.id}}" class="purple-button">Registrar Difunto</router-link>
+                          </template>
+                        </template>
+                        <button class="outline-white-button" @click="closeModal">Cerrar</button>
                       </div>
                     </div>
                   </div>
-                </div> <!-- /grave-container -->
-              </div> <!-- /row-graves -->
-            </div> <!-- /row -->
-          </div> <!-- /block -->
-        </div> <!-- /cemetery-blocks -->
-      </div> <!-- /cemetery-map-scroll -->
-    </div> <!-- /container -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, computed } from 'vue'
+import { getAllGraves } from '@/services/graveService'
+import { getAllDeceased } from '@/services/deceasedService'
+import { useAuthStore } from '@/stores/authStore'
+import { useToast } from '@/composables/useToast'
 
+const { showToast } = useToast()
 
-const occupiedGraves = ref({
-  'A1': true,   
-  'C4': true, 
-  'F2': true,   
-  'K3': true, 
-});
+const allDeceased = ref([])
+const graveMap = ref({})
+const selectedGrave = ref(null)
+const currentGrave = ref(null)
+const showModal = ref(false)
 
-const showModal = ref(false);
-const currentGrave = ref(null);
-const selectedGrave = ref(null);
+const authStore = useAuthStore()
+const isLoggedIn = computed(() => authStore.isLoggedIn)
+const isAdmin = computed(() => authStore.isAdmin)
 
-
-const getGraveLetter = (block, row) => {
-  const letterIndex = (block - 1) * 5 + (row - 1);
-  return String.fromCharCode(65 + letterIndex);
-};
-
-const getGraveNumber = (block, row, grave) => {
-  const gravesPerBlock = 25; 
-  const gravesPerRow = 5;
-  return ((block - 1) * gravesPerBlock) + ((row - 1) * gravesPerRow) + grave;
-};
-
-const getGraveId = (block, row, grave) => {
-  return `${getGraveLetter(block, row)}${grave}`;
-};
-
-const isGraveOccupied = (block, row, grave) => {
-  return occupiedGraves.value[getGraveId(block, row, grave)];
-};
-
-const isGraveSelected = (block, row, grave) => {
-  return selectedGrave.value === getGraveId(block, row, grave);
-};
-
-const toggleGraveModal = (block, row, grave) => {
-  const graveId = getGraveId(block, row, grave);
-  selectedGrave.value = graveId;
-  
-  if (currentGrave.value === graveId && showModal.value) {
-    closeModal();
-  } else {
-    currentGrave.value = graveId;
-    showModal.value = true;
+const indexGraves = (list) => {
+  const map = {}
+  for (const grave of list) {
+    const { blockId, graveRow, section } = grave
+    if (!map[blockId]) map[blockId] = {}
+    if (!map[blockId][graveRow]) map[blockId][graveRow] = {}
+    map[blockId][graveRow][section] = grave
   }
-};
+  graveMap.value = map
+}
+
+onMounted(async () => {
+  try {
+    const data = await getAllGraves()
+    allDeceased.value = await getAllDeceased()
+    indexGraves(data)
+  } catch (err) {
+    showToast('Error al obtener tumbas', 'error')
+    console.error('Error al obtener tumbas:', err)
+  }
+})
+
+const getDeceasedByGraveId = (graveId) => {
+  return allDeceased.value.find(d => d.graveId === graveId)
+}
+
+const getRowsForBlock = (block) => {
+  return block <= 2 ? [1, 2, 3, 4, 5] : [6, 7, 8, 9, 10]
+}
+
+const toggleGraveModal = (grave) => {
+  if (!grave) return
+  selectedGrave.value = grave.id
+  currentGrave.value = grave
+  showModal.value = true
+}
 
 const closeModal = () => {
-  showModal.value = false;
-  currentGrave.value = null;
-};
+  showModal.value = false
+  currentGrave.value = null
+}
 
-const viewDeceased = (block, row, grave) => {
-  console.log('Ver difunto en:', getGraveId(block, row, grave));
-  closeModal();
-};
-
-const generateVisit = (block, row, grave) => {
-  console.log('Generar visita a:', getGraveId(block, row, grave));
-  closeModal();
-};
-
-const registerDeceased = (block, row, grave) => {
-  console.log('Registrar difunto en:', getGraveId(block, row, grave));
-  closeModal();
-};
+const translateType = (type) => {
+  switch (type) {
+    case 'niche': return 'Nicho'
+    case 'grave': return 'Tumba'
+    case 'ossuary': return 'Osario'
+    default: return 'Desconocido'
+  }
+}
 </script>
-<style scoped>
 
+<style scoped>
 .center {
   text-align: center;
 }
@@ -163,8 +160,6 @@ const registerDeceased = (block, row, grave) => {
 }
 .home-view-map-container {
   width: 100%;
-  max-width: 1600px;
-  height: 75vh;
   margin-bottom: 40px;
   background-color: #ffffff;
   border-radius: 8px;
@@ -247,7 +242,7 @@ const registerDeceased = (block, row, grave) => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 0.9rem;
   font-weight: bold;
   color: #ffffff;
   transition: all 0.2s ease;
@@ -257,7 +252,7 @@ const registerDeceased = (block, row, grave) => {
 
 .grave.occupied {
   background-color: #ccc;
-  color: #ffffff;
+  color: #535252;
 }
 
 .grave.selected {
@@ -321,6 +316,13 @@ const registerDeceased = (block, row, grave) => {
   transition: all 0.2s;
 }
 
+#repair-button {
+  background-color: rgb(179, 129, 37);
+}
+
+#repair-button:hover {
+  background-color: rgb(214, 155, 45);
+}
 .purple-button,
 .green-button,
 .outline-white-button{

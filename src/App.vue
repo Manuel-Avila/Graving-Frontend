@@ -125,7 +125,7 @@
     color: white;
   }
 
-  button:hover, .purple-button:hover, .outline-white-button:hover {
+  button:hover, .purple-button:hover, .outline-white-button:hover, .green-button:hover {
     transform: translateY(-3px);
   }
 

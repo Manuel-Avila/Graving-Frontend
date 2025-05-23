@@ -150,7 +150,6 @@ const handleSearch = () => {
   justify-content: center; 
   align-items: center;     
   width: 100%;
-  height: 75vh;
   padding: 20px;
   box-sizing: border-box;
 }

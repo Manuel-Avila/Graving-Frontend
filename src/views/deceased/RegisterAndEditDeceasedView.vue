@@ -45,7 +45,7 @@
 
         <div class="tomb-info">
           <h3>Número de tumba</h3>
-          <p class="tomb-number">A-245</p>
+          <p class="tomb-number">{{ graveId }}</p>
         </div>
       </div>
     </div>
@@ -62,14 +62,14 @@
   const router = useRouter()
   const { showToast } = useToast()
 
-  const isEditing = computed(() => !!route.params.id)
+  const isEditing = computed(() => route.name === 'editDeceased')
   const deceasedId = route.params.id
 
   const name = ref('')
   const birthDate = ref('')
   const deathDate = ref('')
   const epitaph = ref('')
-  const graveId = ref(1)
+  const graveId = ref(isEditing.value ? null : route.params.graveId)
   const imageUrl = ref(null)
   const imageDeleteToken = ref(null)
 
@@ -90,7 +90,7 @@
       } catch {
         showToast('Difunto no encontrado', 'error')
         await nextTick()
-        router.push({ name: 'deceasedAdministration' })
+        router.push({ name: 'searchDeceased' })
       }
     }
   })
@@ -123,7 +123,7 @@
       }
 
       await nextTick()
-      router.push({ name: 'deceasedAdministration' })
+      router.push({ name: 'searchDeceased' })
     } catch (err) {
       showToast('Error al guardar difunto.', 'error')
     }

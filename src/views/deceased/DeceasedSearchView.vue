@@ -12,7 +12,6 @@
             v-model="searchQuery" 
             class="data-input" 
             placeholder=" " 
-            @keyup="searchDeceased"
           />
           <label class="input-label">Nombre del difunto</label>
         </div>
@@ -35,13 +34,13 @@
           :style="{ transform: `translateX(-${currentIndex * (100 / cardsToShow)}%)` }"
         >
           <DeceasedCard 
-            v-for="(deceased, index) in deceasedResults" 
+            v-for="(deceased, index) in filteredDeceased" 
             :key="index"
             :deceased="formatDeceasedData(deceased)"
             class="fixed-size-card"
             :class="{ 
-              'single-card': deceasedResults.length === 1,
-              'double-card': deceasedResults.length === 2
+              'single-card': filteredDeceased.length === 1,
+              'double-card': filteredDeceased.length === 2
             }"
           />
         </div>
@@ -60,7 +59,7 @@
 </template>
 
 <script setup>
-  import { ref, computed, onMounted } from 'vue'
+  import { ref, computed, onMounted, watch } from 'vue'
   import { getAllDeceased } from '@/services/deceasedService'
   import DeceasedCard from '@/components/deceased/DeceasedCard.vue'
   import { useToast } from '@/composables/useToast'
@@ -69,8 +68,16 @@
   const searchQuery = ref('')
   const currentIndex = ref(0)
   const allDeceased = ref([])
-  const deceasedResults = ref([])
   const cardsToShow = 3
+
+  const filteredDeceased = computed(() => {
+    const query = searchQuery.value.trim().toLowerCase()
+    return query
+      ? allDeceased.value.filter(d =>
+          d.name.toLowerCase().includes(query)
+        )
+      : allDeceased.value
+  })
 
   const formatDeceasedData = (deceased) => ({
     id: deceased.id,
@@ -84,19 +91,10 @@
     })
   })
 
-  const searchDeceased = () => {
-    const query = searchQuery.value.trim().toLowerCase()
-    deceasedResults.value = query
-      ? allDeceased.value.filter(d => d.name.toLowerCase().includes(query))
-      : [...allDeceased.value]
-
-    currentIndex.value = 0
-  }
-
-  const showResults = computed(() => deceasedResults.value.length > 0)
+  const showResults = computed(() => filteredDeceased.value.length > 0)
   const canScrollLeft = computed(() => currentIndex.value > 0)
   const canScrollRight = computed(() => {
-    return currentIndex.value < Math.ceil(deceasedResults.value.length / cardsToShow) - 1
+    return currentIndex.value < Math.ceil(filteredDeceased.value.length / cardsToShow) - 1
   })
 
   const nextCard = () => {
@@ -111,11 +109,14 @@
     try {
       const response = await getAllDeceased()
       allDeceased.value = response
-      deceasedResults.value = [...response]
     } catch (err) {
       console.error('Error al obtener difuntos:', err)
       showToast('Error al obtener difuntos', 'error')
     }
+  })
+
+  watch(searchQuery, () => {
+    currentIndex.value = 0
   })
 </script>
 
