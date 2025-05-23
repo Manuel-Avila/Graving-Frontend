@@ -13,18 +13,18 @@
           <div class="input-group">
             <input 
               type="text" 
-              v-model="visitorName" 
+              v-model="searchFilters.name" 
               class="data-input" 
               placeholder=" "
               required
             />
-            <label class="input-label">Nombre</label>
+            <label class="input-label">Nombre del Difunto</label>
           </div>
 
            <div class="input-group">
             <input 
               type="text" 
-              v-model="visitorName" 
+              v-model="searchFilters.block" 
               class="data-input" 
               placeholder=" "
               required
@@ -34,7 +34,7 @@
            <div class="input-group">
             <input 
               type="text" 
-              v-model="visitorName" 
+              v-model="searchFilters.graveRow" 
               class="data-input" 
               placeholder=" "
               required
@@ -47,7 +47,7 @@
            <div class="input-group">
             <input 
               type="text" 
-              v-model="visitorName" 
+              v-model="searchFilters.graveNumber" 
               class="data-input" 
               placeholder=" "
               required
@@ -60,30 +60,27 @@
       </div>
     </div>        
     </div>
-    <GraveMap />
+    <GraveMap ref="graveMap"/>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import GraveMap from '@/components/map/GraveMap.vue';
+import { ref } from 'vue'
+import GraveMap from '@/components/map/GraveMap.vue'
 
-const graveMap = ref(null);
+const graveMap = ref(null)
 
 const searchFilters = ref({
   name: '',
   block: '',
+  graveRow: '',
   graveNumber: ''
-});
+})
 
 const handleSearch = () => {
-
-  console.log('Buscando con filtros:', searchFilters.value);
-  
-  
   if (graveMap.value) {
-    graveMap.value.searchGraves(searchFilters.value);
+    graveMap.value.searchGraves(searchFilters.value)
   }
-};
+}
 </script>
 
 <style scoped>

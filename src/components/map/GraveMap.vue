@@ -15,18 +15,19 @@
                   <button
                     class="grave"
                     :class="{
-                      occupied: graveMap[block]?.[row]?.[col]?.status === 'occupied',
-                      selected: selectedGrave === graveMap[block]?.[row]?.[col]?.id
+                      occupied: getGrave(block, row, col)?.status === 'occupied',
+                      selected: selectedGrave === getGrave(block, row, col)?.id,
+                      highlighted: highlightedGraves.some(g => g.id === getGrave(block, row, col)?.id)
                     }"
-                    @click="toggleGraveModal(graveMap[block]?.[row]?.[col])"
+                    @click="toggleGraveModal(getGrave(block, row, col))"
                   >
-                    {{ graveMap[block]?.[row]?.[col]?.graveNumber || '-' }}
+                    {{ getGrave(block, row, col)?.graveNumber || '-' }}
                   </button>
 
                   <div
                     class="grave-modal"
                     :class="{ 'top-modal': block <= 2, 'bottom-modal': block > 2 }"
-                    v-if="showModal && currentGrave?.id === graveMap[block]?.[row]?.[col]?.id"
+                    v-if="showModal && currentGrave?.id === getGrave(block, row, col)?.id"
                     @click.stop
                   >
                     <div class="modal-content">
@@ -39,25 +40,32 @@
                       <div class="modal-actions">
                         <template v-if="currentGrave?.status === 'occupied'">
                           <router-link 
-                            :to="{name: 'deceased', params: {id: getDeceasedByGraveId(currentGrave?.id)?.id}}" 
+                            :to="{ name: 'deceased', params: { id: getDeceasedByGraveId(currentGrave?.id)?.id } }" 
                             class="purple-button"
-                            >Ver Difunto
-                          </router-link>
-                          <template v-if="isLoggedIn">
-                            <router-link :to="{name: 'visit', params: {id: getDeceasedByGraveId(currentGrave?.id)?.id}}"
-                              class="green-button"
-                              >Agendar Visita
-                            </router-link>
-                          </template>
-                          <template v-if="isAdmin">
-                            <router-link :to="{name: 'registerRepair', params: {graveId: currentGrave?.id}}" id="repair-button" class="purple-button">Reparacion</router-link>
-                          </template>
+                          >Ver Difunto</router-link>
+
+                          <router-link 
+                            v-if="isLoggedIn && getDeceasedByGraveId(currentGrave?.id)" 
+                            :to="{ name: 'visit', params: { id: getDeceasedByGraveId(currentGrave?.id)?.id } }"
+                            class="green-button"
+                          >Agendar Visita</router-link>
+
+                          <router-link 
+                            v-if="isAdmin" 
+                            :to="{ name: 'registerRepair', params: { graveId: currentGrave?.id } }" 
+                            id="repair-button" 
+                            class="purple-button"
+                          >Reparación</router-link>
                         </template>
+
                         <template v-else>
-                          <template v-if="isAdmin">
-                            <router-link :to="{name: 'registerDeceased', params: {graveId: currentGrave?.id}}" class="purple-button">Registrar Difunto</router-link>
-                          </template>
+                          <router-link 
+                            v-if="isAdmin" 
+                            :to="{ name: 'registerDeceased', params: { graveId: currentGrave?.id } }" 
+                            class="purple-button"
+                          >Registrar Difunto</router-link>
                         </template>
+
                         <button class="outline-white-button" @click="closeModal">Cerrar</button>
                       </div>
                     </div>
@@ -73,25 +81,31 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, defineExpose } from 'vue'
 import { getAllGraves } from '@/services/graveService'
 import { getAllDeceased } from '@/services/deceasedService'
 import { useAuthStore } from '@/stores/authStore'
 import { useToast } from '@/composables/useToast'
 
 const { showToast } = useToast()
-
-const allDeceased = ref([])
-const graveMap = ref({})
-const selectedGrave = ref(null)
-const currentGrave = ref(null)
-const showModal = ref(false)
-
 const authStore = useAuthStore()
 const isLoggedIn = computed(() => authStore.isLoggedIn)
 const isAdmin = computed(() => authStore.isAdmin)
 
+const allDeceased = ref([])
+const graves = ref([])
+const graveMap = ref({})
+const selectedGrave = ref(null)
+const currentGrave = ref(null)
+const showModal = ref(false)
+const highlightedGraves = ref([])
+
+const getGrave = (block, row, col) => {
+  return graveMap.value[block]?.[row]?.[col] || null
+}
+
 const indexGraves = (list) => {
+  graves.value = list
   const map = {}
   for (const grave of list) {
     const { blockId, graveRow, section } = grave
@@ -117,9 +131,7 @@ const getDeceasedByGraveId = (graveId) => {
   return allDeceased.value.find(d => d.graveId === graveId)
 }
 
-const getRowsForBlock = (block) => {
-  return block <= 2 ? [1, 2, 3, 4, 5] : [6, 7, 8, 9, 10]
-}
+const getRowsForBlock = (block) => block <= 2 ? [1, 2, 3, 4, 5] : [6, 7, 8, 9, 10]
 
 const toggleGraveModal = (grave) => {
   if (!grave) return
@@ -141,7 +153,41 @@ const translateType = (type) => {
     default: return 'Desconocido'
   }
 }
+
+const searchGraves = (filters) => {
+  const emptyFilters =
+    !filters.name?.trim() &&
+    !filters.block &&
+    !filters.graveRow &&
+    !filters.graveNumber
+
+  if (emptyFilters) {
+    highlightedGraves.value = []
+    return
+  }
+  
+  highlightedGraves.value = graves.value.filter(grave => {
+    const deceased = getDeceasedByGraveId(grave.id)
+    return (
+      (!filters.name || deceased?.name?.toLowerCase().includes(filters.name.toLowerCase())) &&
+      (!filters.block || grave.blockId === Number(filters.block)) &&
+      (!filters.graveRow || grave.graveRow === Number(filters.graveRow)) &&
+      (!filters.graveNumber || grave.graveNumber === Number(filters.graveNumber))
+    )
+  })
+
+  let results = highlightedGraves.value.length
+  
+  if (results=== 0) {
+    showToast('No se encontraron coincidencias', 'info')
+  } else {
+    showToast(`Se encontraron ${results} coincidencias`, 'success')
+  }
+}
+
+defineExpose({ searchGraves })
 </script>
+
 
 <style scoped>
 .center {
@@ -314,6 +360,10 @@ const translateType = (type) => {
   cursor: pointer;
   font-weight: 500;
   transition: all 0.2s;
+}
+
+.grave.highlighted {
+  outline: 3px solid #ee0e0e;
 }
 
 #repair-button {
