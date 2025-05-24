@@ -15,6 +15,7 @@ import OwnersAdministrationView from '@/views/admin/OwnersAdministrationView.vue
 import GravesAdministrationView from '@/views/admin/GravesAdministrationView.vue'
 import SystemLogView from '@/views/admin/SystemLogView.vue'
 import RegisterRepairView from '@/views/admin/RegisterRepairView.vue'
+import RepairsView from '@/views/admin/RepairsView.vue'
 
 const routes = [
   {
@@ -101,6 +102,11 @@ const routes = [
     path: '/repair/register/:graveId',
     name: 'registerRepair',
     component: RegisterRepairView
+  },
+  {
+    path: '/repairsView',
+    name: 'repairsView',
+    component: RepairsView
   }
 ]
 
