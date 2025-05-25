@@ -1,15 +1,16 @@
 <template>
   <div class="grave-owners-container">
     <div class="grave-owners-box">
+      <!-- Barra de búsqueda -->
       <div class="search-group">
         <div class="input-group">
-                <input 
-                  type="text" 
-                  v-model="searchQuery" 
-                  class="data-input" 
-                  placeholder=" " 
-                />
-                <label class="input-label">Acción</label>
+          <input 
+            type="text" 
+            v-model="searchQuery" 
+            class="data-input" 
+            placeholder=" " 
+          />
+          <label class="input-label">Acción</label>
         </div>
       </div>
 
@@ -17,6 +18,7 @@
         <h2>Bitácora del sistema</h2>
       </div>
 
+      <!-- Tabla -->
       <div class="owners-table-wrapper">
         <table class="owners-table">
           <thead>
@@ -25,19 +27,14 @@
               <th>Acción</th>
               <th>Descripción</th>
               <th>Fecha</th>
-             
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(owner, index) in filteredOwners" :key="index">
-              <td>{{ owner.name }}</td>
-              <td>{{ owner.phone }}</td>
-              <td>{{ owner.email }}</td>
-              <td>{{ owner.curp }}</td>
-              <td>{{ owner.deceasedName }}</td>
-              <td class="actions">
-                <router-link :to="{ name: 'editDeceased', params: { id: owner.deceasedId } }" class="purple-button">Editar</router-link>
-              </td>
+            <tr v-for="(log, index) in filteredLogs" :key="index">
+              <td>{{ log.userName }}</td>
+              <td>{{ log.action }}</td>
+              <td>{{ log.description }}</td>
+              <td>{{ formatDate(log.timestamp) }}</td>
             </tr>
           </tbody>
         </table>
@@ -47,29 +44,39 @@
 </template>
 
 <script setup>
-  import { ref, computed, onMounted } from 'vue'
-  import { getAllOwners } from '@/services/ownerService'
+import { ref, computed, onMounted } from 'vue'
+import { getAllLogs } from '@/services/systemLogService'
+import { useToast } from '@/composables/useToast'
 
-  const searchQuery = ref('')
-  const owners = ref([])
+const { showToast } = useToast()
+const logs = ref([])
+const searchQuery = ref('')
 
-  const filteredOwners = computed(() => {
-    return owners.value.filter(owner =>
-      owner.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      owner.phone.includes(searchQuery.value) ||
-      owner.email.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      owner.curp.toLowerCase().includes(searchQuery.value.toLowerCase())
-    )
+onMounted(async () => {
+  try {
+    logs.value = await getAllLogs()
+  } catch (err) {
+    showToast('Error al obtener logs', 'error')
+    console.error('Error al obtener logs:', err)
+  }
+})
+
+const filteredLogs = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase()
+  return q
+    ? logs.value.filter(log => log.action.toLowerCase().includes(q))
+    : logs.value
+})
+
+const formatDate = (timestamp) => {
+  return new Date(timestamp).toLocaleString('es-MX', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
   })
-
-  onMounted(async () => {
-    try {
-      const response = await getAllOwners();
-      owners.value = response;
-    } catch (err) {
-      console.error('Error al obtener propietarios:', err);
-    }
-  })
+}
 </script>
 
 <style scoped>

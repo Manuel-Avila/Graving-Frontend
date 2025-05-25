@@ -49,13 +49,6 @@
                             :to="{ name: 'visit', params: { id: getDeceasedByGraveId(currentGrave?.id)?.id } }"
                             class="green-button"
                           >Agendar Visita</router-link>
-
-                          <router-link 
-                            v-if="isAdmin" 
-                            :to="{ name: 'registerRepair', params: { graveId: currentGrave?.id } }" 
-                            id="repair-button" 
-                            class="purple-button"
-                          >Reparación</router-link>
                         </template>
 
                         <template v-else>
@@ -65,6 +58,13 @@
                             class="purple-button"
                           >Registrar Difunto</router-link>
                         </template>
+
+                        <router-link 
+                            v-if="isAdmin" 
+                            :to="{ name: 'registerRepair', params: { graveId: currentGrave?.id } }" 
+                            id="repair-button" 
+                            class="purple-button"
+                          >Reparación</router-link>
 
                         <button class="outline-white-button" @click="closeModal">Cerrar</button>
                       </div>

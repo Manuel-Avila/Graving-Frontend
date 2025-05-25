@@ -1,8 +1,6 @@
 <template>
   <div class="repairs-container">
     <div class="repairs-center-box">
-   
-
       <div class="repairs-content-wrapper">
         <div class="search-group">
           <div class="input-group">
@@ -12,7 +10,7 @@
               class="data-input" 
               placeholder=" " 
             />
-            <label class="input-label">Nombre</label>
+            <label class="input-label">Buscar reparación</label>
           </div>
         </div>
 
@@ -24,28 +22,37 @@
           <table class="repairs-table">
             <thead>
               <tr>
-                <th>Número de tumba</th>
+                <th>N° Tumba</th>
                 <th>Descripción</th>
                 <th>Fecha</th>
                 <th>Estatus</th>
                 <th>Acciones</th>
-               
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(owner, index) in filteredOwners" :key="index">
-                <td>{{ owner.name }}</td>
-                <td>{{ owner.phone }}</td>
-                <td>{{ owner.email }}</td>
-                <td>{{ owner.curp }}</td>
-                <td>{{ owner.deceasedName }}</td>
+              <tr v-for="repair in filteredRepairs" :key="repair.id">
+                <td>{{ repair.graveNumber }}</td>
+                <td>{{ repair.description }}</td>
+                <td>{{ formatDate(repair.date) }}</td>
+                <td>
+                  <span 
+                    :class="{
+                      'status-pending': repair.status === 'pending',
+                      'status-completed': repair.status === 'completed'
+                    }"
+                  >
+                    {{ repair.status }}
+                  </span>
+                </td>
                 <td class="actions">
-                  <router-link 
-                    :to="{ name: 'editDeceased', params: { id: owner.deceasedId } }" 
+                  <button 
+                    v-if="repair.status === 'pending'" 
+                    @click="handleMarkCompleted(repair.id)"
                     class="purple-button"
                   >
-                    Editar
-                  </router-link>
+                    Marcar como completada
+                  </button>
+                  <span v-else class="text-muted">—</span>
                 </td>
               </tr>
             </tbody>
@@ -58,32 +65,53 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { getAllOwners } from '@/services/ownerService'
+import { getAllRepairs, markRepairAsCompleted } from '@/services/repairService'
+import { useToast } from '@/composables/useToast'
 
+const repairs = ref([])
 const searchQuery = ref('')
-const owners = ref([])
+const { showToast } = useToast()
 
-const filteredOwners = computed(() => {
-  return owners.value.filter(owner =>
-    owner.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    owner.phone.includes(searchQuery.value) ||
-    owner.email.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    owner.curp.toLowerCase().includes(searchQuery.value.toLowerCase())
+const filteredRepairs = computed(() => {
+  const q = searchQuery.value.toLowerCase()
+  return repairs.value.filter(repair =>
+    repair.description.toLowerCase().includes(q) ||
+    repair.status.toLowerCase().includes(q) ||
+    repair.graveNumber.toString().includes(q)
   )
 })
 
+const formatDate = (date) => {
+  return new Date(date).toLocaleDateString('es-MX', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  })
+}
+
+const handleMarkCompleted = async (id) => {
+  try {
+    await markRepairAsCompleted(id)
+    showToast('Reparación marcada como completada', 'success')
+    const response = await getAllRepairs()
+    repairs.value = response
+  } catch (err) {
+    showToast('Error al actualizar reparación', 'error')
+    console.error(err)
+  }
+}
+
 onMounted(async () => {
   try {
-    const response = await getAllOwners();
-    owners.value = response;
+    repairs.value = await getAllRepairs()
   } catch (err) {
-    console.error('Error al obtener propietarios:', err);
+    showToast('Error al actualizar reparación', 'error')
+    console.log('Error al obtener reparaciones:', err)
   }
 })
 </script>
 
 <style scoped>
-/* Estilos base del contenedor */
 .repairs-container {
   display: flex;
   justify-content: center;
@@ -221,19 +249,22 @@ onMounted(async () => {
 }
 
 .purple-button {
-  padding: 6px 12px;
-  background-color: var(--purple-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: background-color 0.2s;
+  padding: 10px 15px;
+  
 }
 
-.purple-button:hover {
-  background-color: #5a4fcf;
+.status-pending {
+  color: #ff9800;
+  font-weight: bold;
+}
+
+.status-completed {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.text-muted {
+  color: #999;
 }
 
 @media (max-width: 768px) {

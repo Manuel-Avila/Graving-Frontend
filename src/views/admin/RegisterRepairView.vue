@@ -11,7 +11,7 @@
               <div class="input-group">
                 <input 
                   type="text" 
-                  v-model="user.name" 
+                  v-model="graveId" 
                   class="data-input" 
                   placeholder=" " 
                   readonly
@@ -22,7 +22,7 @@
               <div class="input-group">
                 <input 
                   type="email" 
-                  v-model="user.email" 
+                  v-model="description" 
                   class="data-input" 
                   placeholder=" " 
                 />
@@ -31,8 +31,8 @@
 
               <div class="input-group">
                 <input 
-                  type="text" 
-                  v-model="user.phoneNumber" 
+                  type="date" 
+                  v-model="date" 
                   class="data-input" 
                   placeholder=" " 
                 />
@@ -57,58 +57,39 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { getMyProfile, updateMyProfile  } from '@/services/userService'
+import { ref, nextTick } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useToast } from '@/composables/useToast'
+import { createRepair } from '@/services/repairService'
 
+const route = useRoute()
+const router = useRouter()
 const { showToast } = useToast()
 
-const user = ref({
-  name: '',
-  email: '',
-  phoneNumber: ''
-})
-
-const password = ref('')
-const newPassword = ref('')
-const confirmPassword = ref('')
-
-onMounted(async () => {
-  try {
-    user.value = await getMyProfile()
-  } catch (err) {
-    console.error('Error al obtener el perfil:', err)
-    showToast('Error al cargar tu perfil', 'error')
-  }
-})
+const graveId = Number(route.params.graveId)
+const description = ref('')
+const date = ref('')
 
 const handleSubmit = async () => {
-  if (!password.value) {
-    showToast('Debes ingresar tu contraseña actual', 'error')
+  if (!description.value || !date.value) {
+    showToast('Todos los campos son obligatorios', 'error')
     return
-  }
-
-  if (newPassword.value && newPassword.value !== confirmPassword.value) {
-    showToast('La nueva contraseña y su confirmación no coinciden', 'error')
-    return
-  }
-
-  const data = {
-    ...user.value,
-    password: password.value,
-    newPassword: newPassword.value || undefined
   }
 
   try {
-    await updateMyProfile(data)
-    showToast('Perfil actualizado correctamente', 'success')
-    password.value = ''
-    newPassword.value = ''
-    confirmPassword.value = ''
+    await createRepair({
+      graveId,
+      description: description.value,
+      date: date.value
+    })
+
+    showToast('Reparación registrada correctamente', 'success')
+    await nextTick()
+    router.push({ name: 'repairs' })
+
   } catch (err) {
-    console.error('Error al actualizar perfil:', err)
-    const msg = err.response?.data?.error || 'Error al actualizar perfil'
-    showToast(msg, 'error')
+    showToast('Error al registrar la reparación', 'error')
+    console.error(err)
   }
 }
 </script>

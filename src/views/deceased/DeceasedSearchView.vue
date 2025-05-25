@@ -289,7 +289,7 @@ h2 {
 }
 
 .arrow-button:hover {
-  background-color: #5a4fcf;
+  background-color: #974392;
 }
 
 .arrow-button:active {

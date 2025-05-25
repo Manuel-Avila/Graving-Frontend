@@ -62,7 +62,7 @@
             <label class="input-label">Nombre</label>
           </div>
           <div class="input-group">
-            <input type="text" v-model="ownerPhone" class="data-input" required placeholder=" " />
+            <input type="tel" v-model="ownerPhone" class="data-input" required placeholder=" " />
             <label class="input-label">Teléfono</label>
           </div>
           <div class="input-group">
@@ -83,6 +83,7 @@
   import { ref, computed, onMounted, nextTick } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { registerDeceased, updateDeceased, getDeceasedById } from '@/services/deceasedService'
+  import { getOwnerByDeceasedId, createOwner, updateOwner } from '@/services/ownerService'
   import { useToast } from '@/composables/useToast'
 
   const route = useRoute()
@@ -92,7 +93,6 @@
   const isEditing = computed(() => route.name === 'editDeceased')
   const deceasedId = route.params.id
 
-  // Datos del difunto
   const name = ref('')
   const birthDate = ref('')
   const deathDate = ref('')
@@ -101,11 +101,11 @@
   const imageUrl = ref(null)
   const imageDeleteToken = ref(null)
 
-  // Datos del responsable
   const ownerName = ref('')
   const ownerPhone = ref('')
   const ownerEmail = ref('')
   const ownerCurp = ref('')
+  const ownerId = ref(null)
 
   const fileInput = ref(null)
   const selectedImage = ref(null)
@@ -121,14 +121,16 @@
         graveId.value = deceased.graveId
         imageUrl.value = deceased.imageUrl
         imageDeleteToken.value = deceased.imageDeleteToken
-        
-        // Si estás editando, carga también los datos del responsable si existen
-        if (deceased.owner) {
-          ownerName.value = deceased.owner.name || ''
-          ownerPhone.value = deceased.owner.phone || ''
-          ownerEmail.value = deceased.owner.email || ''
-          ownerCurp.value = deceased.owner.curp || ''
+
+        const owner = await getOwnerByDeceasedId(deceasedId)
+        if (owner) {
+          ownerId.value = owner.id 
+          ownerName.value = owner.name
+          ownerPhone.value = owner.phone
+          ownerEmail.value = owner.email
+          ownerCurp.value = owner.curp
         }
+
       } catch {
         showToast('Difunto no encontrado', 'error')
         await nextTick()
@@ -147,7 +149,7 @@
     let imageResult = null
 
     try {
-      const data = {
+      const deceasedData = {
         name: name.value,
         birthDate: birthDate.value,
         deathDate: deathDate.value,
@@ -155,19 +157,30 @@
         graveId: graveId.value,
         imageUrl: imageResult?.url || imageUrl.value,
         imageDeleteToken: imageResult?.deleteToken || imageDeleteToken.value,
-        owner: {
-          name: ownerName.value,
-          phone: ownerPhone.value,
-          email: ownerEmail.value,
-          curp: ownerCurp.value
-        }
+      }
+
+      const ownerData = {
+        name: ownerName.value,
+        phone: ownerPhone.value,
+        email: ownerEmail.value,
+        curp: ownerCurp.value,
       }
 
       if (isEditing.value) {
-        await updateDeceased(deceasedId, data, selectedImage.value, imageDeleteToken.value)
+        await updateDeceased(deceasedId, deceasedData, selectedImage.value, imageDeleteToken.value)
+        await updateOwner(ownerId.value, {
+          ...ownerData,
+          deceasedId: deceasedId
+        })
         showToast('Difunto actualizado correctamente', 'success')
       } else {
-        await registerDeceased(data, selectedImage.value)
+        const created = await registerDeceased(deceasedData, selectedImage.value)
+
+        await createOwner({
+          ...ownerData,
+          deceasedId: created.id
+        })
+
         showToast('Difunto registrado correctamente', 'success')
       }
 
@@ -175,6 +188,7 @@
       router.push({ name: 'searchDeceased' })
     } catch (err) {
       showToast('Error al guardar difunto.', 'error')
+      console.log(err)
     }
   }
 
@@ -213,7 +227,6 @@
 .right-section {
   width: 60%;
   padding: 30px;
-  height: 120vh;
   display: flex;
 
   justify-content: center;
@@ -227,7 +240,6 @@
 .form-container-owner {
   margin-top: 30px;
   flex: 1;
-  height: 50%;
   margin-left: 50px;
   width: 70%;
   padding: 30px;
