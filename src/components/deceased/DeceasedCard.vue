@@ -22,15 +22,20 @@
     </div>
 
     <div class="card-actions">
-      <router-link :to="{ name: 'editDeceased', params: { id: deceased.id } }" class="purple-button">Editar</router-link>
-      <router-link :to="{ name: 'visit', params: { id: deceased.id } }" class="purple-button">Visitar</router-link>
+      <router-link v-if="isAdmin" :to="{ name: 'editDeceased', params: { id: deceased.id } }" class="purple-button">Editar</router-link>
+      <router-link v-if="isLoggedIn" :to="{ name: 'visit', params: { id: deceased.id } }" class="purple-button">Visitar</router-link>
       <router-link :to="{ name: 'deceased', params: { id: deceased.id } }"  class="outline-white-button">Ver</router-link>
     </div>
   </div>
 </template>
 
 <script setup> 
-  import { defineProps } from 'vue'
+  import { defineProps, computed } from 'vue'
+  import { useAuthStore } from '@/stores/authStore'
+
+  const authStore = useAuthStore()
+  const isLoggedIn = computed(() => authStore.isLoggedIn)
+  const isAdmin = computed(() => authStore.isAdmin)
 
   defineProps({
     deceased: {

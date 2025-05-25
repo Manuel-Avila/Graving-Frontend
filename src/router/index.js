@@ -17,6 +17,8 @@ import SystemLogView from '@/views/admin/SystemLogView.vue'
 import RegisterRepairView from '@/views/admin/RegisterRepairView.vue'
 import RepairsAdministrationView from '@/views/admin/RepairsAdministrationView.vue'
 
+import { useAuthStore } from '@/stores/authStore'
+
 const routes = [
   {
     path: '/',
@@ -36,17 +38,20 @@ const routes = [
   {
     path: '/profile',
     name: 'profile',
-    component: UserProfileView
+    component: UserProfileView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/editProfile',
     name: 'editProfile',
-    component: EditUserProfileView
+    component: EditUserProfileView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/visits',
     name: 'visits',
-    component: VisitsLogView
+    component: VisitsLogView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/map',
@@ -61,12 +66,14 @@ const routes = [
   {
     path: '/visit/:id',
     name: 'visit',
-    component: RegisterVisitView
+    component: RegisterVisitView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/dashboard',
     name: 'dashboard',
-    component: AdminDashboardView
+    component: AdminDashboardView,
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
     path: '/deceased/search',
@@ -76,43 +83,74 @@ const routes = [
   {
     path: '/deceased/register/:graveId',
     name: 'registerDeceased',
-    component: RegisterAndEditDeceasedView
+    component: RegisterAndEditDeceasedView,
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
     path: '/deceased/edit/:id',
     name: 'editDeceased',
-    component: RegisterAndEditDeceasedView
+    component: RegisterAndEditDeceasedView,
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
     path: '/owners',
     name: 'owners',
-    component: OwnersAdministrationView
+    component: OwnersAdministrationView,
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
     path: '/graves',
     name: 'graves',
-    component: GravesAdministrationView
+    component: GravesAdministrationView,
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
     path: '/systemLog',
     name: 'systemLog',
-    component: SystemLogView
+    component: SystemLogView,
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
     path: '/repair/register/:graveId',
     name: 'registerRepair',
-    component: RegisterRepairView
+    component: RegisterRepairView,
+    meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
     path: '/repairs',
     name: 'repairs',
-    component: RepairsAdministrationView
+    component: RepairsAdministrationView,
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'notFound',
+    redirect: { name: 'home' }
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes
+})
+
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
+
+  if ((to.name === 'login' || to.name === 'register') && authStore.isLoggedIn) {
+    return next({ name: 'home' })
+  }
+
+  if (to.meta.requiresAuth && !authStore.isLoggedIn) {
+    return next({ name: 'login' })
+  }
+
+  if (to.meta.requiresAdmin) {
+    const isAdmin = await authStore.hasAdminRole()
+    if (!isAdmin) return next({name: 'home'})
+  }
+
+  next()
 })
 
 export default router

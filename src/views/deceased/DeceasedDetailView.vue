@@ -5,7 +5,8 @@
         <img v-if="imageUrl" :src="imageUrl" alt="Foto del difunto" class="deceased-photo">
         <img v-else src="../../assets/images/deceasedPlaceholder.png" alt="Foto del difunto" class="deceased-photo">
       </div>
-      <router-link :to="{name: 'editDeceased', params: {id: deceasedId}}" class="purple-button edit-button">Editar</router-link>
+      <router-link v-if="isAdmin" :to="{name: 'editDeceased', params: {id: deceasedId}}" class="purple-button edit-button">Editar</router-link>
+      <router-link v-if="isLoggedIn" :to="{ name: 'visit', params: { id: deceasedId.id } }" class="outline-white-button edit-button">Visitar</router-link>
     </div>  
     <div class="right-section">
       <div class="form-container">
@@ -57,10 +58,15 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, nextTick } from 'vue'
+  import { ref, onMounted, nextTick, computed } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { getDeceasedById } from '@/services/deceasedService'
   import { useToast } from '@/composables/useToast'
+  import { useAuthStore } from '@/stores/authStore'
+
+  const authStore = useAuthStore()
+  const isLoggedIn = computed(() => authStore.isLoggedIn)
+  const isAdmin = computed(() => authStore.isAdmin)
 
   const { showToast } = useToast()
   const router = useRouter()
@@ -141,7 +147,6 @@
   background-color: #ffffff;
   border-radius: 5px;
   width: 70%;
-  height: 90%;
   margin-left: 45px;
 }
 

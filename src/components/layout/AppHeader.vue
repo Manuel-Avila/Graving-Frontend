@@ -228,6 +228,12 @@
         }
     }
 
+    @media (min-width: 771px) {
+        .navegation-bar-mobile {
+            display: none;
+        }
+    }
+
     .slide-down-enter-active, .slide-down-leave-active {
         transition: all 0.2s ease;
     }
