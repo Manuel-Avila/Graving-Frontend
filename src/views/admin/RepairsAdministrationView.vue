@@ -1,27 +1,8 @@
 <template>
   <div class="repairs-container">
     <div class="repairs-center-box">
-      <!-- Tabs (se mantienen igual) -->
-      <div class="repairs-tabs-container">
-        <div class="repairs-tabs">
-          <router-link 
-            to="/repair/register/:graveId" 
-            class="tab-button"
-            :class="{ 'active': $route.path === '/repair/register/:graveId' }"
-          >
-            Registrar reparaciones
-          </router-link>
-          <router-link 
-            to="/repairsView" 
-            class="tab-button"
-            :class="{ 'active': $route.path === '/repairsView' }"
-          >
-            Reparaciones
-          </router-link>
-        </div>
-      </div>
+   
 
-      <!-- Contenido principal (tabla de representantes adaptada) -->
       <div class="repairs-content-wrapper">
         <div class="search-group">
           <div class="input-group">
@@ -36,19 +17,19 @@
         </div>
 
         <div class="table-title">
-          <h2>Listado de Reparaciones</h2> <!-- Cambiado el título -->
+          <h2>Listado de Reparaciones</h2> 
         </div>
 
         <div class="repairs-table-wrapper">
           <table class="repairs-table">
             <thead>
               <tr>
-                <th>Nombre</th>
-                <th>Teléfono</th>
-                <th>Correo</th>
-                <th>Curp</th>
-                <th>Difunto</th>
-                <th>Funciones</th>
+                <th>Número de tumba</th>
+                <th>Descripción</th>
+                <th>Fecha</th>
+                <th>Estatus</th>
+                <th>Acciones</th>
+               
               </tr>
             </thead>
             <tbody>
@@ -123,7 +104,7 @@ onMounted(async () => {
   padding: 20px;
 }
 
-/* Tabs (se mantienen igual) */
+/* Tabs*/
 .repairs-tabs-container {
   padding: 0 20px;
   background: #fff;
@@ -169,7 +150,7 @@ onMounted(async () => {
   background-color: var(--purple-color);
 }
 
-/* Contenido de la tabla */
+/**/
 .repairs-content-wrapper {
   flex: 1;
   display: flex;
@@ -255,14 +236,14 @@ onMounted(async () => {
   background-color: #5a4fcf;
 }
 
-/* Responsive */@media (max-width: 768px) {
+@media (max-width: 768px) {
   .repairs-tabs {
-    flex-direction: column; /* Cambia a columna */
-    align-items: stretch; /* Ocupa todo el ancho */
+    flex-direction: column; 
+    align-items: stretch; 
   }
 
   .tab-button {
-    text-align: left; /* Alineación izquierda */
+    text-align: left;
     padding: 12px 20px;
    
   }
@@ -274,12 +255,12 @@ onMounted(async () => {
     right: auto;
     top: 0;
     bottom: 0;
-    width: 3px; /* Línea lateral en lugar de inferior */
+    width: 3px; 
     height: 100%;
     background-color: var(--purple-color);
   }
 
-  /* Ajustes adicionales para la tabla (opcional) */
+  
   .repairs-table-wrapper {
     overflow-x: auto;
   }

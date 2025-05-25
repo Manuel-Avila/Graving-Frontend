@@ -38,6 +38,15 @@
           </div>
         </div>
       </router-link>
+      <router-link :to="{name: 'repairs'}" class="dashboard-card">
+        <div class="image-container">
+          <img src="../../assets/images/repairsAdministration.jpg" alt="Bitácora del sistema" class="faded-image">
+          <div class="image-overlay">
+            <h2>Reparaciones de tumbas</h2>
+          </div>
+        </div>
+      </router-link>
+      
     </div>
   </div>
 </template>
@@ -104,7 +113,7 @@
   filter: brightness(1) contrast();
 }
 
-/* El resto de tus estilos permanecen igual */
+
 .image-overlay {
   position: absolute;
   bottom: 0;

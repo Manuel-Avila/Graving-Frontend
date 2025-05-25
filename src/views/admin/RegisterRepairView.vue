@@ -1,26 +1,7 @@
 <template>
   <div class="user-profile-container">
     <div class="profile-center-box">
-      <div class="profile-tabs-container">
-        <div class="profile-tabs">
-          <router-link 
-            to="/repair/register/:graveId" 
-            class="tab-button"
-            :class="{ 'active': $route.path === '/repair/register/:graveId' }"
-          >
-            Registrar reparaciones
-          </router-link>
-          <router-link 
-            to="/repairsView" 
-            class="tab-button"
-            :class="{ 'active': $route.path === '/repairsView' }"
-          >
-            Reparaciones
-          </router-link>
-         
-        </div>
-      </div>
-
+      
       <div class="main-content-container">
   
         <div class="profile-content-wrapper">
@@ -33,8 +14,9 @@
                   v-model="user.name" 
                   class="data-input" 
                   placeholder=" " 
+                  readonly
                 />
-                <label class="input-label">Nombre</label>
+                <label class="input-label">Número de tumba</label>
               </div>
             
               <div class="input-group">
@@ -44,7 +26,7 @@
                   class="data-input" 
                   placeholder=" " 
                 />
-                <label class="input-label">Correo</label>
+                <label class="input-label">Descripción</label>
               </div>
 
               <div class="input-group">
@@ -54,38 +36,8 @@
                   class="data-input" 
                   placeholder=" " 
                 />
-                <label class="input-label">Teléfono</label>
+                <label class="input-label">Fecha</label>
               </div>
-              <div class="input-group">
-                <input 
-                  type="password" 
-                  v-model="password" 
-                  class="data-input" 
-                  placeholder=" " 
-                />
-                <label class="input-label">Contraseña Actual</label>
-              </div>
-
-              <div class="input-group">
-                <input 
-                  type="password" 
-                  v-model="newPassword" 
-                  class="data-input" 
-                  placeholder=" " 
-                />
-                <label class="input-label">Nueva Contraseña (opcional)</label>
-              </div>
-
-              <div class="input-group">
-                <input 
-                  type="password" 
-                  v-model="confirmPassword" 
-                  class="data-input" 
-                  placeholder=" " 
-                />
-                <label class="input-label">Confirmar Nueva Contraseña</label>
-              </div>
-
               <button @click="handleSubmit" class="purple-button">Confirmar</button>
             
           </div>
@@ -187,45 +139,6 @@ const handleSubmit = async () => {
   padding: 0 20px;
   background: #fff;
   border-bottom: 1px solid #e0e0e0;
-}
-
-.profile-tabs {
-  display: flex;
-  max-width: 100%;
-  margin: 0 auto;
-}
-
-.tab-button {
-  flex: 1;
-  padding: 15px 20px;
-  text-align: center;
-  text-decoration: none;
-  color: #666;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  position: relative;
-  min-width: 120px;
-}
-
-.tab-button:hover {
-  background-color: #f9f9f9;
-  color: var(--purple-color);
-}
-
-.tab-button.active {
-  color: var(--purple-color);
-  font-weight: 600;
-}
-
-.tab-button.active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background-color: var(--purple-color);
 }
 
 .purple-button{

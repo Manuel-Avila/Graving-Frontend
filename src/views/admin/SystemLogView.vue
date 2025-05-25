@@ -9,24 +9,23 @@
                   class="data-input" 
                   placeholder=" " 
                 />
-                <label class="input-label">Nombre</label>
+                <label class="input-label">Acción</label>
         </div>
       </div>
 
       <div class="table-title">
-        <h2>Listado de Representantes</h2>
+        <h2>Bitácora del sistema</h2>
       </div>
 
       <div class="owners-table-wrapper">
         <table class="owners-table">
           <thead>
             <tr>
-              <th>Nombre</th>
-              <th>Teléfono</th>
-              <th>Correo</th>
-              <th>Curp</th>
-              <th>Difunto</th>
-              <th>Funciones</th>
+              <th>Nombre usuario</th>
+              <th>Acción</th>
+              <th>Descripción</th>
+              <th>Fecha</th>
+             
             </tr>
           </thead>
           <tbody>
