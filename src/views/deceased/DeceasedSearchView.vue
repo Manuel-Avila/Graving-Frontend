@@ -33,10 +33,11 @@
           :class="{ 'vertical-mode': !isDesktop }"
         >
           <DeceasedCard
-            v-for="(deceased, index) in visibleDeceased"
-            :key="index"
+            v-for="(deceased) in visibleDeceased"
+            :key="deceased.id"
             :deceased="formatDeceasedData(deceased)"
             class="fixed-size-card"
+            @deleted="handleDeleted"
           />
         </div>
       </div>
@@ -133,6 +134,11 @@ const prevCard = () => {
 watch(searchQuery, () => {
   currentIndex.value = 0
 })
+
+const handleDeleted = (id) => {
+  allDeceased.value = allDeceased.value.filter(d => d.id !== id)
+  currentIndex.value = 0
+}
 </script>
 
 <style scoped>

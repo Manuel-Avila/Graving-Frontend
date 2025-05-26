@@ -103,6 +103,28 @@
     background-color: #974392;
   }
 
+  .delete-button{
+    background-color: #E53935;
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    border: none;
+    padding: 0.75rem 1.5rem; 
+    border-radius: 0.4rem;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    max-width: 300px;
+    display: inline-block;
+    box-shadow: 5px 5px 8px var(--shadow-color);
+  }
+
+  .delete-button:hover {
+    filter: brightness(1.1);
+  }
+
+
   .outline-white-button{
     color: var(--purple-color);
     border: 1px solid white;

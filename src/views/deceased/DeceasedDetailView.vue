@@ -5,8 +5,13 @@
         <img v-if="imageUrl" :src="imageUrl" alt="Foto del difunto" class="deceased-photo">
         <img v-else src="../../assets/images/deceasedPlaceholder.png" alt="Foto del difunto" class="deceased-photo">
       </div>
-      <router-link v-if="isAdmin" :to="{name: 'editDeceased', params: {id: deceasedId}}" class="purple-button edit-button">Editar</router-link>
-      <router-link v-if="isLoggedIn" :to="{ name: 'visit', params: { id: deceasedId.id } }" class="outline-white-button edit-button">Visitar</router-link>
+      <div class="actions-container">
+        <template v-if="isAdmin">
+          <router-link :to="{name: 'editDeceased', params: {id: deceasedId}}" class="purple-button edit-button">Editar</router-link>
+          <button  @click="handleDelete" class="delete-button">Eliminar</button>
+        </template>
+        <router-link v-if="isLoggedIn" :to="{ name: 'visit', params: { id: deceasedId.id } }" class="outline-white-button edit-button">Visitar</router-link>
+      </div>
     </div>  
     <div class="right-section">
       <div class="form-container">
@@ -60,8 +65,9 @@
 <script setup>
   import { ref, onMounted, nextTick, computed } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
-  import { getDeceasedById } from '@/services/deceasedService'
+  import { getDeceasedById, deleteDeceased } from '@/services/deceasedService'
   import { useToast } from '@/composables/useToast'
+  import { useConfirmModal } from '@/composables/useConfirmModal'
   import { useAuthStore } from '@/stores/authStore'
 
   const authStore = useAuthStore()
@@ -69,6 +75,7 @@
   const isAdmin = computed(() => authStore.isAdmin)
 
   const { showToast } = useToast()
+  const { showConfirmModal } = useConfirmModal()
   const router = useRouter()
   const route = useRoute()
   const deceasedId = route.params.id
@@ -95,6 +102,21 @@
       router.push({ name: 'searchDeceased' })
     }
   })
+
+  const handleDelete = async () => {
+    const confirmed = await showConfirmModal(`¿Deseas eliminar a ${name.value}?`)
+
+    if (!confirmed) return
+
+    try {
+      const result = await deleteDeceased(deceasedId)
+      showToast(`Se eliminó a ${result.name} correctamente`, 'success')
+      await nextTick();
+      router.push({ name: 'searchDeceased' })
+    } catch (error) {
+      showToast('Error al eliminar al difunto', 'error')
+    }
+  }
 </script>
 
 <style scoped>
@@ -142,6 +164,19 @@
   height: 100%;
 }
 
+.edit-button,
+.delete-button,
+.outline-white-button {
+  width: 165px;
+}
+
+.actions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
 .form-container {
   padding: 40px;
   background-color: #ffffff;
@@ -151,12 +186,7 @@
 }
 
 .tomb-info{
-    margin-top: 30px;
-
-}
-
-.outline-white-button{
-    margin-top: 30px;
+  margin-top: 30px;
 }
 
 .input-group {

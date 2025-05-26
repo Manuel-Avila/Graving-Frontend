@@ -64,3 +64,24 @@ export const updateDeceased = async (id, data, file, previousDeleteToken) => {
     throw error
   }
 }
+
+export const deleteDeceased = async (id) => {
+  try {
+    const deceased = await getDeceasedById(id)
+
+    await api.delete(`/deceased/${id}`)
+
+    if (deceased.imageDeleteToken) {
+      await deleteImage(deceased.imageDeleteToken)
+    }
+
+    return {
+      message: 'Difunto eliminado correctamente',
+      name: deceased.name
+    }
+
+  } catch (error) {
+    console.log('❌ Error al eliminar difunto:', error)
+    throw error
+  }
+}

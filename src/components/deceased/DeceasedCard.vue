@@ -22,9 +22,12 @@
     </div>
 
     <div class="card-actions">
-      <router-link v-if="isAdmin" :to="{ name: 'editDeceased', params: { id: deceased.id } }" class="purple-button">Editar</router-link>
       <router-link v-if="isLoggedIn" :to="{ name: 'visit', params: { id: deceased.id } }" class="purple-button">Visitar</router-link>
       <router-link :to="{ name: 'deceased', params: { id: deceased.id } }"  class="outline-white-button">Ver</router-link>
+      <template v-if="isAdmin">
+        <router-link :to="{ name: 'editDeceased', params: { id: deceased.id } }" class="purple-button">Editar</router-link>
+        <button  @click="handleDelete" class="delete-button">Eliminar</button>
+      </template>
     </div>
   </div>
 </template>
@@ -32,17 +35,40 @@
 <script setup> 
   import { defineProps, computed } from 'vue'
   import { useAuthStore } from '@/stores/authStore'
+  import { deleteDeceased } from '@/services/deceasedService'
+  import { useConfirmModal } from '@/composables/useConfirmModal'
+  import { useToast } from '@/composables/useToast'
+  import { defineEmits } from 'vue'
+  
+  const emit = defineEmits(['deleted'])
+  
+  const { showConfirmModal } = useConfirmModal()
+  const { showToast } = useToast()
 
   const authStore = useAuthStore()
   const isLoggedIn = computed(() => authStore.isLoggedIn)
   const isAdmin = computed(() => authStore.isAdmin)
 
-  defineProps({
+  const props = defineProps({
     deceased: {
       type: Object,
       required: true
     }
   })
+  
+  const handleDelete = async () => {
+    const confirmed = await showConfirmModal(`¿Deseas eliminar a ${props.deceased.name}?`)
+
+    if (!confirmed) return
+
+    try {
+      const result = await deleteDeceased(props.deceased.id)
+      showToast(`Se eliminó a ${result.name} correctamente`, 'success')
+      emit('deleted', props.deceased.id)
+    } catch (error) {
+      showToast('Error al eliminar al difunto', 'error')
+    }
+  }
 </script>
 
 <style scoped>
