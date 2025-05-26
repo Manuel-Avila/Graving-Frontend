@@ -64,7 +64,7 @@
 
           <div class="action-buttons">
             <button @click="handleRegisterVisit" class="purple-button">Registrar Visita</button>
-            <button class="outline-white-button">Cancelar</button>
+            <router-link :to="{name: 'searchDeceased'}" class="outline-white-button">Cancelar</router-link>
           </div>
         </div>
 
@@ -252,6 +252,12 @@ h1 {
   justify-content:center;
   margin-top: 40px;
 }
+
+.action-buttons button, .action-buttons a {
+  width: 150px;
+  padding: 10px 0;
+}
+
 .purple-button{
   margin-right:40px;
 }
@@ -325,7 +331,7 @@ h1 {
     width: 90%;
   }
 
-  .action-buttons button{
+  .action-buttons button, .action-buttons a{
     width: 100px;
     font-size: 0.7rem;
   }
