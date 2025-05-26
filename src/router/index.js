@@ -81,7 +81,7 @@ const routes = [
     component: DeceasedSearchView
   },
   {
-    path: '/deceased/register/:graveId',
+    path: '/deceased/register/:graveId?',
     name: 'registerDeceased',
     component: RegisterAndEditDeceasedView,
     meta: { requiresAuth: true, requiresAdmin: true }
@@ -111,7 +111,7 @@ const routes = [
     meta: { requiresAuth: true, requiresAdmin: true }
   },
   {
-    path: '/repair/register/:graveId',
+    path: '/repair/register/:graveId?',
     name: 'registerRepair',
     component: RegisterRepairView,
     meta: { requiresAuth: true, requiresAdmin: true }

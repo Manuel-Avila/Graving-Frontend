@@ -164,7 +164,7 @@
         display: none;
         position: absolute;
         top: 100%;
-        left: 0;
+        right: 0;
         background-color: white;
         border-radius: 5px;
         min-width: 150px;

@@ -27,5 +27,10 @@ export const deceasedSchema = yup.object({
       const { birthDate } = this.parent
       if (!value || !birthDate) return false
       return new Date(value) > new Date(birthDate)
-    })
+    }),
+    
+    graveId: yup
+    .number()
+    .typeError('Debes seleccionar una tumba')
+    .required('Debes seleccionar una tumba')
 })

@@ -47,9 +47,15 @@
             <label class="input-label">Fecha de defunción</label>
           </div>
 
-          <div class="tomb-info">
-            <h3>Número de tumba</h3>
-            <p class="tomb-number">{{ graveId }}</p>
+          <div class="input-group tomb-input-group" @click="showGraveModal = true">
+            <input 
+              type="text" 
+              class="data-input"
+              readonly
+              :value="graveId ? `#${graveId}` : ''"
+              placeholder=" " 
+            />
+            <label class="input-label">Número de tumba</label>
           </div>
         </div>
 
@@ -77,6 +83,11 @@
       
     </div>
   </div>
+  <GraveSelectorModal
+    v-if="showGraveModal"
+    @close="showGraveModal = false"
+    @selected="handleGraveSelected"
+  />
 </template>
 
 <script setup>
@@ -87,6 +98,9 @@
   import { useToast } from '@/composables/useToast'
   import { deceasedSchema } from '@/composables/validations/useDeceasedValidation'
   import { ownerSchema } from '@/composables/validations/useOwnerValidation'
+  import GraveSelectorModal from '@/components/map/GraveSelectorModal.vue'
+
+  const showGraveModal = ref(false)
 
   const route = useRoute()
   const router = useRouter()
@@ -99,7 +113,7 @@
   const birthDate = ref('')
   const deathDate = ref('')
   const epitaph = ref('')
-  const graveId = ref(isEditing.value ? null : route.params.graveId)
+  const graveId = ref(route.params.graveId ? Number(route.params.graveId) : null)
   const imageUrl = ref(null)
   const imageDeleteToken = ref(null)
 
@@ -142,42 +156,29 @@
   })
 
   const handleSubmit = async () => {
-    let imageResult = null
-
     try {
-      const deceasedValues = {
-        name: name.value,
-        epitaph: epitaph.value,
-        birthDate: birthDate.value,
-        deathDate: deathDate.value
-      }
-
-      const ownerValues = {
-        ownerName: ownerName.value,
-        ownerPhone: ownerPhone.value,
-        ownerEmail: ownerEmail.value,
-        ownerCurp: ownerCurp.value
-      }
-
-      await deceasedSchema.validate(deceasedValues)
-      await ownerSchema.validate(ownerValues)
-
       const deceasedData = {
         name: name.value,
+        epitaph: epitaph.value,
         birthDate: birthDate.value,
         deathDate: deathDate.value,
-        epitaph: epitaph.value,
-        graveId: graveId.value,
-        imageUrl: imageResult?.url || imageUrl.value,
-        imageDeleteToken: imageResult?.deleteToken || imageDeleteToken.value,
+        graveId: graveId.value
       }
 
       const ownerData = {
         name: ownerName.value,
         phone: ownerPhone.value,
         email: ownerEmail.value,
-        curp: ownerCurp.value,
+        curp: ownerCurp.value
       }
+
+      if (!selectedImage.value) {
+        deceasedData.imageUrl = imageUrl.value
+        deceasedData.imageDeleteToken = imageDeleteToken.value
+      }
+
+      await deceasedSchema.validate(deceasedData)
+      await ownerSchema.validate(ownerData)
 
       if (isEditing.value) {
         await updateDeceased(deceasedId, deceasedData, selectedImage.value, imageDeleteToken.value)
@@ -222,6 +223,12 @@
       selectedImage.value = null
       imageUrl.value = null
     }
+  }
+
+  const handleGraveSelected = (grave) => {
+    graveId.value = grave.id
+    showToast(`Tumba #${grave.graveNumber} seleccionada`, 'success')
+    showGraveModal.value = false
   }
 </script>
 
