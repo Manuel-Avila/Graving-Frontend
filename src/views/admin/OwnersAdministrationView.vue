@@ -50,7 +50,9 @@
 <script setup>
   import { ref, computed, onMounted } from 'vue'
   import { getAllOwners } from '@/services/ownerService'
+  import { useToast } from '@/composables/useToast'
 
+  const { showToast } = useToast()
   const searchQuery = ref('')
   const owners = ref([])
 
@@ -68,7 +70,7 @@
       const response = await getAllOwners();
       owners.value = response;
     } catch (err) {
-      console.error('Error al obtener propietarios:', err);
+      showToast('Error al obtener propietarios:', 'error');
     }
   })
 </script>
