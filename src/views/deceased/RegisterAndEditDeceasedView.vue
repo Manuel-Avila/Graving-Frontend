@@ -85,6 +85,8 @@
   import { registerDeceased, updateDeceased, getDeceasedById } from '@/services/deceasedService'
   import { getOwnerByDeceasedId, createOwner, updateOwner } from '@/services/ownerService'
   import { useToast } from '@/composables/useToast'
+  import { deceasedSchema } from '@/composables/validations/useDeceasedValidation'
+  import { ownerSchema } from '@/composables/validations/useOwnerValidation'
 
   const route = useRoute()
   const router = useRouter()
@@ -140,15 +142,26 @@
   })
 
   const handleSubmit = async () => {
-    if (!name.value || !birthDate.value || !deathDate.value || !epitaph.value ||
-        !ownerName.value || !ownerPhone.value || !ownerEmail.value || !ownerCurp.value) {
-      showToast('Todos los campos son obligatorios', 'error')
-      return
-    }
-
     let imageResult = null
 
     try {
+      const deceasedValues = {
+        name: name.value,
+        epitaph: epitaph.value,
+        birthDate: birthDate.value,
+        deathDate: deathDate.value
+      }
+
+      const ownerValues = {
+        ownerName: ownerName.value,
+        ownerPhone: ownerPhone.value,
+        ownerEmail: ownerEmail.value,
+        ownerCurp: ownerCurp.value
+      }
+
+      await deceasedSchema.validate(deceasedValues)
+      await ownerSchema.validate(ownerValues)
+
       const deceasedData = {
         name: name.value,
         birthDate: birthDate.value,
@@ -187,8 +200,12 @@
       await nextTick()
       router.push({ name: 'searchDeceased' })
     } catch (err) {
-      showToast('Error al guardar difunto.', 'error')
-      console.log(err)
+      if (err.name === 'ValidationError') {
+        showToast(err.message, 'error')
+      } else {
+        console.error(err)
+        showToast('Error al guardar difunto.', 'error')
+      }
     }
   }
 

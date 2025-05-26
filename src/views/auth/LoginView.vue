@@ -46,6 +46,7 @@ import { useRouter } from 'vue-router'
 import { login, loginGoogle } from '@/services/authService'
 import { useAuthStore } from '@/stores/authStore'
 import { useToast } from '@/composables/useToast'
+import { loginSchema } from '@/composables/validations/useLoginValidation'
 
 const { showToast } = useToast()
 const email = ref('test@gmail.com')
@@ -55,14 +56,24 @@ const authStore = useAuthStore()
 
 const handleLogin = async () => {
   try {
-    const data = await login({ email: email.value, password: password.value })
+    const form = {
+      email: email.value,
+      password: password.value
+    }
+
+    await loginSchema.validate(form)
+
+    const data = await login(form)
     authStore.setAuth(data.token, data.user)
     showToast('Inicio de sesión exitoso!', 'success')
     await nextTick()
     router.push({ name: 'profile' })
   } catch (error) {
-    console.error('Error al iniciar sesión:', error)
-    showToast('Error al iniciar sesión. Verifica tus credenciales.', 'error')
+    if (error.name === 'ValidationError') {
+      showToast(error.message, 'error')
+    } else {
+      showToast('Error al iniciar sesión. Verifica tus datos o intenta más tarde.', 'error')
+    }
   }
 }
 

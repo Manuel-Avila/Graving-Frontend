@@ -61,6 +61,7 @@ import { ref, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useToast } from '@/composables/useToast'
 import { createRepair } from '@/services/repairService'
+import { repairSchema } from '@/composables/validations/useRepairValidation'
 
 const route = useRoute()
 const router = useRouter()
@@ -71,12 +72,14 @@ const description = ref('')
 const date = ref('')
 
 const handleSubmit = async () => {
-  if (!description.value || !date.value) {
-    showToast('Todos los campos son obligatorios', 'error')
-    return
-  }
-
   try {
+    const form = {
+      description: description.value,
+      date: date.value
+    }
+
+    await repairSchema.validate(form)
+
     await createRepair({
       graveId,
       description: description.value,
@@ -88,8 +91,12 @@ const handleSubmit = async () => {
     router.push({ name: 'repairs' })
 
   } catch (err) {
-    showToast('Error al registrar la reparación', 'error')
-    console.error(err)
+    if (err.name === 'ValidationError') {
+      showToast(err.message, 'error')
+    } else {
+      console.error(err)
+      showToast('Error al registrar la reparación', 'error')
+    }
   }
 }
 </script>

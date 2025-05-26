@@ -137,8 +137,40 @@ onMounted(async () => {
 })
 
 const handleSubmit = async () => {
+  if (!user.value.name.trim()) {
+    showToast('El nombre es obligatorio', 'error')
+    return
+  }
+
+  if (!user.value.email.trim()) {
+    showToast('El correo es obligatorio', 'error')
+    return
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(user.value.email)) {
+    showToast('El correo no tiene un formato válido', 'error')
+    return
+  }
+
+  if (!user.value.phoneNumber.trim()) {
+    showToast('El número de teléfono es obligatorio', 'error')
+    return
+  }
+
+  const phoneRegex = /^[0-9]{10}$/
+  if (!phoneRegex.test(user.value.phoneNumber)) {
+    showToast('El número de teléfono debe tener 10 dígitos', 'error')
+    return
+  }
+
   if (!password.value) {
     showToast('Debes ingresar tu contraseña actual', 'error')
+    return
+  }
+
+  if (newPassword.value && newPassword.value.length < 6) {
+    showToast('La nueva contraseña debe tener al menos 6 caracteres', 'error')
     return
   }
 
@@ -160,9 +192,7 @@ const handleSubmit = async () => {
     newPassword.value = ''
     confirmPassword.value = ''
   } catch (err) {
-    console.error('Error al actualizar perfil:', err)
-    const msg = err.response?.data?.error || 'Error al actualizar perfil'
-    showToast(msg, 'error')
+    showToast('Error al actualizar perfil', 'error')
   }
 }
 </script>

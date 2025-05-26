@@ -51,6 +51,7 @@
   import { register, loginGoogle } from '@/services/authService'
   import { useAuthStore } from '@/stores/authStore'
   import { useToast } from '@/composables/useToast'
+  import { registerSchema } from '@/composables/validations/useRegisterValidation'
 
   const { showToast } = useToast()
   const router = useRouter();
@@ -64,18 +65,33 @@
 
   const handleRegister = async () => {
     try {
-      await register({
+      const form = {
         name: name.value,
         email: email.value,
+        phoneNumber: phoneNumber.value,
         password: password.value,
-        phoneNumber: phoneNumber.value
-      });
+        confirmPassword: confirmPassword.value
+      }
+
+      await registerSchema.validate(form)
+
+      await register({
+        name: form.name,
+        email: form.email,
+        phoneNumber: form.phoneNumber,
+        password: form.password
+      })
 
       showToast('Registro exitoso!', 'success');
       await nextTick()
       router.push({ name: 'login' });
-    } catch (err) {
-      showToast('Error al registrarse. Por favor, inténtalo de nuevo.', 'error');
+
+    } catch (error) {
+      if (error.name === 'ValidationError') {
+        showToast(error.message, 'error')
+      } else {
+        showToast('Error al registrarse. Por favor, inténtalo de nuevo.', 'error')
+      }
     }
   };
 

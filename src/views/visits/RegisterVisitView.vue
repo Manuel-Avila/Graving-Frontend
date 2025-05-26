@@ -80,6 +80,7 @@
   import { getDeceasedById } from '@/services/deceasedService'
   import { useToast } from '@/composables/useToast'
   import { createVisit } from '@/services/visitService'
+  import { visitSchema } from '@/composables/validations/useVisitValidation'
 
   const { showToast } = useToast()
   const router = useRouter()
@@ -114,12 +115,16 @@
   })
 
   const handleRegisterVisit = async () => {
-    if (!visitDate.value || !visitTime.value) {
-      showToast('Todos los campos son obligatorios', 'error')
-      return
-    }
-
     try {
+      await visitSchema.validate(
+        {
+          visitDate: visitDate.value,
+          visitTime: visitTime.value,
+          dateTime: `${visitDate.value}T${visitTime.value}`
+        },
+        { abortEarly: false }
+      )
+
       const dateTime = `${visitDate.value} ${visitTime.value}`
 
         await createVisit({
@@ -131,8 +136,12 @@
         await nextTick()
         router.push({ name: 'visits' })
       } catch (error) {
-        console.error('Error al registrar visita:', error)
-        showToast('Error al registrar la visita', 'error')
+        if (error.name === 'ValidationError') {
+          error.errors.forEach(msg => showToast(msg, 'error'))
+        } else {
+          console.error('Error al registrar visita:', error)
+          showToast('Error al registrar la visita', 'error')
+        }
     }
   }
 </script>
@@ -211,6 +220,7 @@ h1 {
 
 .deceased-photo {
   width: 100%;
+  height: 100%;
 }
 
 .info-content {
@@ -243,7 +253,7 @@ h1 {
   margin-top: 40px;
 }
 .purple-button{
-  margin-right:40px ;
+  margin-right:40px;
 }
 
 
@@ -308,6 +318,17 @@ h1 {
   .data-input[type="time"],
   .data-input {
   width: 97%;
+}
+
+@media (max-width: 500px) {
+  .info-card {
+    width: 90%;
+  }
+
+  .action-buttons button{
+    width: 100px;
+    font-size: 0.7rem;
+  }
 }
 
 
