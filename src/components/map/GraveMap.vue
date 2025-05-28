@@ -123,7 +123,6 @@ onMounted(async () => {
     indexGraves(data)
   } catch (err) {
     showToast('Error al obtener tumbas', 'error')
-    console.error('Error al obtener tumbas:', err)
   }
 })
 

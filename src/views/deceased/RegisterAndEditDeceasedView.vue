@@ -204,7 +204,6 @@
       if (err.name === 'ValidationError') {
         showToast(err.message, 'error')
       } else {
-        console.error(err)
         showToast('Error al guardar difunto.', 'error')
       }
     }

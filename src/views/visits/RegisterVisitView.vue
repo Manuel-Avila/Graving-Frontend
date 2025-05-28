@@ -139,7 +139,6 @@
         if (error.name === 'ValidationError') {
           error.errors.forEach(msg => showToast(msg, 'error'))
         } else {
-          console.error('Error al registrar visita:', error)
           showToast('Error al registrar la visita', 'error')
         }
     }

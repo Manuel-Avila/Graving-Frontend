@@ -85,7 +85,6 @@ const handleLoginGoogle = async () => {
     await nextTick()
     router.push({ name: 'profile' })
   } catch (error) {
-    console.error('Error al iniciar sesión con Google:', error)
     showToast('Error al iniciar sesión con Google.', 'error')
   }
 }

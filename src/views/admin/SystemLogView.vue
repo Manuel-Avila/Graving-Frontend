@@ -62,7 +62,6 @@ onMounted(async () => {
     logs.value = await getAllLogs()
   } catch (err) {
     showToast('Error al obtener logs', 'error')
-    console.error('Error al obtener logs:', err)
   }
 })
 
@@ -142,7 +141,7 @@ const generateDeceasedReport = async () => {
         const base64Img = await blobToBase64(blob)
         doc.addImage(base64Img, 'PNG', 150, y - 35, 40, 40)
       } catch (err) {
-        console.warn(`No se pudo cargar imagen de ${d.name}`, err)
+        showToast('Error al generar el reporte', 'error')
       }
 
       y += 10
@@ -158,7 +157,7 @@ const generateDeceasedReport = async () => {
 
     doc.save('Reporte_Difuntos.pdf')
   } catch (error) {
-    console.error('Error al generar el PDF:', error)
+    showToast('Error al generar el reporte', 'error')
   }
 }
 </script>

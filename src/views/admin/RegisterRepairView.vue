@@ -94,7 +94,6 @@ const handleSubmit = async () => {
     if (err.name === 'ValidationError') {
       showToast(err.message, 'error')
     } else {
-      console.error(err)
       showToast('Error al registrar la reparación', 'error')
     }
   }

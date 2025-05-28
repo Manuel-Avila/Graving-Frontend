@@ -97,7 +97,6 @@ const handleMarkCompleted = async (id) => {
     repairs.value = response
   } catch (err) {
     showToast('Error al actualizar reparación', 'error')
-    console.error(err)
   }
 }
 
@@ -106,7 +105,6 @@ onMounted(async () => {
     repairs.value = await getAllRepairs()
   } catch (err) {
     showToast('Error al actualizar reparación', 'error')
-    console.log('Error al obtener reparaciones:', err)
   }
 })
 </script>

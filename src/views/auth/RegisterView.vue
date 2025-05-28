@@ -103,7 +103,6 @@
       await nextTick()
       router.push({ name: 'profile' })
     } catch (error) {
-      console.error('Error al registrarse con Google:', error)
       showToast('Error al registrarse con Google!', 'error');
       await nextTick()
     }

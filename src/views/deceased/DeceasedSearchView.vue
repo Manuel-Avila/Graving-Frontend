@@ -82,7 +82,6 @@ onMounted(async () => {
     allDeceased.value = response
     window.addEventListener('resize', handleResize)
   } catch (err) {
-    console.error('Error al obtener difuntos:', err)
     showToast('Error al obtener difuntos', 'error')
   }
 })

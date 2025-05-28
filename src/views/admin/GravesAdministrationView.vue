@@ -96,7 +96,6 @@ const editingGrave = ref(null)
 onMounted(async () => {
   try {
     graves.value = await getAllGraves()
-    console.log(graves.value)
   } catch (err) {
     showToast('Error al obtener tumbas', 'error')
   }

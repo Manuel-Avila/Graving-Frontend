@@ -16,7 +16,6 @@ export const useAuthStore = defineStore('auth', {
         const data = await getMyProfile()
         return data.role === 'admin'
       } catch (err) {
-        console.log('Error obteniendo el perfil del usuario:', err)
         return false
       }
     },

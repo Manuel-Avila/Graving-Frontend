@@ -131,7 +131,6 @@ onMounted(async () => {
   try {
     user.value = await getMyProfile()
   } catch (err) {
-    console.error('Error al obtener el perfil:', err)
     showToast('Error al cargar tu perfil', 'error')
   }
 })
