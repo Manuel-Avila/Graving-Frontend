@@ -378,7 +378,6 @@
   .form-container-deceased,
   .form-container-owner {
     padding: 20px;
-    height: vh;
   }
 }
 

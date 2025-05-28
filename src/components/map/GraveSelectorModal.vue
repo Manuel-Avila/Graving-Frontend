@@ -194,4 +194,20 @@ onMounted(async () => {
   color: #666;
   cursor: not-allowed;
 }
+
+@media (max-width: 768px) {
+  .grave {
+    width: 45px;
+    height: 35px;
+    font-size: 12px;
+  }
+
+  .block {
+    min-width: 320px; /* Asegura espacio interno horizontal dentro del bloque */
+  }
+
+  .cemetery-blocks {
+    grid-template-columns: repeat(2, minmax(320px, 1fr));
+  }
+}
 </style>
