@@ -38,6 +38,11 @@
             </tr>
           </tbody>
         </table>
+
+      </div>
+      <div class="report-section">
+        <h3>Reportes (PDF)</h3>
+        <button @click="generateDeceasedReport" class="purple-button">Difuntos registrados</button>
       </div>
     </div>
   </div>
@@ -76,6 +81,85 @@ const formatDate = (timestamp) => {
     hour: '2-digit',
     minute: '2-digit'
   })
+}
+
+import { jsPDF } from 'jspdf'
+import { getAllDeceased } from '@/services/deceasedService'
+
+const PURPLE_RGB = [110, 52, 106]
+
+const blobToBase64 = (blob) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result)
+    reader.onerror = reject
+    reader.readAsDataURL(blob)
+  })
+}
+
+const generateDeceasedReport = async () => {
+  try {
+    const deceasedList = await getAllDeceased()
+    const doc = new jsPDF()
+    let y = 20
+
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(18)
+    doc.setTextColor(...PURPLE_RGB)
+    doc.text('Reporte de Difuntos Registrados', 105, y, { align: 'center' })
+    y += 8
+    doc.setDrawColor(...PURPLE_RGB)
+    doc.setLineWidth(0.8)
+    doc.line(15, y, 195, y)
+    y += 10
+
+    doc.setFont('helvetica', '')
+    doc.setFontSize(12)
+    doc.setTextColor(70, 70, 70)
+    doc.text(`Total de difuntos registrados: ${deceasedList.length}`, 15, y)
+    y += 8
+
+    for (const d of deceasedList) {
+      doc.setFont('helvetica', 'bold')
+      doc.setFontSize(13)
+      doc.setTextColor(...PURPLE_RGB)
+      doc.text(d.name, 15, y)
+      y += 8
+
+      doc.setFont('helvetica', '')
+      doc.setFontSize(11)
+      doc.setTextColor(70, 70, 70)
+      doc.text(`Nacimiento: ${d.birthDate?.slice(0, 10) || '-'}`, 15, y); y += 6
+      doc.text(`Fallecimiento: ${d.deathDate?.slice(0, 10) || '-'}`, 15, y); y += 6
+      doc.text(`Epitafio: ${d.epitaph || '-'}`, 15, y); y += 6
+      doc.text(`Ubicación: ${d.blockName}, Sección ${d.section}, Fila ${d.graveRow}, Tumba #${d.graveNumber}`, 15, y); y += 6
+
+      
+      const imageUrl = d.imageUrl || '/images/deceasedPlaceholder.png'
+
+      try {
+        const blob = await fetch(imageUrl).then(r => r.blob())
+        const base64Img = await blobToBase64(blob)
+        doc.addImage(base64Img, 'PNG', 150, y - 35, 40, 40)
+      } catch (err) {
+        console.warn(`No se pudo cargar imagen de ${d.name}`, err)
+      }
+
+      y += 10
+      doc.setDrawColor(220, 220, 220)
+      doc.line(15, y, 195, y)
+      y += 10
+
+      if (y > 270) {
+        doc.addPage()
+        y = 20
+      }
+    }
+
+    doc.save('Reporte_Difuntos.pdf')
+  } catch (error) {
+    console.error('Error al generar el PDF:', error)
+  }
 }
 </script>
 
@@ -191,6 +275,22 @@ const formatDate = (timestamp) => {
 
 .action-link:active {
   transform: translateY(1px);
+}
+
+.report-section {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+  text-align: left;
+}
+
+.report-section h3 {
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+}
+
+.report-section button {
+  width: auto;
 }
 
 /* Responsive */

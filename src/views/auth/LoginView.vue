@@ -49,8 +49,8 @@ import { useToast } from '@/composables/useToast'
 import { loginSchema } from '@/composables/validations/useLoginValidation'
 
 const { showToast } = useToast()
-const email = ref('test@gmail.com')
-const password = ref('test')
+const email = ref('')
+const password = ref('')
 const router = useRouter()
 const authStore = useAuthStore()
 
