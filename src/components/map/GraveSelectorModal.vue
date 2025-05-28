@@ -126,7 +126,6 @@ onMounted(async () => {
   cursor: pointer;
 }
 
-/* mini-mapa styles resumidos */
 .cemetery-map-scroll {
   overflow: auto;
   padding: 10px;
@@ -203,7 +202,7 @@ onMounted(async () => {
   }
 
   .block {
-    min-width: 320px; /* Asegura espacio interno horizontal dentro del bloque */
+    min-width: 320px;
   }
 
   .cemetery-blocks {
