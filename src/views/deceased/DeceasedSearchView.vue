@@ -14,6 +14,13 @@
           <label class="input-label">Nombre del difunto</label>
         </div>
       </div>
+
+      <div v-if="isAdmin" class="toggle-group">
+        <label class="toggle-label">
+          <input type="checkbox" v-model="showInactive" />
+          Ver difuntos olvidados
+        </label>
+      </div>
     </div>
 
     <div class="results-container" v-if="showResults">
@@ -36,6 +43,7 @@
             v-for="(deceased) in visibleDeceased"
             :key="deceased.id"
             :deceased="formatDeceasedData(deceased)"
+            :is-inactive="showInactive"
             class="fixed-size-card"
             @deleted="handleDeleted"
           />
@@ -61,9 +69,14 @@
 
 <script setup>
 import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue'
-import { getAllDeceased } from '@/services/deceasedService'
+import { getAllDeceased, getInactiveDeceased } from '@/services/deceasedService'
 import DeceasedCard from '@/components/deceased/DeceasedCard.vue'
 import { useToast } from '@/composables/useToast'
+import { useAuthStore } from '@/stores/authStore'
+
+const auth = useAuthStore()
+const isAdmin = computed(() => auth.isAdmin)
+const showInactive = ref(false)
 
 const { showToast } = useToast()
 const searchQuery = ref('')
@@ -76,14 +89,21 @@ const handleResize = () => {
   if (!isDesktop.value) currentIndex.value = 0
 }
 
-onMounted(async () => {
+const loadDeceased = async () => {
   try {
-    const response = await getAllDeceased()
+    const response = showInactive.value
+      ? await getInactiveDeceased()
+      : await getAllDeceased()
+
     allDeceased.value = response
-    window.addEventListener('resize', handleResize)
   } catch (err) {
     showToast('Error al obtener difuntos', 'error')
   }
+}
+
+onMounted(() => {
+  loadDeceased()
+  window.addEventListener('resize', handleResize)
 })
 
 onBeforeUnmount(() => {
@@ -138,6 +158,12 @@ const handleDeleted = (id) => {
   allDeceased.value = allDeceased.value.filter(d => d.id !== id)
   currentIndex.value = 0
 }
+
+
+watch(showInactive, () => {
+  loadDeceased()
+  currentIndex.value = 0
+})
 </script>
 
 <style scoped>
@@ -228,6 +254,20 @@ h2 {
 .arrow-button.disabled-arrow {
   opacity: 0;
   pointer-events: none;
+}
+
+.toggle-group {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.toggle-label {
+  font-size: 0.95rem;
+  color: #555;
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 /* Modo Desktop (>768px) */

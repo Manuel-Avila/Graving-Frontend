@@ -5,12 +5,12 @@
         <img v-if="imageUrl" :src="imageUrl" alt="Foto del difunto" class="deceased-photo">
         <img v-else src="../../assets/images/deceasedPlaceholder.png" alt="Foto del difunto" class="deceased-photo">
       </div>
-      <div class="actions-container">
+      <div class="actions-container" v-if="isActive">
+        <router-link v-if="isLoggedIn" :to="{ name: 'visit', params: { id: deceasedId.id } }" class="purple-button edit-button">Visitar</router-link>
         <template v-if="isAdmin">
-          <router-link :to="{name: 'editDeceased', params: {id: deceasedId}}" class="purple-button edit-button">Editar</router-link>
-          <button  @click="handleDelete" class="delete-button">Eliminar</button>
+          <router-link :to="{name: 'editDeceased', params: {id: deceasedId}}" class="outline-white-button edit-button">Editar</router-link>
+          <button  @click="handleDelete" class="delete-button">Olvidar</button>
         </template>
-        <router-link v-if="isLoggedIn" :to="{ name: 'visit', params: { id: deceasedId.id } }" class="outline-white-button edit-button">Visitar</router-link>
       </div>
     </div>  
     <div class="right-section">
@@ -86,6 +86,7 @@
   const deathDate = ref('')
   const graveNumber = ref('')
   const imageUrl = ref('')
+  const isActive = ref(false)
 
   onMounted(async () => {
     try {
@@ -96,6 +97,7 @@
       deathDate.value = deceased.deathDate?.slice(0, 10)
       graveNumber.value = deceased.graveNumber
       imageUrl.value = deceased.imageUrl
+      isActive.value = deceased.isActive !== 0
     } catch (err) {
       showToast('Difunto no encontrado', 'error')
       await nextTick();
@@ -104,17 +106,17 @@
   })
 
   const handleDelete = async () => {
-    const confirmed = await showConfirmModal(`¿Deseas eliminar a ${name.value}?`)
+    const confirmed = await showConfirmModal(`¿Deseas olvidar a ${name.value}? (Esta acción es irreversible)`)
 
     if (!confirmed) return
 
     try {
       const result = await deleteDeceased(deceasedId)
-      showToast(`Se eliminó a ${result.name} correctamente`, 'success')
+      showToast(`Se olvido a ${result.name} correctamente`, 'success')
       await nextTick();
       router.push({ name: 'searchDeceased' })
     } catch (error) {
-      showToast('Error al eliminar al difunto', 'error')
+      showToast('Error al olvidar al difunto', 'error')
     }
   }
 </script>

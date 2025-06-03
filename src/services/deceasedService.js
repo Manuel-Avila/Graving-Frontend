@@ -13,6 +13,11 @@ export const getDeceasedById = async (id) => {
     return response.data
 }
 
+export const getInactiveDeceased = async () => {
+  const response = await api.get('/deceased/inactive')
+  return response.data
+}
+
 export const registerDeceased = async (data, file) => {
   let imageResult = null
 
@@ -70,12 +75,8 @@ export const deleteDeceased = async (id) => {
 
   await api.delete(`/deceased/${id}`)
 
-  if (deceased.imageDeleteToken) {
-    await deleteImage(deceased.imageDeleteToken)
-  }
-
   return {
-    message: 'Difunto eliminado correctamente',
+    message: 'Difunto olvidado correctamente',
     name: deceased.name
   }
 }

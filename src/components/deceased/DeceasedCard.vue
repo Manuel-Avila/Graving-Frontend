@@ -22,11 +22,14 @@
     </div>
 
     <div class="card-actions">
-      <router-link v-if="isLoggedIn" :to="{ name: 'visit', params: { id: deceased.id } }" class="purple-button">Visitar</router-link>
-      <router-link :to="{ name: 'deceased', params: { id: deceased.id } }"  class="outline-white-button">Ver</router-link>
-      <template v-if="isAdmin">
-        <router-link :to="{ name: 'editDeceased', params: { id: deceased.id } }" class="purple-button">Editar</router-link>
-        <button  @click="handleDelete" class="delete-button">Eliminar</button>
+      <router-link :to="{ name: 'deceased', params: { id: deceased.id } }"  class="purple-button">Ver</router-link>
+
+      <template v-if="!isInactive">
+        <router-link v-if="isLoggedIn" :to="{ name: 'visit', params: { id: deceased.id } }" class="outline-white-button">Visitar</router-link>
+        <template v-if="isAdmin">
+          <router-link :to="{ name: 'editDeceased', params: { id: deceased.id } }" class="purple-button">Editar</router-link>
+          <button  @click="handleDelete" class="delete-button">Olvidar</button>
+        </template>
       </template>
     </div>
   </div>
@@ -53,20 +56,24 @@
     deceased: {
       type: Object,
       required: true
+    },
+    isInactive: {
+      type: Boolean,
+      default: false
     }
   })
   
   const handleDelete = async () => {
-    const confirmed = await showConfirmModal(`¿Deseas eliminar a ${props.deceased.name}?`)
+    const confirmed = await showConfirmModal(`¿Deseas olvidar a ${props.deceased.name}? (Esta acción es irreversible)`)
 
     if (!confirmed) return
 
     try {
       const result = await deleteDeceased(props.deceased.id)
-      showToast(`Se eliminó a ${result.name} correctamente`, 'success')
+      showToast(`Se olvido a ${result.name} correctamente`, 'success')
       emit('deleted', props.deceased.id)
     } catch (error) {
-      showToast('Error al eliminar al difunto', 'error')
+      showToast('Error al olvidar al difunto', 'error')
     }
   }
 </script>

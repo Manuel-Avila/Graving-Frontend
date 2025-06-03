@@ -6,8 +6,8 @@
         
     </div>
     <div class="home-view-components">
-        <h1>Busca tumbas,recuerda <br>historias</h1>
-        <label>Busca,encuentra y recuerda. Este sitio fue creado rendir<br> homenaje a tus seres queridos</label>
+        <h1>Busca tumbas, recuerda <br>historias</h1>
+        <label>Busca, encuentra y recuerda. Este sitio fue creado rendir<br> homenaje a tus seres queridos</label>
         <router-link v-if="isLoggedIn" :to="{name: 'searchDeceased'}" class="purple-button">Difuntos</router-link>
         <router-link v-else :to="{name: 'login'}" class="purple-button">Iniciar Sesión</router-link>
         <router-link :to="{name: 'map'}" class="outline-white-button">Mapa</router-link>
