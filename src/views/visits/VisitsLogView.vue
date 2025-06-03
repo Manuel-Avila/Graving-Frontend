@@ -75,7 +75,11 @@ const formatDate = (rawDate) => {
 
 const formatTime = (rawDate) => {
   const date = new Date(rawDate)
-  return date.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })
+  return date.toLocaleTimeString('es-MX', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  })
 }
 </script>
 

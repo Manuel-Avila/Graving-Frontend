@@ -16,8 +16,14 @@
                 <div class="grave-container" v-for="col in 5" :key="`grave-${block}-${row}-${col}`">
                   <button
                     class="grave"
-                    :class="{ occupied: getGrave(block, row, col)?.status === 'occupied' }"
-                    :disabled="getGrave(block, row, col)?.status === 'occupied'"
+                    :class="{
+                      occupied: getGrave(block, row, col)?.status === 'occupied',
+                      maintenance: getGrave(block, row, col)?.underMaintenance === 1
+                    }"
+                    :disabled="
+                      getGrave(block, row, col)?.status === 'occupied' ||
+                      getGrave(block, row, col)?.underMaintenance === 1
+                    "
                     @click="selectGrave(getGrave(block, row, col))"
                   >
                     {{ getGrave(block, row, col)?.graveNumber || '-' }}
@@ -191,6 +197,12 @@ onMounted(async () => {
 .grave.occupied {
   background-color: #ccc;
   color: #666;
+  cursor: not-allowed;
+}
+
+.grave.maintenance {
+  background-color: #e7b41c;
+  color: #222121;
   cursor: not-allowed;
 }
 

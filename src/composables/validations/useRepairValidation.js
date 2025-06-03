@@ -1,6 +1,10 @@
 import * as yup from 'yup'
 
 export const repairSchema = yup.object({
+  type: yup
+    .string()
+    .required('El tipo de reparación es obligatorio'),
+
   description: yup
     .string()
     .required('La descripción es obligatoria'),

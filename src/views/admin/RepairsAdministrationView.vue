@@ -2,6 +2,7 @@
   <div class="repairs-container">
     <div class="repairs-center-box">
       <div class="repairs-content-wrapper">
+        <h2>Filtros</h2>
         <div class="search-group">
           <div class="input-group">
             <input 
@@ -12,8 +13,20 @@
             />
             <label class="input-label">Buscar reparación</label>
           </div>
+          <div class="input-group">
+            <select v-model="filterType" class="data-input">
+              <option value="">Todos los tipos</option>
+              <option value="cleaning">Limpieza</option>
+              <option value="painting">Pintura</option>
+              <option value="graffitiRemoval">Remoción de grafiti</option>
+              <option value="landscaping">Jardinería</option>
+              <option value="structureRepair">Reparación estructural</option>
+              <option value="drainage">Drenaje</option>
+              <option value="other">Otro</option>
+            </select>
+            <label class="input-label">Filtrar por tipo</label>
+          </div>
         </div>
-
         <div class="table-title">
           <h2>Listado de Reparaciones</h2> 
         </div>
@@ -23,6 +36,7 @@
             <thead>
               <tr>
                 <th>N° Tumba</th>
+                <th>Tipo</th>
                 <th>Descripción</th>
                 <th>Fecha</th>
                 <th>Estatus</th>
@@ -32,6 +46,7 @@
             <tbody>
               <tr v-for="repair in filteredRepairs" :key="repair.id">
                 <td>{{ repair.graveNumber }}</td>
+                <td>{{ formatType(repair.type) }}</td>
                 <td>{{ repair.description }}</td>
                 <td>{{ formatDate(repair.date) }}</td>
                 <td>
@@ -41,7 +56,7 @@
                       'status-completed': repair.status === 'completed'
                     }"
                   >
-                    {{ repair.status }}
+                    {{ formatStatus(repair.status) }}
                   </span>
                 </td>
                 <td class="actions">
@@ -71,13 +86,16 @@ import { useToast } from '@/composables/useToast'
 const repairs = ref([])
 const searchQuery = ref('')
 const { showToast } = useToast()
+const filterType = ref('')
 
 const filteredRepairs = computed(() => {
   const q = searchQuery.value.toLowerCase()
+
   return repairs.value.filter(repair =>
-    repair.description.toLowerCase().includes(q) ||
-    repair.status.toLowerCase().includes(q) ||
-    repair.graveNumber.toString().includes(q)
+    (repair.description.toLowerCase().includes(q) ||
+     repair.status.toLowerCase().includes(q) ||
+     repair.graveNumber.toString().includes(q)) &&
+    (filterType.value === '' || repair.type === filterType.value)
   )
 })
 
@@ -87,6 +105,27 @@ const formatDate = (date) => {
     month: '2-digit',
     year: 'numeric'
   })
+}
+
+const formatType = (type) => {
+  const map = {
+    cleaning: 'Limpieza',
+    painting: 'Pintura',
+    graffitiRemoval: 'Remoción de grafiti',
+    landscaping: 'Jardinería',
+    structureRepair: 'Reparación estructural',
+    drainage: 'Drenaje',
+    other: 'Otro'
+  }
+  return map[type] || type
+}
+
+const formatStatus = (status) => {
+  return status === 'pending'
+    ? 'Pendiente'
+    : status === 'completed'
+    ? 'Completada'
+    : status
 }
 
 const handleMarkCompleted = async (id) => {
@@ -186,14 +225,19 @@ onMounted(async () => {
 
 .search-group {
   display: flex;
-  gap: 15px;
-  margin-bottom: 25px;
+  flex-direction: column;
+  margin-bottom: 10px;
+  gap: 10px; 
   align-items: center;
 }
 
+.input-group {
+  margin: 20px;
+}
+
 .table-title {
-  margin-bottom: 20px;
-  padding-bottom: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   border-bottom: 1px solid #eee;
 }
 

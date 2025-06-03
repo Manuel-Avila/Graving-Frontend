@@ -14,7 +14,7 @@ export const registerSchema = yup.object({
   phoneNumber: yup
     .string()
     .required('El número de teléfono es obligatorio')
-    .matches(/^[0-9]{10}$/, 'Debe ser un número de 10 dígitos'),
+    .matches(/^[0-9]{10}$/, 'El número de teléfono debe ser de 10 dígitos'),
 
   password: yup
     .string()

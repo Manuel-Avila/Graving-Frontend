@@ -18,6 +18,20 @@
                 />
                 <label class="input-label">Número de tumba</label>
               </div>
+
+              <div class="input-group margin-0">
+                <select v-model="type" class="data-input" required>
+                  <option value="" disabled>Selecciona un tipo</option>
+                  <option value="cleaning">Limpieza</option>
+                  <option value="painting">Pintura</option>
+                  <option value="graffitiRemoval">Remoción de grafiti</option>
+                  <option value="landscaping">Jardinería</option>
+                  <option value="structureRepair">Reparación estructural</option>
+                  <option value="drainage">Drenaje</option>
+                  <option value="other">Otro</option>
+                </select>
+                <label class="input-label">Tipo de reparación</label>
+              </div>
             
               <div class="input-group">
                 <input 
@@ -38,8 +52,8 @@
                 />
                 <label class="input-label">Fecha</label>
               </div>
+
               <button @click="handleSubmit" class="purple-button">Confirmar</button>
-            
           </div>
           
          
@@ -70,12 +84,14 @@ const { showToast } = useToast()
 const graveId = Number(route.params.graveId)
 const description = ref('')
 const date = ref('')
+const type = ref('')
 
 const handleSubmit = async () => {
   try {
     const form = {
       description: description.value,
-      date: date.value
+      date: date.value,
+      type: type.value
     }
 
     await repairSchema.validate(form)
@@ -83,7 +99,8 @@ const handleSubmit = async () => {
     await createRepair({
       graveId,
       description: description.value,
-      date: date.value
+      date: date.value,
+      type: type.value
     })
 
     showToast('Reparación registrada correctamente', 'success')
@@ -168,6 +185,10 @@ const handleSubmit = async () => {
   max-width: 80%;
   max-height: 80%;
   object-fit: contain;
+}
+
+.margin-0 {
+  margin-bottom: 0;
 }
 
 @media (max-width: 768px) {

@@ -11,7 +11,7 @@ export const visitSchema = yup.object({
 
   dateTime: yup
     .string()
-    .test('is-today-or-future', 'La hora debe ser posterior a la actual si la visita es hoy', function () {
+    .test('is-today-or-future', 'No puedes registrar una visita con una fecha y hora que ya han pasado.', function () {
       const { visitDate, visitTime } = this.parent
 
       if (!visitDate || !visitTime) return true

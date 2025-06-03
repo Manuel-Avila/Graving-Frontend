@@ -16,6 +16,7 @@
                     class="grave"
                     :class="{
                       occupied: getGrave(block, row, col)?.status === 'occupied',
+                      maintenance: getGrave(block, row, col)?.underMaintenance === 1,
                       selected: selectedGrave === getGrave(block, row, col)?.id,
                       highlighted: highlightedGraves.some(g => g.id === getGrave(block, row, col)?.id)
                     }"
@@ -53,7 +54,7 @@
 
                         <template v-else>
                           <router-link 
-                            v-if="isAdmin" 
+                            v-if="isAdmin && !currentGrave?.underMaintenance" 
                             :to="{ name: 'registerDeceased', params: { graveId: currentGrave?.id } }" 
                             class="purple-button"
                           >Registrar Difunto</router-link>
@@ -298,6 +299,11 @@ defineExpose({ searchGraves })
 .grave.occupied {
   background-color: #ccc;
   color: #535252;
+}
+
+.grave.maintenance {
+  background-color: #e7b41c;
+  color: #222121;
 }
 
 .grave.selected {
