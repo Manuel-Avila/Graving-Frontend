@@ -67,7 +67,7 @@ const handleLogin = async () => {
     authStore.setAuth(data.token, data.user)
     showToast('Inicio de sesión exitoso!', 'success')
     await nextTick()
-    router.push({ name: 'profile' })
+    router.push({ name: 'searchDeceased' })
   } catch (error) {
     if (error.name === 'ValidationError') {
       showToast(error.message, 'error')
@@ -83,7 +83,7 @@ const handleLoginGoogle = async () => {
     authStore.setAuth(data.token, data.user)
     showToast('Inicio de sesión exitoso!', 'success')
     await nextTick()
-    router.push({ name: 'profile' })
+    router.push({ name: 'searchDeceased' })
   } catch (error) {
     showToast('Error al iniciar sesión con Google.', 'error')
   }

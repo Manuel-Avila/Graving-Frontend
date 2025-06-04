@@ -18,6 +18,7 @@ import RegisterRepairView from '@/views/admin/RegisterRepairView.vue'
 import RepairsAdministrationView from '@/views/admin/RepairsAdministrationView.vue'
 
 import { useAuthStore } from '@/stores/authStore'
+import VisitsAdministrationView from '@/views/admin/VisitsAdministrationView.vue'
 
 const routes = [
   {
@@ -68,6 +69,12 @@ const routes = [
     name: 'visit',
     component: RegisterVisitView,
     meta: { requiresAuth: true }
+  },
+  {
+    path:  '/admin/visits',
+    name: 'visitsAdmin',
+    component: VisitsAdministrationView,
+    meta: { requireAuth: true }
   },
   {
     path: '/dashboard',

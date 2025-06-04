@@ -1,5 +1,10 @@
 import api from './axiosInstance'
 
+export const getAllVisits = async () => {
+  const response = await api.get('/visits')
+  return response.data
+}
+
 export const getMyVisits = async () => {
   const response = await api.get('/visits/me')
   return response.data

@@ -38,9 +38,19 @@
           </div>
         </div>
       </router-link>
+
       <router-link :to="{name: 'repairs'}" class="dashboard-card">
         <div class="image-container">
           <img src="../../assets/images/repairsAdministration.jpg" alt="Bitácora del sistema" class="faded-image">
+          <div class="image-overlay">
+            <h2>Reparaciones de tumbas</h2>
+          </div>
+        </div>
+      </router-link>
+
+      <router-link :to="{name: 'visitsAdmin'}" class="dashboard-card">
+        <div class="image-container">
+          <img src="../../assets/images/visitsAdministration.webp" alt="Bitácora del sistema" class="faded-image">
           <div class="image-overlay">
             <h2>Reparaciones de tumbas</h2>
           </div>
