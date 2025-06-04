@@ -4,15 +4,18 @@
       <div class="repairs-content-wrapper">
         <h2>Filtros</h2>
         <div class="search-group">
+          <!-- N° Tumba -->
           <div class="input-group">
             <input 
-              type="text" 
-              v-model="searchQuery" 
+              type="number" 
+              v-model="filterGraveNumber" 
               class="data-input" 
-              placeholder=" " 
+              placeholder=" "
             />
-            <label class="input-label">Buscar reparación</label>
+            <label class="input-label">N° Tumba</label>
           </div>
+
+          <!-- Tipo -->
           <div class="input-group">
             <select v-model="filterType" class="data-input">
               <option value="">Todos los tipos</option>
@@ -24,9 +27,30 @@
               <option value="drainage">Drenaje</option>
               <option value="other">Otro</option>
             </select>
-            <label class="input-label">Filtrar por tipo</label>
+            <label class="input-label">Tipo</label>
+          </div>
+
+          <!-- Estado -->
+          <div class="input-group">
+            <select v-model="filterStatus" class="data-input">
+              <option value="">Todos los estados</option>
+              <option value="pending">Pendiente</option>
+              <option value="completed">Completada</option>
+            </select>
+            <label class="input-label">Estado</label>
+          </div>
+
+          <!-- Fecha -->
+          <div class="input-group">
+            <input 
+              type="date" 
+              v-model="filterDate" 
+              class="data-input"
+            />
+            <label class="input-label">Fecha</label>
           </div>
         </div>
+
         <div class="table-title">
           <h2>Listado de Reparaciones</h2> 
         </div>
@@ -84,19 +108,23 @@ import { getAllRepairs, markRepairAsCompleted } from '@/services/repairService'
 import { useToast } from '@/composables/useToast'
 
 const repairs = ref([])
-const searchQuery = ref('')
-const { showToast } = useToast()
+const filterGraveNumber = ref('')
 const filterType = ref('')
+const filterStatus = ref('')
+const filterDate = ref('')
+const { showToast } = useToast()
 
 const filteredRepairs = computed(() => {
-  const q = searchQuery.value.toLowerCase()
+  return repairs.value.filter(repair => {
+    const matchesNumber = !filterGraveNumber.value || repair.graveNumber.toString() === filterGraveNumber.value.toString()
+    const matchesType = !filterType.value || repair.type === filterType.value
+    const matchesStatus = !filterStatus.value || repair.status === filterStatus.value
 
-  return repairs.value.filter(repair =>
-    (repair.description.toLowerCase().includes(q) ||
-     repair.status.toLowerCase().includes(q) ||
-     repair.graveNumber.toString().includes(q)) &&
-    (filterType.value === '' || repair.type === filterType.value)
-  )
+    const repairDate = new Date(repair.date).toLocaleDateString('sv-SE') // yyyy-mm-dd
+    const matchesDate = !filterDate.value || repairDate === filterDate.value
+
+    return matchesNumber && matchesType && matchesStatus && matchesDate
+  })
 })
 
 const formatDate = (date) => {
@@ -143,7 +171,7 @@ onMounted(async () => {
   try {
     repairs.value = await getAllRepairs()
   } catch (err) {
-    showToast('Error al actualizar reparación', 'error')
+    showToast('Error al obtener reparaciones', 'error')
   }
 })
 </script>
@@ -225,7 +253,6 @@ onMounted(async () => {
 
 .search-group {
   display: flex;
-  flex-direction: column;
   margin-bottom: 10px;
   gap: 10px; 
   align-items: center;

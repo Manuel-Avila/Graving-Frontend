@@ -13,6 +13,16 @@
           />
           <label class="input-label">Nombre del difunto</label>
         </div>
+
+        <div class="input-group">
+          <input
+            type="number"
+            v-model="filterDeathYear"
+            class="data-input"
+            placeholder=" "
+          />
+          <label class="input-label">Año de defunción</label>
+        </div>
       </div>
 
       <div v-if="isAdmin" class="toggle-group">
@@ -25,20 +35,16 @@
 
     <div class="results-container" v-if="showResults">
       <button 
-  class="purple-button arrow-button desktop-only" 
-  @click="prevCard" 
-  :class="{ 'disabled-arrow': !canScrollLeft }"
-  aria-label="Resultados anteriores"
->
-  &lt;
-</button>
-
+        class="purple-button arrow-button desktop-only" 
+        @click="prevCard" 
+        :class="{ 'disabled-arrow': !canScrollLeft }"
+        aria-label="Resultados anteriores"
+      >
+        &lt;
+      </button>
 
       <div class="cards-wrapper">
-        <div
-          class="cards-track"
-          :class="{ 'vertical-mode': !isDesktop }"
-        >
+        <div class="cards-track" :class="{ 'vertical-mode': !isDesktop }">
           <DeceasedCard
             v-for="(deceased) in visibleDeceased"
             :key="deceased.id"
@@ -51,14 +57,13 @@
       </div>
 
       <button 
-  class="purple-button arrow-button desktop-only" 
-  @click="nextCard" 
-  :class="{ 'disabled-arrow': !canScrollRight }"
-  aria-label="Siguientes resultados"
->
-  &gt;
-</button>
-
+        class="purple-button arrow-button desktop-only" 
+        @click="nextCard" 
+        :class="{ 'disabled-arrow': !canScrollRight }"
+        aria-label="Siguientes resultados"
+      >
+        &gt;
+      </button>
     </div>
 
     <div class="no-results" v-if="searchQuery && !showResults">
@@ -80,6 +85,7 @@ const showInactive = ref(false)
 
 const { showToast } = useToast()
 const searchQuery = ref('')
+const filterDeathYear = ref('')
 const currentIndex = ref(0)
 const allDeceased = ref([])
 const isDesktop = ref(window.innerWidth > 768)
@@ -112,11 +118,14 @@ onBeforeUnmount(() => {
 
 const filteredDeceased = computed(() => {
   const query = searchQuery.value.trim().toLowerCase()
-  return query
-    ? allDeceased.value.filter(d =>
-        d.name.toLowerCase().includes(query)
-      )
-    : allDeceased.value
+  return allDeceased.value.filter(d => {
+    const matchesName = d.name.toLowerCase().includes(query)
+    const matchesYear =
+      !filterDeathYear.value ||
+      new Date(d.deathDate).getFullYear().toString() === filterDeathYear.value.toString()
+
+    return matchesName && matchesYear
+  })
 })
 
 const visibleDeceased = computed(() => {
@@ -138,7 +147,6 @@ const formatDeceasedData = (deceased) => ({
 
 const showResults = computed(() => filteredDeceased.value.length > 0)
 
-
 const canScrollLeft = computed(() => currentIndex.value > 0)
 const canScrollRight = computed(() => currentIndex.value + 3 < filteredDeceased.value.length)
 
@@ -154,17 +162,17 @@ watch(searchQuery, () => {
   currentIndex.value = 0
 })
 
-const handleDeleted = (id) => {
-  allDeceased.value = allDeceased.value.filter(d => d.id !== id)
-  currentIndex.value = 0
-}
-
-
 watch(showInactive, () => {
   loadDeceased()
   currentIndex.value = 0
 })
+
+const handleDeleted = (id) => {
+  allDeceased.value = allDeceased.value.filter(d => d.id !== id)
+  currentIndex.value = 0
+}
 </script>
+
 
 <style scoped>
 .deceased-container {
@@ -187,6 +195,10 @@ h2 {
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
+}
+
+.input-group {
+  margin: 20px;
 }
 
 .search-group {

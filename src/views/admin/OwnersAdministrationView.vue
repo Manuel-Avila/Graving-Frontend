@@ -1,15 +1,36 @@
 <template>
   <div class="grave-owners-container">
     <div class="grave-owners-box">
+      <h2>Filtros</h2>
       <div class="search-group">
         <div class="input-group">
-                <input 
-                  type="text" 
-                  v-model="searchQuery" 
-                  class="data-input" 
-                  placeholder=" " 
-                />
-                <label class="input-label">Nombre</label>
+          <input 
+            type="text" 
+            v-model="filterName" 
+            class="data-input" 
+            placeholder=" "
+          />
+          <label class="input-label">Nombre</label>
+        </div>
+
+        <div class="input-group">
+          <input 
+            type="text" 
+            v-model="filterEmail" 
+            class="data-input" 
+            placeholder=" "
+          />
+          <label class="input-label">Correo</label>
+        </div>
+
+        <div class="input-group">
+          <input 
+            type="text" 
+            v-model="filterPhone" 
+            class="data-input" 
+            placeholder=" "
+          />
+          <label class="input-label">Teléfono</label>
         </div>
       </div>
 
@@ -48,31 +69,35 @@
 </template>
 
 <script setup>
-  import { ref, computed, onMounted } from 'vue'
-  import { getAllOwners } from '@/services/ownerService'
-  import { useToast } from '@/composables/useToast'
+import { ref, computed, onMounted } from 'vue'
+import { getAllOwners } from '@/services/ownerService'
+import { useToast } from '@/composables/useToast'
 
-  const { showToast } = useToast()
-  const searchQuery = ref('')
-  const owners = ref([])
+const { showToast } = useToast()
 
-  const filteredOwners = computed(() => {
-    return owners.value.filter(owner =>
-      owner.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      owner.phone.includes(searchQuery.value) ||
-      owner.email.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-      owner.curp.toLowerCase().includes(searchQuery.value.toLowerCase())
-    )
+const owners = ref([])
+
+const filterName = ref('')
+const filterEmail = ref('')
+const filterPhone = ref('')
+
+const filteredOwners = computed(() => {
+  return owners.value.filter(owner => {
+    const matchesName = owner.name.toLowerCase().includes(filterName.value.toLowerCase())
+    const matchesEmail = owner.email.toLowerCase().includes(filterEmail.value.toLowerCase())
+    const matchesPhone = owner.phone.includes(filterPhone.value)
+    return matchesName && matchesEmail && matchesPhone
   })
+})
 
-  onMounted(async () => {
-    try {
-      const response = await getAllOwners();
-      owners.value = response;
-    } catch (err) {
-      showToast('Error al obtener propietarios:', 'error');
-    }
-  })
+onMounted(async () => {
+  try {
+    const response = await getAllOwners()
+    owners.value = response
+  } catch (err) {
+    showToast('Error al obtener propietarios', 'error')
+  }
+})
 </script>
 
 <style scoped>
@@ -117,6 +142,10 @@
 
 .purple-button {
   width: 4rem;
+}
+
+.input-group {
+  margin: 20px;
 }
 
 .owners-table-wrapper {

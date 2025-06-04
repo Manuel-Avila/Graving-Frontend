@@ -1,16 +1,35 @@
 <template>
   <div class="grave-owners-container">
     <div class="grave-owners-box">
-      <!-- Barra de búsqueda -->
+      <h2>Filtros</h2>
       <div class="search-group">
         <div class="input-group">
           <input 
             type="text" 
-            v-model="searchQuery" 
+            v-model="filterUser" 
             class="data-input" 
-            placeholder=" " 
+            placeholder=" "
+          />
+          <label class="input-label">Nombre de Usuario</label>
+        </div>
+
+        <div class="input-group">
+          <input 
+            type="text" 
+            v-model="filterAction" 
+            class="data-input" 
+            placeholder=" "
           />
           <label class="input-label">Acción</label>
+        </div>
+
+        <div class="input-group">
+          <input 
+            type="date" 
+            v-model="filterDate" 
+            class="data-input"
+          />
+          <label class="input-label">Fecha</label>
         </div>
       </div>
 
@@ -18,7 +37,6 @@
         <h2>Bitácora del sistema</h2>
       </div>
 
-      <!-- Tabla -->
       <div class="owners-table-wrapper">
         <table class="owners-table">
           <thead>
@@ -38,8 +56,8 @@
             </tr>
           </tbody>
         </table>
-
       </div>
+
       <div class="report-section">
         <h3>Reportes (PDF)</h3>
         <div class="report-actions">          
@@ -54,13 +72,16 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { getAllLogs } from '@/services/systemLogService'
+import { getAllDeceased, getInactiveDeceased } from '@/services/deceasedService'
 import { useToast } from '@/composables/useToast'
 import { jsPDF } from 'jspdf'
-import { getAllDeceased, getInactiveDeceased } from '@/services/deceasedService'
 
 const { showToast } = useToast()
 const logs = ref([])
-const searchQuery = ref('')
+
+const filterUser = ref('')
+const filterAction = ref('')
+const filterDate = ref('')
 
 onMounted(async () => {
   try {
@@ -71,10 +92,15 @@ onMounted(async () => {
 })
 
 const filteredLogs = computed(() => {
-  const q = searchQuery.value.trim().toLowerCase()
-  return q
-    ? logs.value.filter(log => log.action.toLowerCase().includes(q))
-    : logs.value
+  return logs.value.filter(log => {
+    const matchesUser = log.userName.toLowerCase().includes(filterUser.value.toLowerCase())
+    const matchesAction = log.action.toLowerCase().includes(filterAction.value.toLowerCase())
+
+    const logDate = new Date(log.timestamp).toLocaleDateString('sv-SE')
+    const matchesDate = !filterDate.value || logDate === filterDate.value
+
+    return matchesUser && matchesAction && matchesDate
+  })
 })
 
 const formatDate = (timestamp) => {
@@ -87,6 +113,7 @@ const formatDate = (timestamp) => {
   })
 }
 
+// Reporte PDF
 const PURPLE_RGB = [110, 52, 106]
 
 const blobToBase64 = (blob) => {
@@ -145,9 +172,7 @@ const generateDeceasedReport = async () => {
       doc.text(`Epitafio: ${d.epitaph || '-'}`, 15, y); y += 6
       doc.text(`Ubicación: ${d.blockName}, Sección ${d.section}, Fila ${d.graveRow}, Tumba #${d.graveNumber}`, 15, y); y += 6
 
-      
       const imageUrl = d.imageUrl || '/images/deceasedPlaceholder.png'
-
       try {
         const blob = await fetch(imageUrl).then(r => r.blob())
         const base64Img = await blobToBase64(blob)
@@ -221,7 +246,6 @@ const generateInactiveDeceasedReport = async () => {
       doc.text(`Ubicación: ${d.blockName}, Sección ${d.section}, Fila ${d.graveRow}, Tumba #${d.graveNumber}`, 15, y); y += 6
 
       const imageUrl = d.imageUrl || '/images/deceasedPlaceholder.png'
-
       try {
         const blob = await fetch(imageUrl).then(r => r.blob())
         const base64Img = await blobToBase64(blob)
@@ -247,6 +271,7 @@ const generateInactiveDeceasedReport = async () => {
   }
 }
 </script>
+
 
 <style scoped>
 .grave-owners-container {
@@ -329,7 +354,10 @@ const generateInactiveDeceasedReport = async () => {
   background-color: #f1f1f1;
 }
 
-/* Estilos para los textos clickeables */
+.input-group {
+  margin: 20px;
+}
+
 .actions {
   display: flex;
   gap: 12px;

@@ -1,20 +1,44 @@
 <template>
   <div class="graves-container">
     <div class="graves-box">
+      <h2>Filtros</h2>
       <div class="search-group">
+        <!-- Número de Tumba -->
+        <div class="input-group">
+          <input 
+            type="number" 
+            v-model="searchGraveNumber" 
+            class="data-input" 
+            placeholder=" "
+          />
+          <label class="input-label">Número de Tumba</label>
+        </div>
+
+        <!-- Fila -->
         <div class="input-group">
           <input 
             type="text" 
-            v-model="searchQuery" 
+            v-model="filterRow" 
             class="data-input" 
-            placeholder=" " 
+            placeholder=" "
           />
-          <label class="input-label">Tumba</label>
+          <label class="input-label">Fila</label>
+        </div>
+
+        <!-- Manzana -->
+        <div class="input-group">
+          <select v-model="filterBlock" class="data-input">
+            <option value="">Todas las manzanas</option>
+            <option v-for="block in uniqueBlocks" :key="block" :value="block">
+              {{ block }}
+            </option>
+          </select>
+          <label class="input-label">Manzana</label>
         </div>
       </div>
 
       <div class="table-title">
-        <h2>Administracion de Tumbas</h2>
+        <h2>Administración de Tumbas</h2>
       </div>
 
       <div class="graves-table-wrapper">
@@ -38,7 +62,7 @@
               <td>{{ typeLabels[grave.type] }}</td>
               <td class="actions">
                 <button class="purple-button" @click="editGrave(grave)">Editar</button>
-                <router-link :to="{name: 'registerRepair', params: {graveId: grave.id}}" id="repair-button" class="purple-button">Reparacion</router-link>
+                <router-link :to="{ name: 'registerRepair', params: { graveId: grave.id } }" id="repair-button" class="purple-button">Reparación</router-link>
               </td>
             </tr>
           </tbody>
@@ -89,7 +113,9 @@ import { getAllGraves, updateGrave } from '@/services/graveService'
 import { useToast } from '@/composables/useToast'
 
 const { showToast } = useToast()
-const searchQuery = ref('')
+const searchGraveNumber = ref('')
+const filterRow = ref('')
+const filterBlock = ref('')
 const graves = ref([])
 const editingGrave = ref(null)
 
@@ -101,14 +127,18 @@ onMounted(async () => {
   }
 })
 
+const uniqueBlocks = computed(() => {
+  const blocks = new Set(graves.value.map(g => g.blockName))
+  return Array.from(blocks).sort()
+})
+
 const filteredGraves = computed(() => {
-  return graves.value.filter(grave =>
-    grave.blockName.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    grave.section.toString().includes(searchQuery.value) ||
-    grave.graveRow.toString().includes(searchQuery.value) ||
-    grave.graveNumber.toString().includes(searchQuery.value) ||
-    grave.status.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
+  return graves.value.filter(grave => {
+    const matchesNumber = !searchGraveNumber.value || Number(grave.graveNumber) === Number(searchGraveNumber.value)
+    const matchesRow = filterRow.value === '' || grave.graveRow.toString().includes(filterRow.value)
+    const matchesBlock = filterBlock.value === '' || grave.blockName === filterBlock.value
+    return matchesNumber && matchesRow && matchesBlock
+  })
 })
 
 const handleUpdate = async () => {
@@ -133,6 +163,7 @@ const typeLabels = {
   ossuary: 'Osario'
 }
 </script>
+
 
 <style scoped>
 .graves-container {
@@ -180,6 +211,10 @@ const typeLabels = {
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
+}
+
+.input-group {
+  margin: 20px;
 }
 
 .table-title h2 {
