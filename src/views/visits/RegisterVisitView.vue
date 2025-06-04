@@ -62,6 +62,16 @@
             </div>
           </div>
 
+          <div v-if="isAdmin" class="input-group">
+          <select v-model="selectedUserId" class="data-input" required>
+            <option disabled value="">Selecciona un visitante</option>
+            <option v-for="user in users" :key="user.id" :value="user.id">
+              {{ user.name }}
+            </option>
+          </select>
+          <label class="input-label">Seleccionar visitante</label>
+        </div>
+
           <div class="action-buttons">
             <button @click="handleRegisterVisit" class="purple-button">Registrar Visita</button>
             <router-link :to="{name: 'searchDeceased'}" class="outline-white-button">Cancelar</router-link>
@@ -75,74 +85,97 @@
 </template>
 
 <script setup>
-  import { ref, onMounted, nextTick } from 'vue';
-  import { useRouter, useRoute } from 'vue-router'
-  import { getDeceasedById } from '@/services/deceasedService'
-  import { useToast } from '@/composables/useToast'
-  import { createVisit } from '@/services/visitService'
-  import { visitSchema } from '@/composables/validations/useVisitValidation'
+import { ref, onMounted, nextTick, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { getDeceasedById } from '@/services/deceasedService'
+import { getAllUsers } from '@/services/userService'
+import { createVisit, createVisitAsAdmin } from '@/services/visitService'
+import { useToast } from '@/composables/useToast'
+import { visitSchema } from '@/composables/validations/useVisitValidation'
+import { useAuthStore } from '@/stores/authStore'
 
-  const { showToast } = useToast()
-  const router = useRouter()
-  const route = useRoute()
+const { showToast } = useToast()
+const router = useRouter()
+const route = useRoute()
+const auth = useAuthStore()
 
-  const visitDate = ref('');
-  const visitTime = ref('');
+const visitDate = ref('')
+const visitTime = ref('')
+const users = ref([])
+const selectedUserId = ref('')
 
-  const deceasedId = route.params.id
+const deceasedId = route.params.id
+const name = ref('')
+const epitaph = ref('')
+const birthDate = ref('')
+const deathDate = ref('')
+const graveNumber = ref('')
+const imageUrl = ref(null)
 
-  const name = ref('')
-  const epitaph = ref('')
-  const birthDate = ref('')
-  const deathDate = ref('')
-  const graveNumber = ref('')
-  const imageUrl = ref(null)
+const isAdmin = computed(() => auth.isAdmin)
 
-  onMounted(async () => {
-    try {
-      const deceased = await getDeceasedById(deceasedId)
-      name.value = deceased.name
-      epitaph.value = deceased.epitaph
-      birthDate.value = deceased.birthDate?.slice(0, 10)
-      deathDate.value = deceased.deathDate?.slice(0, 10)
-      graveNumber.value = deceased.graveNumber
-      imageUrl.value = deceased.imageUrl
-    } catch (err) {
-      showToast('Difunto no encontrado', 'error')
-      await nextTick()
-      router.push({ name: 'searchDeceased' })
+onMounted(async () => {
+  try {
+    const deceased = await getDeceasedById(deceasedId)
+    name.value = deceased.name
+    epitaph.value = deceased.epitaph
+    birthDate.value = deceased.birthDate?.slice(0, 10)
+    deathDate.value = deceased.deathDate?.slice(0, 10)
+    graveNumber.value = deceased.graveNumber
+    imageUrl.value = deceased.imageUrl
+
+    if (isAdmin.value) {
+      users.value = await getAllUsers()
     }
-  })
+  } catch (err) {
+    showToast('Error al cargar datos', 'error')
+    await nextTick()
+    router.push({ name: 'searchDeceased' })
+  }
+})
 
-  const handleRegisterVisit = async () => {
-    try {
-      await visitSchema.validate(
-        {
-          visitDate: visitDate.value,
-          visitTime: visitTime.value,
-          dateTime: `${visitDate.value}T${visitTime.value}`
-        },
-        { abortEarly: false }
-      )
+const handleRegisterVisit = async () => {
+  try {
+    await visitSchema.validate(
+      {
+        visitDate: visitDate.value,
+        visitTime: visitTime.value,
+        dateTime: `${visitDate.value}T${visitTime.value}`
+      },
+      { abortEarly: false }
+    )
 
-      const dateTime = `${visitDate.value} ${visitTime.value}`
+    const dateTime = `${visitDate.value} ${visitTime.value}`
 
-        await createVisit({
-          deceasedId: deceasedId,
-          date: dateTime
-        })
+    if (isAdmin.value) {
+      if (!selectedUserId.value) {
+        showToast('Debes seleccionar un visitante', 'error')
+        return
+      }
 
-        showToast('Visita registrada correctamente', 'success')
-        await nextTick()
-        router.push({ name: 'visits' })
-      } catch (error) {
-        if (error.name === 'ValidationError') {
-          error.errors.forEach(msg => showToast(msg, 'error'))
-        } else {
-          showToast('Error al registrar la visita', 'error')
-        }
+      await createVisitAsAdmin({
+        deceasedId: deceasedId,
+        userId: selectedUserId.value,
+        date: dateTime
+      })
+    } else {
+      await createVisit({
+        deceasedId: deceasedId,
+        date: dateTime
+      })
+    }
+
+    showToast('Visita registrada correctamente', 'success')
+    await nextTick()
+    router.push({ name: 'visits' })
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      error.errors.forEach(msg => showToast(msg, 'error'))
+    } else {
+      showToast('Error al registrar la visita', 'error')
     }
   }
+}
 </script>
 
 <style scoped>

@@ -14,3 +14,8 @@ export const createVisit = async (data) => {
   const response = await api.post('/visits', data)
   return response.data
 }
+
+export const createVisitAsAdmin = async (data) => {
+  const response = await api.post('/visits/admin', data)
+  return response.data
+}
