@@ -9,7 +9,7 @@
         <router-link v-if="isLoggedIn" :to="{ name: 'visit', params: { id: deceasedId.id } }" class="purple-button edit-button">Visitar</router-link>
         <template v-if="isAdmin">
           <router-link :to="{name: 'editDeceased', params: {id: deceasedId}}" class="outline-white-button edit-button">Editar</router-link>
-          <button  @click="handleDelete" class="delete-button">Olvidar</button>
+          <button  @click="handleDelete" class="delete-button">Eliminar</button>
         </template>
       </div>
     </div>  
@@ -57,6 +57,19 @@
           <h3>Número de tumba</h3>
           <p class="tomb-number">{{ graveNumber }}</p>
         </div>
+
+        <div
+          v-if="isAdmin && deathCertificateUrl"
+          class="certificate-view-container"
+        >
+          <a
+            :href="deathCertificateUrl"
+            target="_blank"
+            class="view-certificate-button"
+          >
+            📄 Ver acta de defunción
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -86,6 +99,7 @@
   const deathDate = ref('')
   const graveNumber = ref('')
   const imageUrl = ref('')
+  const deathCertificateUrl = ref('')
   const isActive = ref(false)
 
   onMounted(async () => {
@@ -97,6 +111,7 @@
       deathDate.value = deceased.deathDate?.slice(0, 10)
       graveNumber.value = deceased.graveNumber
       imageUrl.value = deceased.imageUrl
+      deathCertificateUrl.value = deceased.deathCertificateUrl
       isActive.value = deceased.isActive !== 0
     } catch (err) {
       showToast('Difunto no encontrado', 'error')
@@ -106,17 +121,17 @@
   })
 
   const handleDelete = async () => {
-    const confirmed = await showConfirmModal(`¿Deseas olvidar a ${name.value}? (Esta acción es irreversible)`)
+    const confirmed = await showConfirmModal(`¿Deseas eliminar a ${name.value}? (Esta acción es irreversible)`)
 
     if (!confirmed) return
 
     try {
       const result = await deleteDeceased(deceasedId)
-      showToast(`Se olvido a ${result.name} correctamente`, 'success')
+      showToast(`Se elimino a ${result.name} correctamente`, 'success')
       await nextTick();
       router.push({ name: 'searchDeceased' })
     } catch (error) {
-      showToast('Error al olvidar al difunto', 'error')
+      showToast('Error al eliminar al difunto', 'error')
     }
   }
 </script>
@@ -170,6 +185,32 @@
 .delete-button,
 .outline-white-button {
   width: 165px;
+}
+
+.certificate-view-container {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.view-certificate-button {
+  display: inline-block;
+  width: 100%;
+  max-width: 380px;
+  padding: 10px 15px;
+  background-color: #fff;
+  border: 2px dashed #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #555;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.view-certificate-button:hover {
+  border-color: #888;
+  color: #333;
 }
 
 .actions-container {

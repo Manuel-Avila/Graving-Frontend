@@ -2,23 +2,23 @@ export function useCloudinaryUpload() {
   const cloudName = 'dsesbuouz'
   const uploadPreset = 'Graving'
 
-  const uploadImage = async (file) => {
+  const uploadFile = async (file, folder = 'general') => {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('upload_preset', uploadPreset)
-    formData.append('folder', 'deceased')
+    formData.append('folder', folder)
 
-    const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`
 
     const response = await fetch(url, {
       method: 'POST',
       body: formData
     })
-    
+
     const data = await response.json()
 
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Error al subir imagen a Cloudinary')
+      throw new Error(data.error?.message || 'Error al subir archivo a Cloudinary')
     }
 
     return {
@@ -27,7 +27,7 @@ export function useCloudinaryUpload() {
     }
   }
 
-  const deleteImage = async (deleteToken) => {
+  const deleteFile = async (deleteToken) => {
     const url = `https://api.cloudinary.com/v1_1/${cloudName}/delete_by_token`
 
     const response = await fetch(url, {
@@ -37,15 +37,15 @@ export function useCloudinaryUpload() {
         'Content-Type': 'application/json'
       }
     })
-    
+
     const data = await response.json()
 
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Error al eliminar imagen de Cloudinary')
+      throw new Error(data.error?.message || 'Error al eliminar archivo de Cloudinary')
     }
 
     return data
   }
 
-  return { uploadImage, deleteImage }
+  return { uploadFile, deleteFile }
 }

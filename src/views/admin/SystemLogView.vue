@@ -62,7 +62,7 @@
         <h3>Reportes (PDF)</h3>
         <div class="report-actions">          
           <button @click="generateDeceasedReport" class="purple-button">Difuntos registrados</button>
-          <button @click="generateInactiveDeceasedReport" class="purple-button">Difuntos olvidados</button>
+          <button @click="generateInactiveDeceasedReport" class="purple-button">Difuntos eliminados</button>
         </div>
       </div>
     </div>
@@ -207,7 +207,7 @@ const generateInactiveDeceasedReport = async () => {
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(18)
     doc.setTextColor(...PURPLE_RGB)
-    doc.text('Reporte de Difuntos Olvidados', 105, y, { align: 'center' })
+    doc.text('Reporte de Difuntos Eliminados', 105, y, { align: 'center' })
     y += 8
     doc.setDrawColor(...PURPLE_RGB)
     doc.setLineWidth(0.8)
@@ -227,7 +227,7 @@ const generateInactiveDeceasedReport = async () => {
     doc.text(`Fecha: ${today}`, 150, y)
     y += 8
 
-    doc.text(`Total de difuntos olvidados: ${deceasedList.length}`, 15, y)
+    doc.text(`Total de difuntos eliminados: ${deceasedList.length}`, 15, y)
     y += 8
 
     for (const d of deceasedList) {
@@ -265,7 +265,7 @@ const generateInactiveDeceasedReport = async () => {
       }
     }
 
-    doc.save('Reporte_Difuntos_Olvidados.pdf')
+    doc.save('Reporte_Difuntos_Eliminados.pdf')
   } catch (error) {
     showToast('Error al generar el reporte', 'error')
   }

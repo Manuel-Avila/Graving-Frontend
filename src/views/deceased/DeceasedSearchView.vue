@@ -28,7 +28,7 @@
       <div v-if="isAdmin" class="toggle-group">
         <label class="toggle-label">
           <input type="checkbox" v-model="showInactive" />
-          Ver difuntos olvidados
+          Ver difuntos eliminados
         </label>
       </div>
     </div>

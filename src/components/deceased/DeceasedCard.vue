@@ -33,7 +33,7 @@
             class="delete-button"
             :disabled="isSubmitting"
           >
-            Olvidar
+            Eliminar
           </button>
         </template>
       </template>
@@ -72,15 +72,15 @@ const props = defineProps({
 
 const handleDelete = () => {
   guardedSubmit(async () => {
-    const confirmed = await showConfirmModal(`¿Deseas olvidar a ${props.deceased.name}? (Esta acción es irreversible)`)
+    const confirmed = await showConfirmModal(`¿Deseas eliminar a ${props.deceased.name}? (Esta acción es irreversible)`)
     if (!confirmed) return
 
     try {
       const result = await deleteDeceased(props.deceased.id)
-      showToast(`Se olvidó a ${result.name} correctamente`, 'success')
+      showToast(`Se elimino a ${result.name} correctamente`, 'success')
       emit('deleted', props.deceased.id)
     } catch (error) {
-      showToast('Error al olvidar al difunto', 'error')
+      showToast('Error al eliminar al difunto', 'error')
     }
   })
 }

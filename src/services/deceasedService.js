@@ -1,16 +1,16 @@
 import api from './axiosInstance'
 import { useCloudinaryUpload } from '@/composables/useCloudinaryUpload'
 
-const { uploadImage, deleteImage } = useCloudinaryUpload()
+const { uploadFile, deleteFile } = useCloudinaryUpload()
 
 export const getAllDeceased = async () => {
-    const response = await api.get('/deceased')
-    return response.data
+  const response = await api.get('/deceased')
+  return response.data
 }
 
 export const getDeceasedById = async (id) => {
-    const response = await api.get(`/deceased/${id}`)
-    return response.data
+  const response = await api.get(`/deceased/${id}`)
+  return response.data
 }
 
 export const getInactiveDeceased = async () => {
@@ -18,36 +18,42 @@ export const getInactiveDeceased = async () => {
   return response.data
 }
 
-export const registerDeceased = async (data, file) => {
+export const registerDeceased = async (data, imageFile, certificateFile) => {
   let imageResult = null
+  let certificateResult = null
 
   try {
-    if (file) {
-      imageResult = await uploadImage(file)
+    if (imageFile) {
+      imageResult = await uploadFile(imageFile, 'deceased')
+    }
+
+    if (certificateFile) {
+      certificateResult = await uploadFile(certificateFile, 'death_certificates')
     }
 
     const response = await api.post('/deceased', {
       ...data,
       imageUrl: imageResult?.url || null,
-      imageDeleteToken: imageResult?.deleteToken || null
+      imageDeleteToken: imageResult?.deleteToken || null,
+      deathCertificateUrl: certificateResult?.url || null,
+      deathCertificateDeleteToken: certificateResult?.deleteToken || null
     })
 
     return response.data
 
   } catch (error) {
-    if (imageResult?.deleteToken) {
-      await deleteImage(imageResult.deleteToken)
-    }
+    if (imageResult?.deleteToken) await deleteFile(imageResult.deleteToken)
+    if (certificateResult?.deleteToken) await deleteFile(certificateResult.deleteToken)
     throw error
   }
 }
 
-export const updateDeceased = async (id, data, file, previousDeleteToken) => {
+export const updateDeceased = async (id, data, imageFile, previousDeleteToken) => {
   let imageResult = null
 
   try {
-    if (file) {
-      imageResult = await uploadImage(file)
+    if (imageFile) {
+      imageResult = await uploadFile(imageFile, 'deceased')
     }
 
     const response = await api.put(`/deceased/${id}`, {
@@ -57,14 +63,14 @@ export const updateDeceased = async (id, data, file, previousDeleteToken) => {
     })
 
     if (imageResult?.deleteToken && previousDeleteToken) {
-      await deleteImage(previousDeleteToken)
+      await deleteFile(previousDeleteToken)
     }
 
     return response.data
 
   } catch (error) {
     if (imageResult?.deleteToken) {
-      await deleteImage(imageResult.deleteToken)
+      await deleteFile(imageResult.deleteToken)
     }
     throw error
   }

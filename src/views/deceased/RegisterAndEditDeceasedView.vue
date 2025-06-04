@@ -1,14 +1,9 @@
 <template>
   <div class="register-container">
     <div class="left-section">
+      <!-- Imagen del difunto -->
       <div class="image-upload">
-        <input
-          type="file"
-          accept="image/*"
-          ref="fileInput"
-          @change="handleImageChange"
-          style="display: none"
-        />
+        <input type="file" accept="image/*" ref="fileInput" @change="handleImageChange" style="display: none" />
         <button class="upload-btn" @click.prevent="triggerImageInput">
           <template v-if="imageUrl">
             <img :src="imageUrl" class="preview-img" />
@@ -19,20 +14,15 @@
           </template>
         </button>
       </div>
-      <button 
-        @click="handleSubmit" 
-        class="purple-button confirm-btn"
-        :disabled="isSubmitting"
-      >
+
+      <button @click="handleSubmit" class="purple-button confirm-btn" :disabled="isSubmitting">
         {{ isEditing ? 'Actualizar Difunto' : 'Registrar Difunto' }}
       </button>
-    </div>  
+    </div>
 
     <div class="right-section">
       <div class="form-container-deceased">
-        <div class="section-title">
-          <h3>Datos del difunto</h3>
-        </div>
+        <div class="section-title"><h3>Datos del difunto</h3></div>
 
         <div class="input-group">
           <input type="text" v-model="name" class="data-input" required placeholder=" " />
@@ -44,32 +34,46 @@
           <label class="input-label">Epitafio</label>
         </div>
 
-        <div class="input-group">  
+        <div class="input-group">
           <input type="date" v-model="birthDate" class="data-input" required />
           <label class="input-label">Fecha de nacimiento</label>
         </div>
 
-        <div class="input-group">  
+        <div class="input-group">
           <input type="date" v-model="deathDate" class="data-input" required />
           <label class="input-label">Fecha de defunción</label>
         </div>
 
         <div class="input-group tomb-input-group" @click="showGraveModal = true">
-          <input 
-            type="text" 
-            class="data-input"
-            readonly
-            :value="graveId ? `#${graveId}` : ''"
-            placeholder=" " 
-          />
+          <input type="text" class="data-input" readonly :value="graveId ? `#${graveId}` : ''" placeholder=" " />
           <label class="input-label">Número de tumba</label>
+        </div>
+
+        <div class="certificate-upload">
+          <button
+            class="upload-btn-small"
+            @click.prevent="!isEditing && triggerCertificateInput()"
+            :class="{ disabled: isEditing }"
+          >
+            <span>
+              {{ isEditing ? '📄 Acta de defunción registrada' : (selectedCertificateName || '+ Subir acta de defunción') }}
+            </span>
+          </button>
+
+          <input
+            type="file"
+            accept="image/*"
+            ref="certificateInput"
+            @change="handleCertificateChange"
+            :disabled="isEditing"
+            :required="!isEditing"
+            style="display: none"
+          />
         </div>
       </div>
 
       <div class="form-container-owner">
-        <div class="section-title">
-          <h3>Datos del responsable</h3>
-        </div>
+        <div class="section-title"><h3>Datos del responsable</h3></div>
 
         <div class="input-group">
           <input type="text" v-model="ownerName" class="data-input" required placeholder=" " />
@@ -92,15 +96,14 @@
         </div>
       </div>
     </div>
+
+    <GraveSelectorModal
+      v-if="showGraveModal"
+      @close="showGraveModal = false"
+      @selected="handleGraveSelected"
+    />
   </div>
-
-  <GraveSelectorModal
-    v-if="showGraveModal"
-    @close="showGraveModal = false"
-    @selected="handleGraveSelected"
-  />
 </template>
-
 
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
@@ -137,7 +140,10 @@ const ownerCurp = ref('')
 const ownerId = ref(null)
 
 const fileInput = ref(null)
+const certificateInput = ref(null)
 const selectedImage = ref(null)
+const selectedCertificate = ref(null)
+const selectedCertificateName = ref('')
 
 onMounted(async () => {
   if (isEditing.value) {
@@ -153,7 +159,7 @@ onMounted(async () => {
 
       const owner = await getOwnerByDeceasedId(deceasedId)
       if (owner) {
-        ownerId.value = owner.id 
+        ownerId.value = owner.id
         ownerName.value = owner.name
         ownerPhone.value = owner.phone
         ownerEmail.value = owner.email
@@ -201,11 +207,13 @@ const handleSubmit = () => {
         })
         showToast('Difunto actualizado correctamente', 'success')
       } else {
-        const created = await registerDeceased(deceasedData, selectedImage.value)
-        await createOwner({
-          ...ownerData,
-          deceasedId: created.id
-        })
+        if (!selectedCertificate.value) {
+          showToast('Debes subir el acta de defunción.', 'error')
+          return
+        }
+
+        const created = await registerDeceased(deceasedData, selectedImage.value, selectedCertificate.value)
+        await createOwner({ ...ownerData, deceasedId: created.id })
         showToast('Difunto registrado correctamente', 'success')
       }
 
@@ -221,9 +229,7 @@ const handleSubmit = () => {
   })
 }
 
-const triggerImageInput = () => {
-  fileInput.value?.click()
-}
+const triggerImageInput = () => fileInput.value?.click()
 
 const handleImageChange = (event) => {
   const file = event.target.files[0]
@@ -236,6 +242,22 @@ const handleImageChange = (event) => {
   }
 }
 
+const handleCertificateChange = (event) => {
+  const file = event.target.files[0]
+  if (file && file.type.startsWith('image/')) {
+    selectedCertificate.value = file
+    selectedCertificateName.value = file.name
+  } else {
+    selectedCertificate.value = null
+    selectedCertificateName.value = ''
+    showToast('Solo se permiten imágenes para el acta.', 'error')
+  }
+}
+
+const triggerCertificateInput = () => {
+  certificateInput.value?.click()
+}
+
 const handleGraveSelected = (grave) => {
   graveId.value = grave.id
   showToast(`Tumba #${grave.graveNumber} seleccionada`, 'success')
@@ -245,6 +267,37 @@ const handleGraveSelected = (grave) => {
 
 
 <style scoped>
+.certificate-upload {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.upload-btn-small {
+  width: 100%;
+  max-width: 380px;
+  padding: 10px 15px;
+  background-color: #fff;
+  border: 2px dashed #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: #555;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.upload-btn-small:hover {
+  border-color: #888;
+  color: #333;
+}
+
+.upload-btn-small.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
 .register-container {
   width: 100%;
   display: flex;
