@@ -6,8 +6,12 @@
         
     </div>
     <div class="home-view-components">
-        <h1>Busca tumbas, recuerda <br>historias</h1>
-        <label>Busca, encuentra y recuerda. Este sitio fue creado rendir<br> homenaje a tus seres queridos</label>
+        <h1>
+          Busca tumbas, recuerda historias
+        </h1>
+        <p class="subtitle">
+          Busca, encuentra y recuerda. Este sitio fue creado para rendir homenaje a tus seres queridos.
+        </p>
         <router-link v-if="isLoggedIn" :to="{name: 'searchDeceased'}" class="purple-button">Difuntos</router-link>
         <router-link v-else :to="{name: 'login'}" class="purple-button">Iniciar Sesión</router-link>
         <router-link :to="{name: 'map'}" class="outline-white-button">Mapa</router-link>
@@ -28,7 +32,7 @@
 <style scoped>
 .home-view-top {
   display: flex;
-  height: 75vh;
+  min-height: 75vh;
   text-align: center;
   
 }
@@ -65,6 +69,13 @@
 
 .purple-button{
   margin-top: 30px;
+}
+
+.subtitle {
+  font-size: 20px;
+  line-height: 1.6;
+  color: #555;
+  margin-top: -15px;
 }
 
 h1{

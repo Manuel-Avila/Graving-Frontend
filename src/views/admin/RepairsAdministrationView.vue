@@ -88,6 +88,7 @@
                     v-if="repair.status === 'pending'" 
                     @click="handleMarkCompleted(repair.id)"
                     class="purple-button"
+                    :disabled="isSubmitting"
                   >
                     Marcar como completada
                   </button>
@@ -106,6 +107,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { getAllRepairs, markRepairAsCompleted } from '@/services/repairService'
 import { useToast } from '@/composables/useToast'
+import { useSubmitGuard } from '@/composables/useSubmitGuard'
 
 const repairs = ref([])
 const filterGraveNumber = ref('')
@@ -113,6 +115,7 @@ const filterType = ref('')
 const filterStatus = ref('')
 const filterDate = ref('')
 const { showToast } = useToast()
+const { isSubmitting, guardedSubmit } = useSubmitGuard()
 
 const filteredRepairs = computed(() => {
   return repairs.value.filter(repair => {
@@ -156,15 +159,16 @@ const formatStatus = (status) => {
     : status
 }
 
-const handleMarkCompleted = async (id) => {
-  try {
-    await markRepairAsCompleted(id)
-    showToast('Reparación marcada como completada', 'success')
-    const response = await getAllRepairs()
-    repairs.value = response
-  } catch (err) {
-    showToast('Error al actualizar reparación', 'error')
-  }
+const handleMarkCompleted = (id) => {
+  guardedSubmit(async () => {
+    try {
+      await markRepairAsCompleted(id)
+      showToast('Reparación marcada como completada', 'success')
+      repairs.value = await getAllRepairs()
+    } catch (err) {
+      showToast('Error al actualizar reparación', 'error')
+    }
+  })
 }
 
 onMounted(async () => {

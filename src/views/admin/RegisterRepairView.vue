@@ -1,62 +1,63 @@
 <template>
   <div class="user-profile-container">
     <div class="profile-center-box">
-      
       <div class="main-content-container">
-  
         <div class="profile-content-wrapper">
-        
           <div class="profile-info-column">
-            
-              <div class="input-group">
-                <input 
-                  type="text" 
-                  v-model="graveId" 
-                  class="data-input" 
-                  placeholder=" " 
-                  readonly
-                />
-                <label class="input-label">Número de tumba</label>
-              </div>
+            <div class="input-group">
+              <input 
+                type="text" 
+                v-model="graveId" 
+                class="data-input" 
+                placeholder=" " 
+                readonly
+              />
+              <label class="input-label">Número de tumba</label>
+            </div>
 
-              <div class="input-group margin-0">
-                <select v-model="type" class="data-input" required>
-                  <option value="" disabled>Selecciona un tipo</option>
-                  <option value="cleaning">Limpieza</option>
-                  <option value="painting">Pintura</option>
-                  <option value="graffitiRemoval">Remoción de grafiti</option>
-                  <option value="landscaping">Jardinería</option>
-                  <option value="structureRepair">Reparación estructural</option>
-                  <option value="drainage">Drenaje</option>
-                  <option value="other">Otro</option>
-                </select>
-                <label class="input-label">Tipo de reparación</label>
-              </div>
-            
-              <div class="input-group">
-                <input 
-                  type="email" 
-                  v-model="description" 
-                  class="data-input" 
-                  placeholder=" " 
-                />
-                <label class="input-label">Descripción</label>
-              </div>
+            <div class="input-group margin-0">
+              <select v-model="type" class="data-input" required>
+                <option value="" disabled>Selecciona un tipo</option>
+                <option value="cleaning">Limpieza</option>
+                <option value="painting">Pintura</option>
+                <option value="graffitiRemoval">Remoción de grafiti</option>
+                <option value="landscaping">Jardinería</option>
+                <option value="structureRepair">Reparación estructural</option>
+                <option value="drainage">Drenaje</option>
+                <option value="other">Otro</option>
+              </select>
+              <label class="input-label">Tipo de reparación</label>
+            </div>
 
-              <div class="input-group">
-                <input 
-                  type="date" 
-                  v-model="date" 
-                  class="data-input" 
-                  placeholder=" " 
-                />
-                <label class="input-label">Fecha</label>
-              </div>
+            <div class="input-group">
+              <input 
+                type="text" 
+                v-model="description" 
+                class="data-input" 
+                placeholder=" " 
+              />
+              <label class="input-label">Descripción</label>
+            </div>
 
-              <button @click="handleSubmit" class="purple-button">Confirmar</button>
+            <div class="input-group">
+              <input 
+                type="date" 
+                v-model="date" 
+                class="data-input" 
+                placeholder=" " 
+              />
+              <label class="input-label">Fecha</label>
+            </div>
+
+            <button 
+              @click="handleSubmit" 
+              class="purple-button"
+              :disabled="isSubmitting"
+            >
+              Confirmar
+            </button>
           </div>
-          
-         
+
           <div class="logo-column">
             <img 
               src="../../assets/images/logo.png" 
@@ -76,46 +77,51 @@ import { useRoute, useRouter } from 'vue-router'
 import { useToast } from '@/composables/useToast'
 import { createRepair } from '@/services/repairService'
 import { repairSchema } from '@/composables/validations/useRepairValidation'
+import { useSubmitGuard } from '@/composables/useSubmitGuard'
 
 const route = useRoute()
 const router = useRouter()
 const { showToast } = useToast()
+const { isSubmitting, guardedSubmit } = useSubmitGuard()
 
 const graveId = Number(route.params.graveId)
 const description = ref('')
 const date = ref('')
 const type = ref('')
 
-const handleSubmit = async () => {
-  try {
-    const form = {
-      description: description.value,
-      date: date.value,
-      type: type.value
+const handleSubmit = () => {
+  guardedSubmit(async () => {
+    try {
+      const form = {
+        description: description.value,
+        date: date.value,
+        type: type.value
+      }
+
+      await repairSchema.validate(form)
+
+      await createRepair({
+        graveId,
+        description: description.value,
+        date: date.value,
+        type: type.value
+      })
+
+      showToast('Reparación registrada correctamente', 'success')
+      await nextTick()
+      router.push({ name: 'repairs' })
+
+    } catch (err) {
+      if (err.name === 'ValidationError') {
+        showToast(err.message, 'error')
+      } else {
+        showToast('Error al registrar la reparación', 'error')
+      }
     }
-
-    await repairSchema.validate(form)
-
-    await createRepair({
-      graveId,
-      description: description.value,
-      date: date.value,
-      type: type.value
-    })
-
-    showToast('Reparación registrada correctamente', 'success')
-    await nextTick()
-    router.push({ name: 'repairs' })
-
-  } catch (err) {
-    if (err.name === 'ValidationError') {
-      showToast(err.message, 'error')
-    } else {
-      showToast('Error al registrar la reparación', 'error')
-    }
-  }
+  })
 }
 </script>
+
 
 <style scoped>
 .user-profile-container {

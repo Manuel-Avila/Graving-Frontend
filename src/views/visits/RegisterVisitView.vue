@@ -2,8 +2,8 @@
   <div class="visit-registration-container">
     <div class="left-section">
       <div class="left-section-components">
-         <div class="container-tittle-visit-data">
-            <h1 class="tittle-visit-data">Datos de tu Visita</h1>
+        <div class="container-tittle-visit-data">
+          <h1 class="tittle-visit-data">Datos de tu Visita</h1>
         </div>
         <div class="info-card">
           <div class="photo-upload">
@@ -28,9 +28,7 @@
             </div>
           </div>
         </div>
-
       </div>
-       
     </div>
 
     <div class="right-section">
@@ -38,7 +36,7 @@
         <div class="container-tittle-your-data">
           <h1 class="tittle-your-data">Fecha</h1>
         </div>
-          
+
         <div class="form-card">
           <div class="date-time-group">
             <div class="input-group">
@@ -63,26 +61,31 @@
           </div>
 
           <div v-if="isAdmin" class="input-group">
-          <select v-model="selectedUserId" class="data-input" required>
-            <option disabled value="">Selecciona un visitante</option>
-            <option v-for="user in users" :key="user.id" :value="user.id">
-              {{ user.name }}
-            </option>
-          </select>
-          <label class="input-label">Seleccionar visitante</label>
-        </div>
+            <select v-model="selectedUserId" class="data-input" required>
+              <option disabled value="">Selecciona un visitante</option>
+              <option v-for="user in users" :key="user.id" :value="user.id">
+                {{ user.name }}
+              </option>
+            </select>
+            <label class="input-label">Seleccionar visitante</label>
+          </div>
 
           <div class="action-buttons">
-            <button @click="handleRegisterVisit" class="purple-button">Registrar Visita</button>
+            <button 
+              @click="handleRegisterVisit" 
+              class="purple-button"
+              :disabled="isSubmitting"
+            >
+              Registrar Visita
+            </button>
             <router-link :to="{name: 'searchDeceased'}" class="outline-white-button">Cancelar</router-link>
           </div>
         </div>
-
       </div>
-      
     </div>
   </div>
 </template>
+
 
 <script setup>
 import { ref, onMounted, nextTick, computed } from 'vue'
@@ -93,11 +96,13 @@ import { createVisit, createVisitAsAdmin } from '@/services/visitService'
 import { useToast } from '@/composables/useToast'
 import { visitSchema } from '@/composables/validations/useVisitValidation'
 import { useAuthStore } from '@/stores/authStore'
+import { useSubmitGuard } from '@/composables/useSubmitGuard'
 
 const { showToast } = useToast()
 const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
+const { isSubmitting, guardedSubmit } = useSubmitGuard()
 
 const visitDate = ref('')
 const visitTime = ref('')
@@ -134,49 +139,52 @@ onMounted(async () => {
   }
 })
 
-const handleRegisterVisit = async () => {
-  try {
-    await visitSchema.validate(
-      {
-        visitDate: visitDate.value,
-        visitTime: visitTime.value,
-        dateTime: `${visitDate.value}T${visitTime.value}`
-      },
-      { abortEarly: false }
-    )
+const handleRegisterVisit = () => {
+  guardedSubmit(async () => {
+    try {
+      await visitSchema.validate(
+        {
+          visitDate: visitDate.value,
+          visitTime: visitTime.value,
+          dateTime: `${visitDate.value}T${visitTime.value}`
+        },
+        { abortEarly: false }
+      )
 
-    const dateTime = `${visitDate.value} ${visitTime.value}`
+      const dateTime = `${visitDate.value} ${visitTime.value}`
 
-    if (isAdmin.value) {
-      if (!selectedUserId.value) {
-        showToast('Debes seleccionar un visitante', 'error')
-        return
+      if (isAdmin.value) {
+        if (!selectedUserId.value) {
+          showToast('Debes seleccionar un visitante', 'error')
+          return
+        }
+
+        await createVisitAsAdmin({
+          deceasedId,
+          userId: selectedUserId.value,
+          date: dateTime
+        })
+      } else {
+        await createVisit({
+          deceasedId,
+          date: dateTime
+        })
       }
 
-      await createVisitAsAdmin({
-        deceasedId: deceasedId,
-        userId: selectedUserId.value,
-        date: dateTime
-      })
-    } else {
-      await createVisit({
-        deceasedId: deceasedId,
-        date: dateTime
-      })
+      showToast('Visita registrada correctamente', 'success')
+      await nextTick()
+      router.push({ name: 'visits' })
+    } catch (error) {
+      if (error.name === 'ValidationError') {
+        error.errors.forEach(msg => showToast(msg, 'error'))
+      } else {
+        showToast('Error al registrar la visita', 'error')
+      }
     }
-
-    showToast('Visita registrada correctamente', 'success')
-    await nextTick()
-    router.push({ name: 'visits' })
-  } catch (error) {
-    if (error.name === 'ValidationError') {
-      error.errors.forEach(msg => showToast(msg, 'error'))
-    } else {
-      showToast('Error al registrar la visita', 'error')
-    }
-  }
+  })
 }
 </script>
+
 
 <style scoped>
 .visit-registration-container {

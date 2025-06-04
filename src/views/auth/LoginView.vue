@@ -26,7 +26,9 @@
         <label class="input-label" :class="{ 'input-label-focused': password }">Contraseña</label>
       </div>
 
-      <button type="submit" class="purple-button">Iniciar sesión</button>
+      <button type="submit" class="purple-button" :disabled="isSubmitting">
+        Iniciar sesión
+      </button>
     </form>
 
     <button @click="handleLoginGoogle" class="google-signin-btn">
@@ -41,40 +43,45 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue';
+import { ref, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { login, loginGoogle } from '@/services/authService'
 import { useAuthStore } from '@/stores/authStore'
 import { useToast } from '@/composables/useToast'
 import { loginSchema } from '@/composables/validations/useLoginValidation'
+import { useSubmitGuard } from '@/composables/useSubmitGuard'
 
 const { showToast } = useToast()
+const { isSubmitting, guardedSubmit } = useSubmitGuard()
+
 const email = ref('')
 const password = ref('')
 const router = useRouter()
 const authStore = useAuthStore()
 
-const handleLogin = async () => {
-  try {
-    const form = {
-      email: email.value,
-      password: password.value
-    }
+const handleLogin = () => {
+  guardedSubmit(async () => {
+    try {
+      const form = {
+        email: email.value,
+        password: password.value
+      }
 
-    await loginSchema.validate(form)
+      await loginSchema.validate(form)
 
-    const data = await login(form)
-    authStore.setAuth(data.token, data.user)
-    showToast('Inicio de sesión exitoso!', 'success')
-    await nextTick()
-    router.push({ name: 'searchDeceased' })
-  } catch (error) {
-    if (error.name === 'ValidationError') {
-      showToast(error.message, 'error')
-    } else {
-      showToast('Error al iniciar sesión. Verifica tus datos o intenta más tarde.', 'error')
+      const data = await login(form)
+      authStore.setAuth(data.token, data.user)
+      showToast('Inicio de sesión exitoso!', 'success')
+      await nextTick()
+      router.push({ name: 'searchDeceased' })
+    } catch (error) {
+      if (error.name === 'ValidationError') {
+        showToast(error.message, 'error')
+      } else {
+        showToast('Error al iniciar sesión. Verifica tus datos o intenta más tarde.', 'error')
+      }
     }
-  }
+  })
 }
 
 const handleLoginGoogle = async () => {
@@ -88,8 +95,8 @@ const handleLoginGoogle = async () => {
     showToast('Error al iniciar sesión con Google.', 'error')
   }
 }
-
 </script>
+
 
 <style scoped>
 

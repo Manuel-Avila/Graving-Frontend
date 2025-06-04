@@ -28,7 +28,13 @@
         <router-link v-if="isLoggedIn" :to="{ name: 'visit', params: { id: deceased.id } }" class="outline-white-button">Visitar</router-link>
         <template v-if="isAdmin">
           <router-link :to="{ name: 'editDeceased', params: { id: deceased.id } }" class="purple-button">Editar</router-link>
-          <button  @click="handleDelete" class="delete-button">Olvidar</button>
+          <button 
+            @click="handleDelete" 
+            class="delete-button"
+            :disabled="isSubmitting"
+          >
+            Olvidar
+          </button>
         </template>
       </template>
     </div>
@@ -36,47 +42,50 @@
 </template>
 
 <script setup> 
-  import { defineProps, computed } from 'vue'
-  import { useAuthStore } from '@/stores/authStore'
-  import { deleteDeceased } from '@/services/deceasedService'
-  import { useConfirmModal } from '@/composables/useConfirmModal'
-  import { useToast } from '@/composables/useToast'
-  import { defineEmits } from 'vue'
-  
-  const emit = defineEmits(['deleted'])
-  
-  const { showConfirmModal } = useConfirmModal()
-  const { showToast } = useToast()
+import { defineProps, computed } from 'vue'
+import { useAuthStore } from '@/stores/authStore'
+import { deleteDeceased } from '@/services/deceasedService'
+import { useConfirmModal } from '@/composables/useConfirmModal'
+import { useToast } from '@/composables/useToast'
+import { defineEmits } from 'vue'
+import { useSubmitGuard } from '@/composables/useSubmitGuard'
 
-  const authStore = useAuthStore()
-  const isLoggedIn = computed(() => authStore.isLoggedIn)
-  const isAdmin = computed(() => authStore.isAdmin)
+const emit = defineEmits(['deleted'])
+const { showConfirmModal } = useConfirmModal()
+const { showToast } = useToast()
+const { isSubmitting, guardedSubmit } = useSubmitGuard()
 
-  const props = defineProps({
-    deceased: {
-      type: Object,
-      required: true
-    },
-    isInactive: {
-      type: Boolean,
-      default: false
-    }
-  })
-  
-  const handleDelete = async () => {
+const authStore = useAuthStore()
+const isLoggedIn = computed(() => authStore.isLoggedIn)
+const isAdmin = computed(() => authStore.isAdmin)
+
+const props = defineProps({
+  deceased: {
+    type: Object,
+    required: true
+  },
+  isInactive: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const handleDelete = () => {
+  guardedSubmit(async () => {
     const confirmed = await showConfirmModal(`¿Deseas olvidar a ${props.deceased.name}? (Esta acción es irreversible)`)
-
     if (!confirmed) return
 
     try {
       const result = await deleteDeceased(props.deceased.id)
-      showToast(`Se olvido a ${result.name} correctamente`, 'success')
+      showToast(`Se olvidó a ${result.name} correctamente`, 'success')
       emit('deleted', props.deceased.id)
     } catch (error) {
       showToast('Error al olvidar al difunto', 'error')
     }
-  }
+  })
+}
 </script>
+
 
 <style scoped>
 .deceased-card {

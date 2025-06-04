@@ -103,6 +103,11 @@
     background-color: #974392;
   }
 
+  .purple-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
   .delete-button{
     background-color: #E53935;
     color: white;
@@ -118,6 +123,11 @@
     max-width: 300px;
     display: inline-block;
     box-shadow: 5px 5px 8px var(--shadow-color);
+  }
+
+  .delete-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   .delete-button:hover {

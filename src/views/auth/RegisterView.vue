@@ -4,20 +4,19 @@
     <h1 class="register-title">Crear perfil</h1>
 
     <form @submit.prevent="handleRegister">
-
       <div class="input-group">
         <input type="text" v-model="name" class="data-input" placeholder=" " required />
         <label class="input-label">Nombre</label>
       </div>
 
       <div class="input-group">
-        <input type="email" v-model="email" class="data-input"  placeholder=" " required />
+        <input type="email" v-model="email" class="data-input" placeholder=" " required />
         <label class="input-label">Correo</label>
       </div>
 
       <div class="input-group">
         <input type="tel" v-model="phoneNumber" class="data-input" placeholder=" " required />
-        <label class="input-label"  >Teléfono</label>
+        <label class="input-label">Teléfono</label>
       </div>
 
       <div class="input-group">
@@ -27,10 +26,12 @@
 
       <div class="input-group">
         <input type="password" v-model="confirmPassword" class="data-input" placeholder=" " required />
-        <label class="input-label"  >Confirmar contraseña</label>
+        <label class="input-label">Confirmar contraseña</label>
       </div>
 
-      <button type="submit" class="purple-button">Registrarse</button>
+      <button type="submit" class="purple-button" :disabled="isSubmitting">
+        Registrarse
+      </button>
     </form>
 
     <button @click="handleGoogleLogin" class="google-signin-btn">
@@ -46,24 +47,27 @@
 </template>
 
 <script setup>
-  import { ref, nextTick } from 'vue'
-  import { useRouter } from 'vue-router'
-  import { register, loginGoogle } from '@/services/authService'
-  import { useAuthStore } from '@/stores/authStore'
-  import { useToast } from '@/composables/useToast'
-  import { registerSchema } from '@/composables/validations/useRegisterValidation'
+import { ref, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
+import { register, loginGoogle } from '@/services/authService'
+import { useAuthStore } from '@/stores/authStore'
+import { useToast } from '@/composables/useToast'
+import { useSubmitGuard } from '@/composables/useSubmitGuard'
+import { registerSchema } from '@/composables/validations/useRegisterValidation'
 
-  const { showToast } = useToast()
-  const router = useRouter();
-  const authStore = useAuthStore()
+const { showToast } = useToast()
+const router = useRouter()
+const authStore = useAuthStore()
+const { isSubmitting, guardedSubmit } = useSubmitGuard()
 
-  const name = ref('');
-  const email = ref('');
-  const phoneNumber = ref('');
-  const password = ref('');
-  const confirmPassword = ref('');
+const name = ref('')
+const email = ref('')
+const phoneNumber = ref('')
+const password = ref('')
+const confirmPassword = ref('')
 
-  const handleRegister = async () => {
+const handleRegister = () => {
+  guardedSubmit(async () => {
     try {
       const form = {
         name: name.value,
@@ -82,9 +86,9 @@
         password: form.password
       })
 
-      showToast('Registro exitoso!', 'success');
+      showToast('Registro exitoso!', 'success')
       await nextTick()
-      router.push({ name: 'login' });
+      router.push({ name: 'login' })
 
     } catch (error) {
       if (error.name === 'ValidationError') {
@@ -93,22 +97,21 @@
         showToast('Error al registrarse. Por favor, inténtalo de nuevo.', 'error')
       }
     }
-  };
+  })
+}
 
-  const handleGoogleLogin = async () => {
-    try {
-      const data = await loginGoogle()
-      authStore.setAuth(data.token, data.user)
-      showToast('Registro exitoso!', 'success');
-      await nextTick()
-      router.push({ name: 'profile' })
-    } catch (error) {
-      showToast('Error al registrarse con Google!', 'error');
-      await nextTick()
-    }
+const handleGoogleLogin = async () => {
+  try {
+    const data = await loginGoogle()
+    authStore.setAuth(data.token, data.user)
+    showToast('Registro exitoso!', 'success')
+    await nextTick()
+    router.push({ name: 'profile' })
+  } catch (error) {
+    showToast('Error al registrarse con Google!', 'error')
   }
+}
 </script>
-
 
 <style scoped>
 

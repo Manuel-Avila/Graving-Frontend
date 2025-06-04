@@ -101,7 +101,13 @@
 
       <div class="modal-actions">
         <button class="outline-white-button" @click="editingGrave = null">Cancelar</button>
-        <button class="purple-button" @click="handleUpdate">Guardar</button>
+        <button 
+          class="purple-button" 
+          @click="handleUpdate" 
+          :disabled="isSubmitting"
+        >
+          Guardar
+        </button>
       </div>
     </div>
   </div>
@@ -111,8 +117,11 @@
 import { ref, computed, onMounted } from 'vue'
 import { getAllGraves, updateGrave } from '@/services/graveService'
 import { useToast } from '@/composables/useToast'
+import { useSubmitGuard } from '@/composables/useSubmitGuard'
 
 const { showToast } = useToast()
+const { isSubmitting, guardedSubmit } = useSubmitGuard()
+
 const searchGraveNumber = ref('')
 const filterRow = ref('')
 const filterBlock = ref('')
@@ -141,16 +150,18 @@ const filteredGraves = computed(() => {
   })
 })
 
-const handleUpdate = async () => {
-  try {
-    const { id, type } = editingGrave.value
-    await updateGrave(id, { type })
-    showToast('Tumba actualizada correctamente', 'success')
-    editingGrave.value = null
-    graves.value = await getAllGraves()
-  } catch (err) {
-    showToast('Error al actualizar tumba', 'error')
-  }
+const handleUpdate = () => {
+  guardedSubmit(async () => {
+    try {
+      const { id, type } = editingGrave.value
+      await updateGrave(id, { type })
+      showToast('Tumba actualizada correctamente', 'success')
+      editingGrave.value = null
+      graves.value = await getAllGraves()
+    } catch (err) {
+      showToast('Error al actualizar tumba', 'error')
+    }
+  })
 }
 
 const editGrave = (grave) => {
@@ -163,6 +174,7 @@ const typeLabels = {
   ossuary: 'Osario'
 }
 </script>
+
 
 
 <style scoped>

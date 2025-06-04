@@ -19,70 +19,81 @@
           </template>
         </button>
       </div>
-      <button @click="handleSubmit" class="purple-button confirm-btn">
+      <button 
+        @click="handleSubmit" 
+        class="purple-button confirm-btn"
+        :disabled="isSubmitting"
+      >
         {{ isEditing ? 'Actualizar Difunto' : 'Registrar Difunto' }}
       </button>
     </div>  
 
     <div class="right-section">
-      
-        <div class="form-container-deceased">
-          <div class="section-title">
-            <h3>Datos del difunto</h3>
-          </div>
-          <div class="input-group">
-            <input type="text" v-model="name" class="data-input" required placeholder=" " />
-            <label class="input-label">Nombre completo</label>
-          </div>
-          <div class="input-group">
-            <input type="text" v-model="epitaph" class="data-input" required placeholder=" " />
-            <label class="input-label">Epitafio</label>
-          </div>
-          <div class="input-group">  
-            <input type="date" v-model="birthDate" class="data-input" required />
-            <label class="input-label">Fecha de nacimiento</label>
-          </div>
-          <div class="input-group">  
-            <input type="date" v-model="deathDate" class="data-input" required />
-            <label class="input-label">Fecha de defunción</label>
-          </div>
-
-          <div class="input-group tomb-input-group" @click="showGraveModal = true">
-            <input 
-              type="text" 
-              class="data-input"
-              readonly
-              :value="graveId ? `#${graveId}` : ''"
-              placeholder=" " 
-            />
-            <label class="input-label">Número de tumba</label>
-          </div>
+      <div class="form-container-deceased">
+        <div class="section-title">
+          <h3>Datos del difunto</h3>
         </div>
 
-        <div class="form-container-owner">
-          <div class="section-title">
-            <h3>Datos del responsable</h3>
-          </div>
-          <div class="input-group">
-            <input type="text" v-model="ownerName" class="data-input" required placeholder=" " />
-            <label class="input-label">Nombre</label>
-          </div>
-          <div class="input-group">
-            <input type="tel" v-model="ownerPhone" class="data-input" required placeholder=" " />
-            <label class="input-label">Teléfono</label>
-          </div>
-          <div class="input-group">
-            <input type="email" v-model="ownerEmail" class="data-input" required placeholder=" " />
-            <label class="input-label">Correo</label>
-          </div>
-          <div class="input-group">
-            <input type="text" v-model="ownerCurp" class="data-input" required placeholder=" " />
-            <label class="input-label">CURP</label>
-          </div>
+        <div class="input-group">
+          <input type="text" v-model="name" class="data-input" required placeholder=" " />
+          <label class="input-label">Nombre completo</label>
         </div>
-      
+
+        <div class="input-group">
+          <input type="text" v-model="epitaph" class="data-input" required placeholder=" " />
+          <label class="input-label">Epitafio</label>
+        </div>
+
+        <div class="input-group">  
+          <input type="date" v-model="birthDate" class="data-input" required />
+          <label class="input-label">Fecha de nacimiento</label>
+        </div>
+
+        <div class="input-group">  
+          <input type="date" v-model="deathDate" class="data-input" required />
+          <label class="input-label">Fecha de defunción</label>
+        </div>
+
+        <div class="input-group tomb-input-group" @click="showGraveModal = true">
+          <input 
+            type="text" 
+            class="data-input"
+            readonly
+            :value="graveId ? `#${graveId}` : ''"
+            placeholder=" " 
+          />
+          <label class="input-label">Número de tumba</label>
+        </div>
+      </div>
+
+      <div class="form-container-owner">
+        <div class="section-title">
+          <h3>Datos del responsable</h3>
+        </div>
+
+        <div class="input-group">
+          <input type="text" v-model="ownerName" class="data-input" required placeholder=" " />
+          <label class="input-label">Nombre</label>
+        </div>
+
+        <div class="input-group">
+          <input type="tel" v-model="ownerPhone" class="data-input" required placeholder=" " />
+          <label class="input-label">Teléfono</label>
+        </div>
+
+        <div class="input-group">
+          <input type="email" v-model="ownerEmail" class="data-input" required placeholder=" " />
+          <label class="input-label">Correo</label>
+        </div>
+
+        <div class="input-group">
+          <input type="text" v-model="ownerCurp" class="data-input" required placeholder=" " />
+          <label class="input-label">CURP</label>
+        </div>
+      </div>
     </div>
   </div>
+
   <GraveSelectorModal
     v-if="showGraveModal"
     @close="showGraveModal = false"
@@ -90,72 +101,74 @@
   />
 </template>
 
+
 <script setup>
-  import { ref, computed, onMounted, nextTick } from 'vue'
-  import { useRouter, useRoute } from 'vue-router'
-  import { registerDeceased, updateDeceased, getDeceasedById } from '@/services/deceasedService'
-  import { getOwnerByDeceasedId, createOwner, updateOwner } from '@/services/ownerService'
-  import { useToast } from '@/composables/useToast'
-  import { deceasedSchema } from '@/composables/validations/useDeceasedValidation'
-  import { ownerSchema } from '@/composables/validations/useOwnerValidation'
-  import GraveSelectorModal from '@/components/map/GraveSelectorModal.vue'
+import { ref, computed, onMounted, nextTick } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { registerDeceased, updateDeceased, getDeceasedById } from '@/services/deceasedService'
+import { getOwnerByDeceasedId, createOwner, updateOwner } from '@/services/ownerService'
+import { useToast } from '@/composables/useToast'
+import { deceasedSchema } from '@/composables/validations/useDeceasedValidation'
+import { ownerSchema } from '@/composables/validations/useOwnerValidation'
+import { useSubmitGuard } from '@/composables/useSubmitGuard'
+import GraveSelectorModal from '@/components/map/GraveSelectorModal.vue'
 
-  const showGraveModal = ref(false)
+const showGraveModal = ref(false)
+const { showToast } = useToast()
+const route = useRoute()
+const router = useRouter()
+const { isSubmitting, guardedSubmit } = useSubmitGuard()
 
-  const route = useRoute()
-  const router = useRouter()
-  const { showToast } = useToast()
+const isEditing = computed(() => route.name === 'editDeceased')
+const deceasedId = route.params.id
 
-  const isEditing = computed(() => route.name === 'editDeceased')
-  const deceasedId = route.params.id
+const name = ref('')
+const birthDate = ref('')
+const deathDate = ref('')
+const epitaph = ref('')
+const graveId = ref(route.params.graveId ? Number(route.params.graveId) : null)
+const imageUrl = ref(null)
+const imageDeleteToken = ref(null)
 
-  const name = ref('')
-  const birthDate = ref('')
-  const deathDate = ref('')
-  const epitaph = ref('')
-  const graveId = ref(route.params.graveId ? Number(route.params.graveId) : null)
-  const imageUrl = ref(null)
-  const imageDeleteToken = ref(null)
+const ownerName = ref('')
+const ownerPhone = ref('')
+const ownerEmail = ref('')
+const ownerCurp = ref('')
+const ownerId = ref(null)
 
-  const ownerName = ref('')
-  const ownerPhone = ref('')
-  const ownerEmail = ref('')
-  const ownerCurp = ref('')
-  const ownerId = ref(null)
+const fileInput = ref(null)
+const selectedImage = ref(null)
 
-  const fileInput = ref(null)
-  const selectedImage = ref(null)
+onMounted(async () => {
+  if (isEditing.value) {
+    try {
+      const deceased = await getDeceasedById(deceasedId)
+      name.value = deceased.name
+      birthDate.value = deceased.birthDate?.slice(0, 10)
+      deathDate.value = deceased.deathDate?.slice(0, 10)
+      epitaph.value = deceased.epitaph
+      graveId.value = deceased.graveId
+      imageUrl.value = deceased.imageUrl
+      imageDeleteToken.value = deceased.imageDeleteToken
 
-  onMounted(async () => {
-    if (isEditing.value) {
-      try {
-        const deceased = await getDeceasedById(deceasedId)
-        name.value = deceased.name
-        birthDate.value = deceased.birthDate?.slice(0, 10)
-        deathDate.value = deceased.deathDate?.slice(0, 10)
-        epitaph.value = deceased.epitaph
-        graveId.value = deceased.graveId
-        imageUrl.value = deceased.imageUrl
-        imageDeleteToken.value = deceased.imageDeleteToken
-
-        const owner = await getOwnerByDeceasedId(deceasedId)
-        if (owner) {
-          ownerId.value = owner.id 
-          ownerName.value = owner.name
-          ownerPhone.value = owner.phone
-          ownerEmail.value = owner.email
-          ownerCurp.value = owner.curp
-        }
-
-      } catch {
-        showToast('Difunto no encontrado', 'error')
-        await nextTick()
-        router.push({ name: 'searchDeceased' })
+      const owner = await getOwnerByDeceasedId(deceasedId)
+      if (owner) {
+        ownerId.value = owner.id 
+        ownerName.value = owner.name
+        ownerPhone.value = owner.phone
+        ownerEmail.value = owner.email
+        ownerCurp.value = owner.curp
       }
+    } catch {
+      showToast('Difunto no encontrado', 'error')
+      await nextTick()
+      router.push({ name: 'searchDeceased' })
     }
-  })
+  }
+})
 
-  const handleSubmit = async () => {
+const handleSubmit = () => {
+  guardedSubmit(async () => {
     try {
       const deceasedData = {
         name: name.value,
@@ -184,17 +197,15 @@
         await updateDeceased(deceasedId, deceasedData, selectedImage.value, imageDeleteToken.value)
         await updateOwner(ownerId.value, {
           ...ownerData,
-          deceasedId: deceasedId
+          deceasedId
         })
         showToast('Difunto actualizado correctamente', 'success')
       } else {
         const created = await registerDeceased(deceasedData, selectedImage.value)
-
         await createOwner({
           ...ownerData,
           deceasedId: created.id
         })
-
         showToast('Difunto registrado correctamente', 'success')
       }
 
@@ -207,29 +218,31 @@
         showToast('Error al guardar difunto.', 'error')
       }
     }
-  }
+  })
+}
 
-  const triggerImageInput = () => {
-    fileInput.value?.click()
-  }
+const triggerImageInput = () => {
+  fileInput.value?.click()
+}
 
-  const handleImageChange = (event) => {
-    const file = event.target.files[0]
-    if (file && file.type.startsWith('image/')) {
-      selectedImage.value = file
-      imageUrl.value = URL.createObjectURL(file)
-    } else {
-      selectedImage.value = null
-      imageUrl.value = null
-    }
+const handleImageChange = (event) => {
+  const file = event.target.files[0]
+  if (file && file.type.startsWith('image/')) {
+    selectedImage.value = file
+    imageUrl.value = URL.createObjectURL(file)
+  } else {
+    selectedImage.value = null
+    imageUrl.value = null
   }
+}
 
-  const handleGraveSelected = (grave) => {
-    graveId.value = grave.id
-    showToast(`Tumba #${grave.graveNumber} seleccionada`, 'success')
-    showGraveModal.value = false
-  }
+const handleGraveSelected = (grave) => {
+  graveId.value = grave.id
+  showToast(`Tumba #${grave.graveNumber} seleccionada`, 'success')
+  showGraveModal.value = false
+}
 </script>
+
 
 <style scoped>
 .register-container {

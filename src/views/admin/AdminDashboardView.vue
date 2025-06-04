@@ -52,7 +52,7 @@
         <div class="image-container">
           <img src="../../assets/images/visitsAdministration.webp" alt="Bitácora del sistema" class="faded-image">
           <div class="image-overlay">
-            <h2>Reparaciones de tumbas</h2>
+            <h2>Visitas</h2>
           </div>
         </div>
       </router-link>
