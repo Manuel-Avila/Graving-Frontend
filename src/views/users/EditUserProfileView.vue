@@ -3,106 +3,50 @@
     <div class="profile-center-box">
       <div class="profile-tabs-container">
         <div class="profile-tabs">
-          <router-link 
-            to="/profile" 
-            class="tab-button"
-            :class="{ 'active': $route.path === '/profile' }"
-          >
-            Perfil
-          </router-link>
-          <router-link 
-            to="/editProfile" 
-            class="tab-button"
-            :class="{ 'active': $route.path === '/editProfile' }"
-          >
-            Editar Perfil
-          </router-link>
-          <router-link 
-            to="/visits" 
-            class="tab-button"
-            :class="{ 'active': $route.path === '/visits' }"
-          >
-            Historial de Visitas
-          </router-link>
+          <router-link to="/profile" class="tab-button" :class="{ 'active': $route.path === '/profile' }">Perfil</router-link>
+          <router-link to="/editProfile" class="tab-button" :class="{ 'active': $route.path === '/editProfile' }">Editar Perfil</router-link>
+          <router-link to="/visits" class="tab-button" :class="{ 'active': $route.path === '/visits' }">Historial de Visitas</router-link>
         </div>
       </div>
 
       <div class="main-content-container">
-  
         <div class="profile-content-wrapper">
-        
           <div class="profile-info-column">
-            
-              <div class="input-group">
-                <input 
-                  type="text" 
-                  v-model="user.name" 
-                  class="data-input" 
-                  placeholder=" " 
-                />
-                <label class="input-label">Nombre</label>
-              </div>
-            
-              <div class="input-group">
-                <input 
-                  type="email" 
-                  v-model="user.email" 
-                  class="data-input" 
-                  placeholder=" " 
-                />
-                <label class="input-label">Correo</label>
-              </div>
+            <div class="input-group">
+              <input type="text" v-model="user.name" class="data-input" placeholder=" " />
+              <label class="input-label">Nombre</label>
+            </div>
 
-              <div class="input-group">
-                <input 
-                  type="text" 
-                  v-model="user.phoneNumber" 
-                  class="data-input" 
-                  placeholder=" " 
-                />
-                <label class="input-label">Teléfono</label>
-              </div>
-              <div class="input-group">
-                <input 
-                  type="password" 
-                  v-model="password" 
-                  class="data-input" 
-                  placeholder=" " 
-                />
-                <label class="input-label">Contraseña Actual</label>
-              </div>
+            <div class="input-group">
+              <input type="email" v-model="user.email" class="data-input" placeholder=" " />
+              <label class="input-label">Correo</label>
+            </div>
 
-              <div class="input-group">
-                <input 
-                  type="password" 
-                  v-model="newPassword" 
-                  class="data-input" 
-                  placeholder=" " 
-                />
-                <label class="input-label">Nueva Contraseña (opcional)</label>
-              </div>
+            <div class="input-group">
+              <input type="text" v-model="user.phoneNumber" class="data-input" placeholder=" " />
+              <label class="input-label">Teléfono</label>
+            </div>
 
-              <div class="input-group">
-                <input 
-                  type="password" 
-                  v-model="confirmPassword" 
-                  class="data-input" 
-                  placeholder=" " 
-                />
-                <label class="input-label">Confirmar Nueva Contraseña</label>
-              </div>
+            <div class="input-group">
+              <input type="password" v-model="password" class="data-input" placeholder=" " />
+              <label class="input-label">Contraseña Actual</label>
+            </div>
 
-              <button @click="handleSubmit" class="purple-button">Confirmar</button>
-            
+            <div class="input-group">
+              <input type="password" v-model="newPassword" class="data-input" placeholder=" " />
+              <label class="input-label">Nueva Contraseña (opcional)</label>
+            </div>
+
+            <div class="input-group">
+              <input type="password" v-model="confirmPassword" class="data-input" placeholder=" " />
+              <label class="input-label">Confirmar Nueva Contraseña</label>
+            </div>
+
+            <button @click="handleSubmit" class="purple-button" :disabled="isSubmitting">Confirmar</button>
           </div>
-          
-         
+
           <div class="logo-column">
-            <img 
-              src="../../assets/images/logo.png" 
-              alt="Logo usuario" 
-              class="user-logo"
-            />
+            <img src="../../assets/images/logo.png" alt="Logo usuario" class="user-logo" />
           </div>
         </div>
       </div>
@@ -111,13 +55,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { getMyProfile, updateMyProfile  } from '@/services/userService'
+import { reactive, ref, onMounted } from 'vue'
+import { getMyProfile, updateMyProfile } from '@/services/userService'
 import { useToast } from '@/composables/useToast'
+import { useSubmitGuard } from '@/composables/useSubmitGuard'
+import { editProfileSchema } from '@/composables/validations/useEditProfileValidation'
 
 const { showToast } = useToast()
+const { isSubmitting, guardedSubmit } = useSubmitGuard()
 
-const user = ref({
+const user = reactive({
   name: '',
   email: '',
   phoneNumber: ''
@@ -129,70 +76,53 @@ const confirmPassword = ref('')
 
 onMounted(async () => {
   try {
-    user.value = await getMyProfile()
+    const data = await getMyProfile()
+    user.name = data.name || ''
+    user.email = data.email || ''
+    user.phoneNumber = data.phoneNumber || ''
   } catch (err) {
     showToast('Error al cargar tu perfil', 'error')
   }
 })
 
-const handleSubmit = async () => {
-  if (!user.value.name.trim()) {
-    showToast('El nombre es obligatorio', 'error')
-    return
-  }
+const handleSubmit = () => {
+  guardedSubmit(async () => {
+    try {
+      const form = {
+        name: user.name,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        password: password.value,
+        newPassword: newPassword.value,
+        confirmPassword: confirmPassword.value
+      }
 
-  if (!user.value.email.trim()) {
-    showToast('El correo es obligatorio', 'error')
-    return
-  }
+      await editProfileSchema.validate(form, { abortEarly: false })
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(user.value.email)) {
-    showToast('El correo no tiene un formato válido', 'error')
-    return
-  }
+      const payload = {
+        name: user.name,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        password: password.value,
+        newPassword: newPassword.value || undefined
+      }
 
-  if (!user.value.phoneNumber.trim()) {
-    showToast('El número de teléfono es obligatorio', 'error')
-    return
-  }
+      await updateMyProfile(payload)
+      showToast('Perfil actualizado correctamente', 'success')
 
-  const phoneRegex = /^[0-9]{10}$/
-  if (!phoneRegex.test(user.value.phoneNumber)) {
-    showToast('El número de teléfono debe tener 10 dígitos', 'error')
-    return
-  }
-
-  if (!password.value) {
-    showToast('Debes ingresar tu contraseña actual', 'error')
-    return
-  }
-
-  if (newPassword.value && newPassword.value.length < 6) {
-    showToast('La nueva contraseña debe tener al menos 6 caracteres', 'error')
-    return
-  }
-
-  if (newPassword.value && newPassword.value !== confirmPassword.value) {
-    showToast('La nueva contraseña y su confirmación no coinciden', 'error')
-    return
-  }
-
-  const data = {
-    ...user.value,
-    password: password.value,
-    newPassword: newPassword.value || undefined
-  }
-
-  try {
-    await updateMyProfile(data)
-    showToast('Perfil actualizado correctamente', 'success')
-    password.value = ''
-    newPassword.value = ''
-    confirmPassword.value = ''
-  } catch (err) {
-    showToast('Error al actualizar perfil', 'error')
-  }
+      password.value = ''
+      newPassword.value = ''
+      confirmPassword.value = ''
+    } catch (err) {
+      if (err.name === 'ValidationError') {
+        err.errors.forEach(msg => showToast(msg, 'error'))
+      } else if (err.response?.data?.error) {
+        showToast(err.response.data.error, 'error')
+      } else {
+        showToast('Error al actualizar perfil', 'error')
+      }
+    }
+  })
 }
 </script>
 
