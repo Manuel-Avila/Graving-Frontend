@@ -113,7 +113,6 @@ const formatDate = (timestamp) => {
   })
 }
 
-// Reporte PDF
 const PURPLE_RGB = [110, 52, 106]
 
 const blobToBase64 = (blob) => {
@@ -156,6 +155,11 @@ const generateDeceasedReport = async () => {
 
     doc.text(`Total de difuntos registrados: ${deceasedList.length}`, 15, y)
     y += 8
+
+    doc.setDrawColor(160, 160, 160)
+    doc.setLineWidth(0.5)
+    doc.line(15, y, 195, y)
+    y += 10
 
     for (const d of deceasedList) {
       doc.setFont('helvetica', 'bold')
@@ -230,6 +234,11 @@ const generateInactiveDeceasedReport = async () => {
     doc.text(`Total de difuntos eliminados: ${deceasedList.length}`, 15, y)
     y += 8
 
+    doc.setDrawColor(160, 160, 160)
+    doc.setLineWidth(0.5)
+    doc.line(15, y, 195, y)
+    y += 10
+
     for (const d of deceasedList) {
       doc.setFont('helvetica', 'bold')
       doc.setFontSize(13)
@@ -271,7 +280,6 @@ const generateInactiveDeceasedReport = async () => {
   }
 }
 </script>
-
 
 <style scoped>
 .grave-owners-container {
