@@ -120,6 +120,7 @@ const handleDelete = () => {
 
 .deceased-info {
   padding: 16px;
+  min-height: 220px;
 }
 
 .deceased-name {

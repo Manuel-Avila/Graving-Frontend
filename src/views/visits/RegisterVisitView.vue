@@ -194,6 +194,7 @@ const handleRegisterVisit = () => {
  
 }
 
+
 .left-section, .right-section {
   width: 50%;
   padding-top: 40px;

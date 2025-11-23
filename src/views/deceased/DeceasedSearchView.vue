@@ -183,6 +183,7 @@ const handleDeleted = (id) => {
   min-height: 70vh;
 }
 
+
 h2 {
   color: #333;
   text-align: center;

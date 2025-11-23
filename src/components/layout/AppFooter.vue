@@ -1,6 +1,6 @@
 <template>
     <footer class="container-background">
-        <h5>©2024 Graving</h5>
+        <h5>©2025 Graving</h5>
     </footer>
 </template>
 
