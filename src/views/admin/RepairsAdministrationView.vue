@@ -372,6 +372,22 @@ onMounted(async () => {
   .repairs-table {
     min-width: 700px;
   }
+
+  
+  .search-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .input-group {
+    margin: 8px 16px;
+    width: 94%;
+  }
+
+  .input-group .data-input {
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {

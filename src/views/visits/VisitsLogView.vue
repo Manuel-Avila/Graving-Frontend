@@ -87,7 +87,7 @@ const formatTime = (rawDate) => {
   display: flex;
   justify-content: center;
   min-height: 70vh;
-  padding: 20px;
+  padding: 10px;
   background-color: #f5f5f5;
 }
 
@@ -190,9 +190,12 @@ const formatTime = (rawDate) => {
 /* Responsive */
 @media (max-width: 768px) {
   .profile-center-box {
-    height: 100vh;
+    height: auto;
+    gap: 10px;
+    width: 80%;
+    min-height: auto;
   }
-
+ 
   .profile-tabs {
     flex-direction: column;
   }
@@ -211,17 +214,14 @@ const formatTime = (rawDate) => {
     height: 100%;
     
   }
-  .visits-table-wrapper {
-  
-  max-height: 750px; 
- 
-}
 }
 
 @media (max-width: 480px) {
   .profile-center-box {
-    border-radius: 8px;
+    border-radius: 10px;
   }
+  
+
 
   .profile-tabs-container {
     padding: 0 10px;

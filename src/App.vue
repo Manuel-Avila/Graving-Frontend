@@ -56,6 +56,21 @@
     color: var(--font-color);
   }
 
+  
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  img, svg, video {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  html, body, #app {
+    overflow-x: hidden;
+  }
+
   body, p, span, li, a, input, textarea {
     font-family: 'Lato', sans-serif;
   }

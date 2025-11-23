@@ -26,6 +26,7 @@
                         <template v-if="isLoggedIn">
                             <router-link :to="{name: 'profile'}">Ver Perfil</router-link>
                             <button @click.prevent="handleLogOut">Cerrar Sesión</button>
+                            
                         </template>
                         <template v-else>
                             <router-link :to="{name: 'login'}">Iniciar Sesión</router-link>
@@ -44,7 +45,7 @@
                 <router-link v-if="isAdmin" :to="{ name: 'dashboard' }" @click="closeMenu">Panel</router-link>
                 <template v-if="isLoggedIn">
                     <router-link :to="{ name: 'profile' }" @click="closeMenu">Ver Perfil</router-link>
-                    <button @click.prevent="handleLogOut">Cerrar Sesión</button>
+                    <button  @click.prevent="handleLogOut">Cerrar Sesión</button>
                 </template>
                 <template v-else>
                     <router-link :to="{ name: 'login' }" @click="closeMenu">Iniciar Sesión</router-link>
@@ -99,6 +100,8 @@
 </script>
 
 <style scoped>
+
+
     .header {
         display: flex;
         justify-content: space-around;
@@ -130,10 +133,19 @@
         color: var(--font-color);
         font-size: 1.1rem;
     }
+    .navegation-bar button {
+        
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
 
     .navegation-bar button, .navegation-bar-mobile button {
         background-color: white;
         border: none;
+    }
+    .navegation-bar-mobile button {
+        font-size: 1.2rem;
+        font-weight: 500;
     }
 
     .navegation-bar a:hover, .navegation-bar button:hover {
@@ -156,7 +168,7 @@
 
     .dropdown-toggle::after {
         content: "▼";
-        font-size: 0.7em;
+        font-size: 1.1em;
         margin-left: 4px;
     }
 
@@ -183,6 +195,7 @@
         display: flex;
     }
 
+   
     .hamburguer-icon {
         display: none;
         background-color: white;

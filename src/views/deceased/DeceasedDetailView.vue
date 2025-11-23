@@ -307,7 +307,7 @@
 .form-container {
   background-color: #ffffff;
   border-radius: 5px;
-  width: 83%;
+  width: 95%;
   height: 90%;
   
 }

@@ -194,9 +194,9 @@ const handleSubmit = () => {
 }
 
 .purple-button{
-    margin-top: 30px;
-    width: 200px;
-    align-self: center;
+  margin-top: 24px;
+  width: 200px;
+  align-self: center;
 }
 
 .main-content-container {
@@ -219,6 +219,15 @@ const handleSubmit = () => {
   flex-direction: column;
 }
 
+.profile-info-column, .logo-column {
+  min-width: 0; 
+}
+
+
+.input-group {
+  width: 100%;
+}
+
 /*inputs*/
 
 .logo-column {
@@ -230,30 +239,34 @@ const handleSubmit = () => {
 }
 
 .user-logo {
-  max-width: 80%;
-  max-height: 80%;
+  max-width: 260px;
+  max-height: 260px;
   object-fit: contain;
 }
 
 @media (max-width: 768px) {
-    
-.profile-center-box {
+   .user-profile-container{
+    margin-bottom: 15px;
+  }
+  .profile-center-box {
+    height: auto;
+  }
 
-  height: 100vh;
-
-}
   .profile-content-wrapper {
     flex-direction: column;
+    gap: 16px;
+    min-height: auto;
   }
-  
+
   .profile-info-column {
     border-right: none;
-   
-    padding: 20px;
+    height: auto;
+    padding: 16px;
   }
-  
+
   .logo-column {
-    padding: 30px;
+    height: auto;
+    padding: 12px 20px;
   }
   
   .profile-tabs {
@@ -277,7 +290,8 @@ const handleSubmit = () => {
 
 
   .input-group {
-    margin-bottom: 25px;
+    margin-bottom: 16px;
+    margin-top: 12px;
   }
 }
 

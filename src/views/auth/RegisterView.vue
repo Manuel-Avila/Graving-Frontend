@@ -15,7 +15,7 @@
       </div>
 
       <div class="input-group">
-        <input type="tel" v-model="phoneNumber" class="data-input" placeholder=" " required />
+        <input type="tel" v-model="phoneNumber" class="data-input" placeholder=" " required @input="validatePhone" inputmode="numeric" pattern="[0-9]*" maxlength="10"/>
         <label class="input-label">Teléfono</label>
       </div>
 
@@ -69,6 +69,8 @@ const confirmPassword = ref('')
 const handleRegister = () => {
   guardedSubmit(async () => {
     try {
+      phoneNumber.value = phoneNumber.value.replace(/\D/g, '')   
+      phoneNumber.value = phoneNumber.value.slice(0, 10)        
       const form = {
         name: name.value,
         email: email.value,
@@ -85,6 +87,7 @@ const handleRegister = () => {
         phoneNumber: form.phoneNumber,
         password: form.password
       })
+      
 
       showToast('Registro exitoso!', 'success')
       await nextTick()
@@ -111,6 +114,14 @@ const handleGoogleLogin = async () => {
     showToast('Error al registrarse con Google!', 'error')
   }
 }
+
+// keep phone input numeric and limit to 10 digits while typing
+const validatePhone = (e) => {
+  // Replace any non-digit character and limit length to 10
+  phoneNumber.value = e.target.value.replace(/\D/g, '').slice(0, 10)
+}
+
+
 </script>
 
 <style scoped>

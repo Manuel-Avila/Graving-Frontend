@@ -368,7 +368,7 @@ h1 {
 
 @media (max-width: 500px) {
   .info-card {
-    width: 90%;
+    width: 100%;
   }
 
   .action-buttons button, .action-buttons a{

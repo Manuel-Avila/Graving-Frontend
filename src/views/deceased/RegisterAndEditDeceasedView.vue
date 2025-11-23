@@ -81,7 +81,7 @@
         </div>
 
         <div class="input-group">
-          <input type="tel" v-model="ownerPhone" class="data-input" required placeholder=" " />
+          <input type="tel" v-model="ownerPhone" class="data-input" placeholder=" " required @input="validatePhone" inputmode="numeric" pattern="[0-9]*" maxlength="10"/>
           <label class="input-label">Teléfono</label>
         </div>
 
@@ -91,7 +91,7 @@
         </div>
 
         <div class="input-group">
-          <input type="text" v-model="ownerCurp" class="data-input" required placeholder=" " />
+          <input type="text" v-model="ownerCurp" class="data-input" required placeholder=" " @input="validateCurp" maxlength="18" pattern="[A-Za-z0-9]*"/>
           <label class="input-label">CURP</label>
         </div>
       </div>
@@ -156,7 +156,12 @@ onMounted(async () => {
       graveId.value = deceased.graveId
       imageUrl.value = deceased.imageUrl
       imageDeleteToken.value = deceased.imageDeleteToken
-
+      
+  
+      ownerPhone.value = (ownerPhone.value || '')
+        .toString()
+        .replace(/\D/g, '')
+        .slice(0, 10)
       const owner = await getOwnerByDeceasedId(deceasedId)
       if (owner) {
         ownerId.value = owner.id
@@ -227,6 +232,15 @@ const handleSubmit = () => {
       }
     }
   })
+}
+
+
+const validatePhone = (e) => {
+  ownerPhone.value = e.target.value.replace(/\D/g, '').slice(0, 10)
+}
+
+const validateCurp = (e) => {
+  ownerCurp.value = e.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 18)
 }
 
 const triggerImageInput = () => fileInput.value?.click()
@@ -304,6 +318,11 @@ const handleGraveSelected = (grave) => {
   min-height: 100vh;
 }
 
+
+.register-container {
+  overflow-x: hidden;
+}
+
 .left-section {
   width: 40%;
   display: flex;
@@ -311,6 +330,10 @@ const handleGraveSelected = (grave) => {
   align-items: center;
   padding: 20px;
   background-color: #f5f5f5;
+}
+
+.left-section, .right-section {
+  min-width: 0; 
 }
 
 .right-section {
@@ -335,6 +358,7 @@ const handleGraveSelected = (grave) => {
   background-color: #ffffff;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
 }
 
 .section-title {
@@ -427,6 +451,7 @@ const handleGraveSelected = (grave) => {
   .form-container-owner{
     margin-top: 30px;
     margin-left: 0px;
+    width: 100%;
   }
 }
 

@@ -213,6 +213,8 @@ defineExpose({ searchGraves })
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  /* Limit the container height so mobile viewports don't make it too large */
+  max-height: calc(100vh - 140px);
 }
 
 .cemetery-map-scroll {
@@ -224,11 +226,12 @@ defineExpose({ searchGraves })
 
 .cemetery-blocks {
   display: grid;
-  grid-template-columns: repeat(2, minmax(300px, 1fr));
+  grid-template-columns: repeat(2, minmax(200px, 1fr));
   grid-template-rows: repeat(2, auto);
   gap: 20px;
-  min-width: 800px;
-  min-height: 600px;
+  /* allow the grid to shrink on small devices instead of forcing huge min sizes */
+  min-width: auto;
+  min-height: auto;
 }
 
 
@@ -358,6 +361,19 @@ defineExpose({ searchGraves })
   margin-top: 15px;
 }
 
+
+.modal-actions .green-button,
+.modal-actions .purple-button,
+.modal-actions .outline-white-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: normal;
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+}
+
 .modal-btn {
   padding: 8px 12px;
   border-radius: 4px;
@@ -396,12 +412,13 @@ defineExpose({ searchGraves })
 
 @media (max-width: 768px) {
   .home-view-map {
-    height: 80vh;
+    /* let the container sizing control height and avoid 100vh issues on mobile */
     padding: 10px;
   }
   
   .cemetery-blocks {
     gap: 15px;
+    grid-template-columns: 1fr;
   }
   
   .block {
